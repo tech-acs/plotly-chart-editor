@@ -21,10 +21,13 @@
         })();
     "
 >
-    {{-- Canvas area — Plotly mounts here --}}
+    {{-- Canvas area — Plotly mounts here.
+         wire:ignore prevents Livewire's morphdom from wiping Plotly's injected SVG
+         when the component re-renders after a syncFromAlpine call. --}}
     <div
         class="chart-builder__canvas"
         data-plotly-canvas
+        wire:ignore
     >
         {{-- Plotly renders into this div; peer-dep guard message also appears here --}}
     </div>
