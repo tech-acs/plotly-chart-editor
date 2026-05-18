@@ -16,9 +16,8 @@
         (function () {
             var payload    = JSON.parse($el.dataset.chartBuilderPayload);
             var missingMsg = @js(__('plotly-chart-editor::plotly-chart-editor.errors.plotly_missing'));
-            window.initChartBuilder(payload, missingMsg);
-            Alpine.store('chartBuilder').setWire($wire);
-            Alpine.store('chartBuilder').boot($el.querySelector('[data-plotly-canvas]'));
+            var canvas     = $el.querySelector('[data-plotly-canvas]');
+            window.bootChartBuilder(payload, missingMsg, canvas, $wire);
         })();
     "
 >

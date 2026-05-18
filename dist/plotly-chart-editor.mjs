@@ -1,124 +1,106 @@
-function s(e) {
+function r(e) {
   return typeof Alpine < "u" && typeof Alpine.raw == "function" ? Alpine.raw(e) : e;
 }
-function n(e) {
-  return structuredClone(s(e));
+function o(e) {
+  return structuredClone(r(e));
 }
-function f(e, h) {
-  let r = null, o = null, c = null, a = null;
-  Alpine.store("chartBuilder", {
-    // ── Loaded from Livewire on mount ─────────────────────────────────
+let l = null, a = null, f = null, h = null, u = !1;
+function y(e, s) {
+  return !!Alpine.store("chartBuilder") || Alpine.store("chartBuilder", {
+    // ── Loaded from Livewire on mount ─────────────────────────────
     dataSources: e.dataSources ?? {},
     schemaProfiles: e.schemaProfiles ?? {},
-    // ── Managed by Alpine ─────────────────────────────────────────────
+    // ── Managed by Alpine ─────────────────────────────────────────
     traces: e.traces ?? [],
     layout: e.layout ?? {},
     config: e.config ?? { responsive: !0 },
-    // ── Sync / UI config ──────────────────────────────────────────────
+    // ── Sync / UI config ──────────────────────────────────────────
     syncMode: e.syncMode ?? "manual",
     traceTypes: e.traceTypes ?? ["bar"],
     showExport: e.showExport ?? !0,
-    // ── Derived ───────────────────────────────────────────────────────
+    // ── Derived ───────────────────────────────────────────────────
     activeTraceIndex: 0,
-    // ── Validation & sync state ───────────────────────────────────────
+    // ── Validation & sync state ───────────────────────────────────
     warnings: [],
     dirty: !1,
     syncing: !1,
     lastSyncAt: null,
-    // ── Internal flags (reactive — safe to make reactive) ─────────────
-    _plotlyMissingMessage: h,
+    // ── Internal flags ────────────────────────────────────────────
+    _plotlyMissingMessage: s,
     _plotlyMissing: !1,
     /**
-     * Call once after the store is registered, passing the canvas DOM element.
-     *
-     * @param {HTMLElement} canvasEl
+     * Wire up effects and perform the initial render.
+     * Called by boot() below; separated so re-boot after a Livewire
+     * morph can call _render() without re-registering effects.
      */
-    boot(t) {
-      if (o = t, typeof window.Plotly > "u") {
-        this._plotlyMissing = !0, t && (t.textContent = this._plotlyMissingMessage);
-        return;
-      }
+    _startEffects() {
       Alpine.effect(() => {
-        JSON.stringify(s(this.traces)), this._scheduleRender();
+        JSON.stringify(r(this.traces)), this._scheduleRender();
       }), Alpine.effect(() => {
-        JSON.stringify(s(this.layout)), this._scheduleRender();
-      }), this._render();
+        JSON.stringify(r(this.layout)), this._scheduleRender();
+      });
     },
-    // ── Render pipeline ───────────────────────────────────────────────
+    // ── Render pipeline ───────────────────────────────────────────
     _scheduleRender() {
-      clearTimeout(c), c = setTimeout(() => {
-        this._render(), this.markDirty();
+      clearTimeout(f), f = setTimeout(() => {
+        this._render(), u && this.markDirty();
       }, 50);
     },
     _render() {
-      if (this._plotlyMissing || !o) return;
-      const t = s(this.traces).map((i) => this.resolveMeta(i));
+      if (this._plotlyMissing || !a) return;
+      const i = r(this.traces).map((t) => this.resolveMeta(t));
       window.Plotly.react(
-        o,
-        t,
-        n(this.layout),
-        n(this.config)
+        a,
+        i,
+        o(this.layout),
+        o(this.config)
       );
     },
-    // ── Meta resolution ───────────────────────────────────────────────
-    /**
-     * Resolve meta.columnNames → actual data arrays from dataSources.
-     * Returns a new plain object — never mutates the original trace.
-     *
-     * @param {object} trace
-     * @returns {object}
-     */
-    resolveMeta(t) {
-      var u;
-      const i = n(t), y = ((u = i.meta) == null ? void 0 : u.columnNames) ?? {};
-      for (const [d, l] of Object.entries(y))
-        l && this.dataSources[l] !== void 0 && (i[d] = s(this.dataSources[l]));
-      return i;
+    // ── Meta resolution ───────────────────────────────────────────
+    resolveMeta(i) {
+      var d;
+      const t = o(i), m = ((d = t.meta) == null ? void 0 : d.columnNames) ?? {};
+      for (const [p, c] of Object.entries(m))
+        c && this.dataSources[c] !== void 0 && (t[p] = r(this.dataSources[c]));
+      return t;
     },
-    /**
-     * Strip meta from a trace for export / sync payloads (PRD §4).
-     *
-     * @param {object} trace
-     * @returns {object}
-     */
-    compileTrace(t) {
-      const i = this.resolveMeta(t);
-      return delete i.meta, i;
+    compileTrace(i) {
+      const t = this.resolveMeta(i);
+      return delete t.meta, t;
     },
-    // ── Sync state ────────────────────────────────────────────────────
+    // ── Sync state ────────────────────────────────────────────────
     markDirty() {
       this.dirty = !0, this._maybeAutoSync();
     },
     _maybeAutoSync() {
-      (this.syncMode === "auto" || this.syncMode === "hybrid") && (clearTimeout(a), a = setTimeout(() => this.syncToBackend(), 500));
+      (this.syncMode === "auto" || this.syncMode === "hybrid") && (clearTimeout(h), h = setTimeout(() => this.syncToBackend(), 500));
     },
-    /**
-     * Sync current state back to Livewire (PRD §10).
-     * All sync calls route through this single method.
-     */
     syncToBackend() {
-      if (this.syncing || !r) return;
+      if (this.syncing || !l) return;
       this.syncing = !0;
-      const t = {
-        traces: s(this.traces).map((i) => this.compileTrace(i)),
-        layout: n(this.layout)
+      const i = {
+        traces: r(this.traces).map((t) => this.compileTrace(t)),
+        layout: o(this.layout)
       };
-      r.syncFromAlpine(JSON.stringify(t)).finally(() => {
+      l.syncFromAlpine(JSON.stringify(i)).finally(() => {
         this.syncing = !1, this.dirty = !1, this.lastSyncAt = Date.now();
       });
     },
-    /**
-     * Register the $wire reference. Called from Blade x-init.
-     * Stored in the closure (not in the store) so Alpine never proxies it.
-     *
-     * @param {object} wire  — the Livewire $wire proxy
-     */
-    setWire(t) {
-      r = t;
+    setWire(i) {
+      l = i;
     }
-  });
+  }), Alpine.store("chartBuilder");
 }
-typeof window < "u" && (window.initChartBuilder = f);
+function _(e, s, n, i) {
+  const t = y(e, s);
+  if (a = n, l = i, typeof window.Plotly > "u") {
+    t._plotlyMissing = !0, n && (n.textContent = s);
+    return;
+  }
+  u || (t._startEffects(), u = !0), t._render();
+}
+typeof window < "u" && (window.initChartBuilder = y, window.bootChartBuilder = _);
 export {
-  f as initChartBuilder
+  _ as bootChartBuilder,
+  y as initChartBuilder
 };
