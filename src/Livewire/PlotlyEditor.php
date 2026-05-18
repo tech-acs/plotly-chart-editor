@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Uneca\PlotlyChartEditor\Livewire;
 
 use Illuminate\View\View;
+use InvalidArgumentException;
 use Livewire\Component;
+use Uneca\PlotlyChartEditor\Support\SchemaProfileLoader;
 
 class PlotlyEditor extends Component
 {
@@ -33,6 +35,9 @@ class PlotlyEditor extends Component
     /** @var bool Show export buttons in footer. */
     public bool $showExport = true;
 
+    /** @var array<string, array<mixed>> Pre-loaded schema profiles (populated during mount). */
+    public array $schemaProfiles = [];
+
     /**
      * @param  array<string, array<mixed>>  $dataSources
      * @param  array<int, array<mixed>>  $data
@@ -40,7 +45,7 @@ class PlotlyEditor extends Component
      * @param  array<string, mixed>  $config
      * @param  array<int, string>  $traceTypes
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function mount(
         array $dataSources,
@@ -53,8 +58,8 @@ class PlotlyEditor extends Component
         bool $showExport = true,
     ): void {
         if (empty($dataSources)) {
-            throw new \InvalidArgumentException(
-                __('plotly-chart-editor.validation.data_sources_required')
+            throw new InvalidArgumentException(
+                __('plotly-chart-editor::plotly-chart-editor.validation.data_sources_required')
             );
         }
 
@@ -66,11 +71,26 @@ class PlotlyEditor extends Component
         $this->syncMode = $syncMode;
         $this->preloadSchema = $preloadSchema;
         $this->showExport = $showExport;
+
+        if ($preloadSchema) {
+            $this->schemaProfiles = $this->makeLoader()->loadAll($traceTypes);
+        }
+    }
+
+    /**
+     * Return the schema profile for a given trace type.
+     * Used for lazy-loading exotic types from Alpine via $wire.getSchemaProfile(type).
+     *
+     * @throws InvalidArgumentException When the type is unknown.
+     */
+    public function getSchemaProfile(string $type): array
+    {
+        return $this->makeLoader()->load($type);
     }
 
     /**
      * Receive compiled state from Alpine and dispatch the chart-synced event.
-     * Full implementation in Phase 7; this stub makes the Livewire request succeed.
+     * Full sync implementation in Phase 7.
      */
     public function syncFromAlpine(string $payload): void
     {
@@ -83,5 +103,12 @@ class PlotlyEditor extends Component
     public function render(): View
     {
         return view('plotly-chart-editor::livewire.plotly-editor');
+    }
+
+    private function makeLoader(): SchemaProfileLoader
+    {
+        return new SchemaProfileLoader(
+            config('plotly-chart-editor', [])
+        );
     }
 }

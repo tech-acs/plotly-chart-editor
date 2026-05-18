@@ -9,7 +9,7 @@
         'traceTypes'     => $traceTypes,
         'syncMode'       => $syncMode,
         'showExport'     => $showExport,
-        'schemaProfiles' => (object) [],
+        'schemaProfiles' => empty($schemaProfiles) ? (object) [] : $schemaProfiles,
     ]) }}"
     x-data
     x-init="

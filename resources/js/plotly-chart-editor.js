@@ -37,15 +37,11 @@ let _wire = null
 let _canvasEl = null
 let _renderTimer = null
 let _autoSyncTimer = null
-let _booted = false   // prevents double-boot on Livewire morph re-renders
+let _booted = false
 
 /**
  * Bootstrap the chart builder Alpine store.
- *
- * Safe to call multiple times (e.g. on Livewire morph re-renders):
- * - First call registers the store and boots it.
- * - Subsequent calls (after a Livewire update morphs the DOM) only re-boot
- *   with the new canvas element without re-registering the store.
+ * Safe to call multiple times (idempotent after first call).
  *
  * @param {object} payload              — serialized from the Livewire mount payload
  * @param {string} plotlyMissingMessage — translatable error string from PHP
@@ -56,7 +52,7 @@ function initChartBuilder(payload, plotlyMissingMessage) {
     if (!alreadyExists) {
         Alpine.store('chartBuilder', {
             // ── Loaded from Livewire on mount ─────────────────────────────
-            dataSources: payload.dataSources ?? {},
+            dataSources:    payload.dataSources    ?? {},
             schemaProfiles: payload.schemaProfiles ?? {},
 
             // ── Managed by Alpine ─────────────────────────────────────────
@@ -65,36 +61,30 @@ function initChartBuilder(payload, plotlyMissingMessage) {
             config: payload.config ?? { responsive: true },
 
             // ── Sync / UI config ──────────────────────────────────────────
-            syncMode: payload.syncMode ?? 'manual',
-            traceTypes: payload.traceTypes ?? ['bar'],
-            showExport: payload.showExport ?? true,
+            syncMode:    payload.syncMode    ?? 'manual',
+            traceTypes:  payload.traceTypes  ?? ['bar'],
+            showExport:  payload.showExport  ?? true,
 
             // ── Derived ───────────────────────────────────────────────────
             activeTraceIndex: 0,
 
             // ── Validation & sync state ───────────────────────────────────
-            warnings: [],
-            dirty: false,
-            syncing: false,
+            warnings:   [],
+            dirty:      false,
+            syncing:    false,
             lastSyncAt: null,
 
-            // ── Internal flags ────────────────────────────────────────────
+            // ── Internal flags (reactive — safe) ──────────────────────────
             _plotlyMissingMessage: plotlyMissingMessage,
-            _plotlyMissing: false,
+            _plotlyMissing:        false,
 
-            /**
-             * Wire up effects and perform the initial render.
-             * Called by boot() below; separated so re-boot after a Livewire
-             * morph can call _render() without re-registering effects.
-             */
+            // ── Effects setup ─────────────────────────────────────────────
+
             _startEffects() {
-                // Watch traces (deep) → debounced render + dirty
                 Alpine.effect(() => {
                     JSON.stringify(toRaw(this.traces))
                     this._scheduleRender()
                 })
-
-                // Watch layout (deep) → debounced render + dirty
                 Alpine.effect(() => {
                     JSON.stringify(toRaw(this.layout))
                     this._scheduleRender()
@@ -107,8 +97,6 @@ function initChartBuilder(payload, plotlyMissingMessage) {
                 clearTimeout(_renderTimer)
                 _renderTimer = setTimeout(() => {
                     this._render()
-                    // Only mark dirty after the initial boot is complete —
-                    // the very first render is not a user-driven mutation.
                     if (_booted) {
                         this.markDirty()
                     }
@@ -148,6 +136,112 @@ function initChartBuilder(payload, plotlyMissingMessage) {
                 return compiled
             },
 
+            // ── Trace type switching (PRD §6) ─────────────────────────────
+
+            /**
+             * Change a trace's type. If the profile is not yet cached, lazy-loads
+             * it via $wire.getSchemaProfile(). On failure: reverts type, emits toast.
+             *
+             * @param {number} index    — trace index in this.traces
+             * @param {string} newType  — target trace type
+             */
+            async setTraceType(index, newType) {
+                const previousType = toRaw(this.traces)[index]?.type
+
+                if (previousType === newType) return
+
+                // If profile already cached, proceed immediately (no network call)
+                if (this.schemaProfiles[newType]) {
+                    this._applyTraceType(index, newType)
+                    return
+                }
+
+                // Lazy-load via Livewire
+                if (!_wire) return
+
+                try {
+                    const profile = await _wire.getSchemaProfile(newType)
+
+                    if (!profile || typeof profile !== 'object' || !profile.groups) {
+                        throw new Error(`Invalid profile returned for type "${newType}"`)
+                    }
+
+                    // Cache and apply
+                    this.schemaProfiles[newType] = profile
+                    this._applyTraceType(index, newType)
+                } catch (err) {
+                    // PRD §11.2: revert type, do NOT cache failure, dispatch toast
+                    // (type was not changed yet — nothing to revert in traces)
+                    console.error(`[plotly-chart-editor] Failed to load profile for "${newType}":`, err)
+                    this._dispatchToast(newType)
+                }
+            },
+
+            /**
+             * Apply a type change: update type, prune fields not in new profile,
+             * preserve meta/name/type.
+             *
+             * @param {number} index
+             * @param {string} newType
+             */
+            _applyTraceType(index, newType) {
+                const profile    = this.schemaProfiles[newType]
+                const oldTrace   = deepClone(toRaw(this.traces)[index] ?? {})
+                const keepKeys   = this._profileFieldKeys(profile)
+
+                const pruned = { type: newType }
+
+                // Preserve identity and meta fields always
+                for (const k of ['name', 'meta']) {
+                    if (oldTrace[k] !== undefined) pruned[k] = oldTrace[k]
+                }
+
+                // Keep fields that exist in the new profile
+                for (const k of Object.keys(oldTrace)) {
+                    if (['type', 'name', 'meta'].includes(k)) continue
+                    if (keepKeys.has(k)) pruned[k] = oldTrace[k]
+                }
+
+                this.traces[index] = pruned
+            },
+
+            /**
+             * Collect the top-level key names declared in a profile's fields.
+             *
+             * @param {object} profile
+             * @returns {Set<string>}
+             */
+            _profileFieldKeys(profile) {
+                const keys = new Set()
+
+                for (const group of Object.values(profile?.groups ?? {})) {
+                    for (const field of group?.fields ?? []) {
+                        // dot-separated key → only the top-level segment
+                        keys.add(field.key.split('.')[0])
+                    }
+                }
+
+                return keys
+            },
+
+            /**
+             * Dispatch a toast event for a failed profile load (PRD §11.2).
+             *
+             * @param {string} type
+             */
+            _dispatchToast(type) {
+                window.dispatchEvent(new CustomEvent('plotly-editor:toast', {
+                    detail: {
+                        key:     'errors.profile_load_failed',
+                        message: this._plotlyMissingMessage
+                            .replace
+                            ? `Failed to load profile for ${type}. Please try again.`
+                            : `Failed to load profile for ${type}. Please try again.`,
+                        type:    type,
+                    },
+                }))
+            },
+
             // ── Sync state ────────────────────────────────────────────────
 
             markDirty() {
@@ -175,7 +269,7 @@ function initChartBuilder(payload, plotlyMissingMessage) {
                 _wire.syncFromAlpine(JSON.stringify(wirePayload))
                     .finally(() => {
                         this.syncing = false
-                        this.dirty = false
+                        this.dirty      = false
                         this.lastSyncAt = Date.now()
                     })
             },
@@ -190,8 +284,8 @@ function initChartBuilder(payload, plotlyMissingMessage) {
 }
 
 /**
- * Boot (or re-boot) the store against a DOM canvas element.
- * Called from Blade x-init — safe to call on every Livewire morph.
+ * Boot (or re-boot) the store against a canvas DOM element.
+ * Called from Blade x-init on every mount and every Livewire morph.
  *
  * @param {object}      payload
  * @param {string}      plotlyMissingMessage
@@ -201,9 +295,8 @@ function initChartBuilder(payload, plotlyMissingMessage) {
 function bootChartBuilder(payload, plotlyMissingMessage, canvasEl, wire) {
     const store = initChartBuilder(payload, plotlyMissingMessage)
 
-    // Always update the canvas reference in case Livewire morphed the DOM
     _canvasEl = canvasEl
-    _wire = wire
+    _wire     = wire
 
     if (typeof window.Plotly === 'undefined') {
         store._plotlyMissing = true
@@ -212,24 +305,17 @@ function bootChartBuilder(payload, plotlyMissingMessage, canvasEl, wire) {
     }
 
     if (!_booted) {
-        // First boot: register reactive effects and do initial render
         store._startEffects()
         _booted = true
-        // Render immediately (before effects fire) so the chart appears at once
         store._render()
     } else {
-        // Re-boot after Livewire morph: just re-render into the new canvas element
         store._render()
     }
 }
 
-/**
- * Expose globally so Blade x-init can call window.bootChartBuilder().
- * Also expose initChartBuilder for consumers using ES module imports.
- */
 if (typeof window !== 'undefined') {
-    window.initChartBuilder = initChartBuilder
-    window.bootChartBuilder = bootChartBuilder
+    window.initChartBuilder  = initChartBuilder
+    window.bootChartBuilder  = bootChartBuilder
 }
 
 export { initChartBuilder, bootChartBuilder }

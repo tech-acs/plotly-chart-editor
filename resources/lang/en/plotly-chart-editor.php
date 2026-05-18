@@ -20,6 +20,41 @@ return [
 
     'errors' => [
         'plotly_missing' => 'Plotly.js is not loaded. See package README for installation instructions.',
+        'profile_load_failed' => 'Failed to load profile for :type. Please try again.',
+    ],
+
+    'groups' => [
+        'data' => 'Data',
+        'bars' => 'Bars',
+        'lines' => 'Lines',
+        'markers' => 'Markers',
+        'fill' => 'Fill',
+        'sectors' => 'Sectors',
+        'bins' => 'Bins',
+    ],
+
+    'fields' => [
+        'x' => 'X',
+        'y' => 'Y',
+        'labels' => 'Labels',
+        'values' => 'Values',
+        'mode' => 'Mode',
+        'color' => 'Color',
+        'colors' => 'Colors',
+        'width' => 'Width',
+        'dash' => 'Dash',
+        'size' => 'Size',
+        'symbol' => 'Symbol',
+        'opacity' => 'Opacity',
+        'fill' => 'Fill',
+        'fillcolor' => 'Fill color',
+        'orientation' => 'Orientation',
+        'line_color' => 'Line color',
+        'line_width' => 'Line width',
+        'textinfo' => 'Text info',
+        'pull' => 'Pull',
+        'nbinsx' => 'Bin count',
+        'histnorm' => 'Normalisation',
     ],
 
 ];

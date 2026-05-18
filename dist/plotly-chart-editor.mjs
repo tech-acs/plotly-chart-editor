@@ -1,23 +1,23 @@
-function r(e) {
-  return typeof Alpine < "u" && typeof Alpine.raw == "function" ? Alpine.raw(e) : e;
+function a(s) {
+  return typeof Alpine < "u" && typeof Alpine.raw == "function" ? Alpine.raw(s) : s;
 }
-function o(e) {
-  return structuredClone(r(e));
+function f(s) {
+  return structuredClone(a(s));
 }
-let l = null, a = null, f = null, h = null, u = !1;
-function y(e, s) {
+let c = null, h = null, p = null, m = null, y = !1;
+function _(s, u) {
   return !!Alpine.store("chartBuilder") || Alpine.store("chartBuilder", {
     // ── Loaded from Livewire on mount ─────────────────────────────
-    dataSources: e.dataSources ?? {},
-    schemaProfiles: e.schemaProfiles ?? {},
+    dataSources: s.dataSources ?? {},
+    schemaProfiles: s.schemaProfiles ?? {},
     // ── Managed by Alpine ─────────────────────────────────────────
-    traces: e.traces ?? [],
-    layout: e.layout ?? {},
-    config: e.config ?? { responsive: !0 },
+    traces: s.traces ?? [],
+    layout: s.layout ?? {},
+    config: s.config ?? { responsive: !0 },
     // ── Sync / UI config ──────────────────────────────────────────
-    syncMode: e.syncMode ?? "manual",
-    traceTypes: e.traceTypes ?? ["bar"],
-    showExport: e.showExport ?? !0,
+    syncMode: s.syncMode ?? "manual",
+    traceTypes: s.traceTypes ?? ["bar"],
+    showExport: s.showExport ?? !0,
     // ── Derived ───────────────────────────────────────────────────
     activeTraceIndex: 0,
     // ── Validation & sync state ───────────────────────────────────
@@ -25,82 +25,146 @@ function y(e, s) {
     dirty: !1,
     syncing: !1,
     lastSyncAt: null,
-    // ── Internal flags ────────────────────────────────────────────
-    _plotlyMissingMessage: s,
+    // ── Internal flags (reactive — safe) ──────────────────────────
+    _plotlyMissingMessage: u,
     _plotlyMissing: !1,
-    /**
-     * Wire up effects and perform the initial render.
-     * Called by boot() below; separated so re-boot after a Livewire
-     * morph can call _render() without re-registering effects.
-     */
+    // ── Effects setup ─────────────────────────────────────────────
     _startEffects() {
       Alpine.effect(() => {
-        JSON.stringify(r(this.traces)), this._scheduleRender();
+        JSON.stringify(a(this.traces)), this._scheduleRender();
       }), Alpine.effect(() => {
-        JSON.stringify(r(this.layout)), this._scheduleRender();
+        JSON.stringify(a(this.layout)), this._scheduleRender();
       });
     },
     // ── Render pipeline ───────────────────────────────────────────
     _scheduleRender() {
-      clearTimeout(f), f = setTimeout(() => {
-        this._render(), u && this.markDirty();
+      clearTimeout(p), p = setTimeout(() => {
+        this._render(), y && this.markDirty();
       }, 50);
     },
     _render() {
-      if (this._plotlyMissing || !a) return;
-      const i = r(this.traces).map((t) => this.resolveMeta(t));
+      if (this._plotlyMissing || !h) return;
+      const t = a(this.traces).map((e) => this.resolveMeta(e));
       window.Plotly.react(
-        a,
-        i,
-        o(this.layout),
-        o(this.config)
+        h,
+        t,
+        f(this.layout),
+        f(this.config)
       );
     },
     // ── Meta resolution ───────────────────────────────────────────
-    resolveMeta(i) {
-      var d;
-      const t = o(i), m = ((d = t.meta) == null ? void 0 : d.columnNames) ?? {};
-      for (const [p, c] of Object.entries(m))
-        c && this.dataSources[c] !== void 0 && (t[p] = r(this.dataSources[c]));
-      return t;
+    resolveMeta(t) {
+      var r;
+      const e = f(t), o = ((r = e.meta) == null ? void 0 : r.columnNames) ?? {};
+      for (const [i, l] of Object.entries(o))
+        l && this.dataSources[l] !== void 0 && (e[i] = a(this.dataSources[l]));
+      return e;
     },
-    compileTrace(i) {
-      const t = this.resolveMeta(i);
-      return delete t.meta, t;
+    compileTrace(t) {
+      const e = this.resolveMeta(t);
+      return delete e.meta, e;
+    },
+    // ── Trace type switching (PRD §6) ─────────────────────────────
+    /**
+     * Change a trace's type. If the profile is not yet cached, lazy-loads
+     * it via $wire.getSchemaProfile(). On failure: reverts type, emits toast.
+     *
+     * @param {number} index    — trace index in this.traces
+     * @param {string} newType  — target trace type
+     */
+    async setTraceType(t, e) {
+      var r;
+      if (((r = a(this.traces)[t]) == null ? void 0 : r.type) !== e) {
+        if (this.schemaProfiles[e]) {
+          this._applyTraceType(t, e);
+          return;
+        }
+        if (c)
+          try {
+            const i = await c.getSchemaProfile(e);
+            if (!i || typeof i != "object" || !i.groups)
+              throw new Error(`Invalid profile returned for type "${e}"`);
+            this.schemaProfiles[e] = i, this._applyTraceType(t, e);
+          } catch (i) {
+            console.error(`[plotly-chart-editor] Failed to load profile for "${e}":`, i), this._dispatchToast(e);
+          }
+      }
+    },
+    /**
+     * Apply a type change: update type, prune fields not in new profile,
+     * preserve meta/name/type.
+     *
+     * @param {number} index
+     * @param {string} newType
+     */
+    _applyTraceType(t, e) {
+      const o = this.schemaProfiles[e], r = f(a(this.traces)[t] ?? {}), i = this._profileFieldKeys(o), l = { type: e };
+      for (const n of ["name", "meta"])
+        r[n] !== void 0 && (l[n] = r[n]);
+      for (const n of Object.keys(r))
+        ["type", "name", "meta"].includes(n) || i.has(n) && (l[n] = r[n]);
+      this.traces[t] = l;
+    },
+    /**
+     * Collect the top-level key names declared in a profile's fields.
+     *
+     * @param {object} profile
+     * @returns {Set<string>}
+     */
+    _profileFieldKeys(t) {
+      const e = /* @__PURE__ */ new Set();
+      for (const o of Object.values((t == null ? void 0 : t.groups) ?? {}))
+        for (const r of (o == null ? void 0 : o.fields) ?? [])
+          e.add(r.key.split(".")[0]);
+      return e;
+    },
+    /**
+     * Dispatch a toast event for a failed profile load (PRD §11.2).
+     *
+     * @param {string} type
+     */
+    _dispatchToast(t) {
+      window.dispatchEvent(new CustomEvent("plotly-editor:toast", {
+        detail: {
+          key: "errors.profile_load_failed",
+          message: this._plotlyMissingMessage.replace ? `Failed to load profile for ${t}. Please try again.` : `Failed to load profile for ${t}. Please try again.`,
+          type: t
+        }
+      }));
     },
     // ── Sync state ────────────────────────────────────────────────
     markDirty() {
       this.dirty = !0, this._maybeAutoSync();
     },
     _maybeAutoSync() {
-      (this.syncMode === "auto" || this.syncMode === "hybrid") && (clearTimeout(h), h = setTimeout(() => this.syncToBackend(), 500));
+      (this.syncMode === "auto" || this.syncMode === "hybrid") && (clearTimeout(m), m = setTimeout(() => this.syncToBackend(), 500));
     },
     syncToBackend() {
-      if (this.syncing || !l) return;
+      if (this.syncing || !c) return;
       this.syncing = !0;
-      const i = {
-        traces: r(this.traces).map((t) => this.compileTrace(t)),
-        layout: o(this.layout)
+      const t = {
+        traces: a(this.traces).map((e) => this.compileTrace(e)),
+        layout: f(this.layout)
       };
-      l.syncFromAlpine(JSON.stringify(i)).finally(() => {
+      c.syncFromAlpine(JSON.stringify(t)).finally(() => {
         this.syncing = !1, this.dirty = !1, this.lastSyncAt = Date.now();
       });
     },
-    setWire(i) {
-      l = i;
+    setWire(t) {
+      c = t;
     }
   }), Alpine.store("chartBuilder");
 }
-function _(e, s, n, i) {
-  const t = y(e, s);
-  if (a = n, l = i, typeof window.Plotly > "u") {
-    t._plotlyMissing = !0, n && (n.textContent = s);
+function g(s, u, d, t) {
+  const e = _(s, u);
+  if (h = d, c = t, typeof window.Plotly > "u") {
+    e._plotlyMissing = !0, d && (d.textContent = u);
     return;
   }
-  u || (t._startEffects(), u = !0), t._render();
+  y || (e._startEffects(), y = !0), e._render();
 }
-typeof window < "u" && (window.initChartBuilder = y, window.bootChartBuilder = _);
+typeof window < "u" && (window.initChartBuilder = _, window.bootChartBuilder = g);
 export {
-  _ as bootChartBuilder,
-  y as initChartBuilder
+  g as bootChartBuilder,
+  _ as initChartBuilder
 };

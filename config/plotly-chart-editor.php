@@ -7,10 +7,7 @@ declare(strict_types=1);
 | Plotly Chart Editor Configuration
 |--------------------------------------------------------------------------
 |
-| This file contains the configuration for the uneca/plotly-chart-editor
-| package. Publish this file with:
-|
-|   php artisan vendor:publish --tag="plotly-chart-editor-config"
+| Publish with:  php artisan vendor:publish --tag="plotly-chart-editor-config"
 |
 */
 
@@ -18,18 +15,315 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Schema Profiles (Phase 3)
+    | Schema Profiles
     |--------------------------------------------------------------------------
     |
-    | Define per-trace-type field groups here. Pre-loaded profiles (bar, scatter,
-    | line, pie, histogram) are shipped in this config. Exotic types are lazy-
-    | loaded on demand via Livewire.
+    | Each top-level key is a trace type name. The structure is:
+    |
+    |   'type' => [
+    |       'groups' => [
+    |           'GroupKey' => [
+    |               'label'  => __('plotly-chart-editor.groups.key'),
+    |               'xshow'  => 'optional Alpine expression',
+    |               'fields' => [ [...], ... ],
+    |           ],
+    |       ],
+    |   ]
+    |
+    | Field types: column | color | range | number | text | boolean | enumerated
+    | Aliases map one type to another profile (e.g. 'line' reuses scatter).
     |
     */
 
+    'profiles' => [
+
+        // ── bar ──────────────────────────────────────────────────────────────
+        'bar' => [
+            'groups' => [
+                'Data' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.data',
+                    'fields' => [
+                        [
+                            'key' => 'x',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.x',
+                            'type' => 'column',
+                        ],
+                        [
+                            'key' => 'y',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.y',
+                            'type' => 'column',
+                        ],
+                        [
+                            'key' => 'orientation',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.orientation',
+                            'type' => 'enumerated',
+                            'values' => ['v', 'h'],
+                            'dflt' => 'v',
+                        ],
+                    ],
+                ],
+                'Bars' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.bars',
+                    'fields' => [
+                        [
+                            'key' => 'marker.color',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.color',
+                            'type' => 'color',
+                            'dflt' => '#1f77b4',
+                        ],
+                        [
+                            'key' => 'marker.line.color',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.line_color',
+                            'type' => 'color',
+                            'dflt' => '#444444',
+                        ],
+                        [
+                            'key' => 'marker.line.width',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.line_width',
+                            'type' => 'number',
+                            'min' => 0,
+                            'max' => 10,
+                            'dflt' => 0,
+                        ],
+                        [
+                            'key' => 'opacity',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.opacity',
+                            'type' => 'range',
+                            'min' => 0,
+                            'max' => 1,
+                            'dflt' => 1,
+                        ],
+                    ],
+                ],
+            ],
+        ],
+
+        // ── scatter ───────────────────────────────────────────────────────────
+        'scatter' => [
+            'groups' => [
+                'Data' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.data',
+                    'fields' => [
+                        [
+                            'key' => 'x',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.x',
+                            'type' => 'column',
+                        ],
+                        [
+                            'key' => 'y',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.y',
+                            'type' => 'column',
+                        ],
+                        [
+                            'key' => 'mode',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.mode',
+                            'type' => 'enumerated',
+                            'values' => ['lines', 'markers', 'lines+markers', 'text'],
+                            'dflt' => 'markers',
+                        ],
+                    ],
+                ],
+                'Lines' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.lines',
+                    'xshow' => "trace.mode && trace.mode.includes('lines')",
+                    'fields' => [
+                        [
+                            'key' => 'line.color',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.color',
+                            'type' => 'color',
+                            'dflt' => '#1f77b4',
+                        ],
+                        [
+                            'key' => 'line.width',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.width',
+                            'type' => 'number',
+                            'min' => 0,
+                            'max' => 20,
+                            'dflt' => 2,
+                        ],
+                        [
+                            'key' => 'line.dash',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.dash',
+                            'type' => 'enumerated',
+                            'values' => ['solid', 'dot', 'dash', 'longdash', 'dashdot'],
+                            'dflt' => 'solid',
+                        ],
+                    ],
+                ],
+                'Markers' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.markers',
+                    'xshow' => "trace.mode && trace.mode.includes('markers')",
+                    'fields' => [
+                        [
+                            'key' => 'marker.color',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.color',
+                            'type' => 'color',
+                            'dflt' => '#1f77b4',
+                        ],
+                        [
+                            'key' => 'marker.size',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.size',
+                            'type' => 'number',
+                            'min' => 1,
+                            'max' => 50,
+                            'dflt' => 8,
+                        ],
+                        [
+                            'key' => 'marker.symbol',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.symbol',
+                            'type' => 'enumerated',
+                            'values' => ['circle', 'square', 'diamond', 'cross', 'x', 'triangle-up'],
+                            'dflt' => 'circle',
+                        ],
+                        [
+                            'key' => 'marker.opacity',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.opacity',
+                            'type' => 'range',
+                            'min' => 0,
+                            'max' => 1,
+                            'dflt' => 1,
+                        ],
+                    ],
+                ],
+                'Fill' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.fill',
+                    'fields' => [
+                        [
+                            'key' => 'fill',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.fill',
+                            'type' => 'enumerated',
+                            'values' => ['none', 'tozeroy', 'tozerox', 'tonexty', 'tonextx', 'toself'],
+                            'dflt' => 'none',
+                        ],
+                        [
+                            'key' => 'fillcolor',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.fillcolor',
+                            'type' => 'color',
+                            'xshow' => "trace.fill && trace.fill !== 'none'",
+                        ],
+                    ],
+                ],
+            ],
+        ],
+
+        // ── pie ───────────────────────────────────────────────────────────────
+        'pie' => [
+            'groups' => [
+                'Data' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.data',
+                    'fields' => [
+                        [
+                            'key' => 'labels',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.labels',
+                            'type' => 'column',
+                        ],
+                        [
+                            'key' => 'values',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.values',
+                            'type' => 'column',
+                        ],
+                    ],
+                ],
+                'Sectors' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.sectors',
+                    'fields' => [
+                        [
+                            'key' => 'textinfo',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.textinfo',
+                            'type' => 'enumerated',
+                            'values' => ['label', 'value', 'percent', 'label+value', 'label+percent', 'none'],
+                            'dflt' => 'percent',
+                        ],
+                        [
+                            'key' => 'pull',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.pull',
+                            'type' => 'range',
+                            'min' => 0,
+                            'max' => 0.5,
+                            'dflt' => 0,
+                        ],
+                        [
+                            'key' => 'opacity',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.opacity',
+                            'type' => 'range',
+                            'min' => 0,
+                            'max' => 1,
+                            'dflt' => 1,
+                        ],
+                    ],
+                ],
+            ],
+        ],
+
+        // ── histogram ─────────────────────────────────────────────────────────
+        'histogram' => [
+            'groups' => [
+                'Data' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.data',
+                    'fields' => [
+                        [
+                            'key' => 'x',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.x',
+                            'type' => 'column',
+                        ],
+                    ],
+                ],
+                'Bins' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.bins',
+                    'fields' => [
+                        [
+                            'key' => 'nbinsx',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.nbinsx',
+                            'type' => 'number',
+                            'min' => 1,
+                            'max' => 200,
+                            'dflt' => 0,
+                        ],
+                        [
+                            'key' => 'histnorm',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.histnorm',
+                            'type' => 'enumerated',
+                            'values' => ['', 'percent', 'probability', 'density', 'probability density'],
+                            'dflt' => '',
+                        ],
+                        [
+                            'key' => 'marker.color',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.color',
+                            'type' => 'color',
+                            'dflt' => '#1f77b4',
+                        ],
+                        [
+                            'key' => 'opacity',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.opacity',
+                            'type' => 'range',
+                            'min' => 0,
+                            'max' => 1,
+                            'dflt' => 1,
+                        ],
+                    ],
+                ],
+            ],
+        ],
+
+    ],
+
     /*
     |--------------------------------------------------------------------------
-    | Sync Mode Default (Phase 7)
+    | Profile Aliases
+    |--------------------------------------------------------------------------
+    |
+    | Maps a trace type name to another type whose profile it reuses.
+    | e.g. 'line' uses the scatter profile but defaults mode to 'lines'.
+    |
+    */
+
+    'aliases' => [
+        'line' => 'scatter',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Sync Mode Default
     |--------------------------------------------------------------------------
     |
     | The default sync mode used when the :sync-mode prop is not passed.
@@ -39,11 +333,11 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Theming (Phase 8)
+    | Theming
     |--------------------------------------------------------------------------
     |
-    | CSS variable overrides and class hook configuration for consumers who
-    | want to re-theme the editor without modifying package files.
+    | CSS variable overrides for consumers who want to re-theme the editor
+    | without modifying package files.
     |
     */
 
