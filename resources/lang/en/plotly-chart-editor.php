@@ -18,4 +18,8 @@ return [
         'data_sources_required' => 'The dataSources property is required and must not be empty.',
     ],
 
+    'errors' => [
+        'plotly_missing' => 'Plotly.js is not loaded. See package README for installation instructions.',
+    ],
+
 ];
