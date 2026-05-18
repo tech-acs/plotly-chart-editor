@@ -9,18 +9,18 @@
         'traceTypes'     => $traceTypes,
         'syncMode'       => $syncMode,
         'showExport'     => $showExport,
-        // Cast to object so empty profiles encode as {} not []
         'schemaProfiles' => (object) [],
     ]) }}"
-    x-data="{
-        init() {
-            const payload = JSON.parse(this.$el.dataset.chartBuilderPayload)
-            const missingMsg = @js(__('plotly-chart-editor.errors.plotly_missing'))
-            initChartBuilder(payload, missingMsg)
-            Alpine.store('chartBuilder').setWire(this.$wire)
-            Alpine.store('chartBuilder').boot(this.$el.querySelector('[data-plotly-canvas]'))
-        }
-    }"
+    x-data
+    x-init="
+        (function () {
+            var payload    = JSON.parse($el.dataset.chartBuilderPayload);
+            var missingMsg = @js(__('plotly-chart-editor::plotly-chart-editor.errors.plotly_missing'));
+            window.initChartBuilder(payload, missingMsg);
+            Alpine.store('chartBuilder').setWire($wire);
+            Alpine.store('chartBuilder').boot($el.querySelector('[data-plotly-canvas]'));
+        })();
+    "
 >
     {{-- Canvas area — Plotly mounts here --}}
     <div
