@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace Uneca\PlotlyChartEditor\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class PlotlyChartEditorCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'plotly-chart-editor';
 
     public $description = 'My command';
 
