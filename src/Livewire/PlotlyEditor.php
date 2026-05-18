@@ -68,6 +68,18 @@ class PlotlyEditor extends Component
         $this->showExport = $showExport;
     }
 
+    /**
+     * Receive compiled state from Alpine and dispatch the chart-synced event.
+     * Full implementation in Phase 7; this stub makes the Livewire request succeed.
+     */
+    public function syncFromAlpine(string $payload): void
+    {
+        $state = json_decode($payload, true) ?? [];
+        $this->data = $state['traces'] ?? $this->data;
+        $this->layout = $state['layout'] ?? $this->layout;
+        $this->dispatch('chart-synced', data: $this->data, layout: $this->layout);
+    }
+
     public function render(): View
     {
         return view('plotly-chart-editor::livewire.plotly-editor');
