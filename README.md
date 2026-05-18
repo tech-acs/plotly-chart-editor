@@ -1,37 +1,88 @@
 # Plotly Chart Editor
 
-> **Status:** Planning artifact. The package itself has not been built yet — this folder contains the PRD, phase plan, and scaffolding inputs for a coding agent to implement.
-
 A reusable Laravel package providing a reactive visual chart builder Livewire component that produces valid Plotly.js configurations.
 
 - **Composer:** `uneca/plotly-chart-editor`
 - **License:** MIT
-- **Target stack:** PHP 8.4 · Laravel 12 · Livewire 3 · Alpine 3 · Tailwind v4 · Plotly.js (peer dep)
+- **Stack:** PHP 8.4 · Laravel 13 · Livewire 4 · Alpine 3 · Tailwind v4 · Plotly.js (peer dep)
 
-## Repository contents
+## Requirements
 
-| Path | Purpose |
+- PHP 8.4+
+- Laravel 13.x
+- Livewire 4.x
+- Plotly.js exposed as `window.Plotly` in your app bundle (peer dependency — not shipped by this package)
+
+## Installation
+
+```bash
+composer require uneca/plotly-chart-editor
+```
+
+Publish the config and language files:
+
+```bash
+php artisan vendor:publish --tag="plotly-chart-editor-config"
+php artisan vendor:publish --tag="plotly-chart-editor-translations"
+```
+
+## Basic usage
+
+```blade
+<livewire:plotly-editor
+    :data-sources="$rawDataset"
+    :trace-types="['bar', 'line', 'scatter', 'pie', 'histogram']"
+/>
+```
+
+Full API:
+
+```blade
+<livewire:plotly-editor
+    :data-sources="$rawDataset"
+    :data="$traces"
+    :layout="$globalLayout"
+    :config="$plotlyConfig"
+    :trace-types="['bar', 'line', 'scatter']"
+    :preload-schema="true"
+    :sync-mode="'hybrid'"
+    :show-export="true"
+/>
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `dataSources` | `array` | **required** | Key-value pool of columns. Immutable after mount. |
+| `data` | `array` | `[]` | Pre-populated traces. |
+| `layout` | `array` | `[]` | Initial Plotly layout config. |
+| `config` | `array` | `['responsive' => true]` | Plotly config flags. |
+| `traceTypes` | `array` | `['bar']` | Enabled trace types. |
+| `preloadSchema` | `bool` | `true` | Load all enabled schema profiles on mount. |
+| `syncMode` | `string` | `'manual'` | `manual` \| `auto` \| `hybrid` |
+| `showExport` | `bool` | `true` | Show export buttons in footer. |
+
+## Sync modes
+
+| Mode | Behaviour |
 |---|---|
-| `AGENTS.md` | Operating instructions for the coding agent. **Read first.** |
-| `SETUP.md` | Pinned versions and package identity. Non-negotiable. |
-| `docs/PRD.md` | Full product requirements (v1.3.0). |
-| `docs/phases/` | 8-phase implementation plan. One file per phase. |
-| `examples/demo.blade.php` | Consumer-perspective reference of how to mount the component. |
-| `fixtures/african-countries.json` | Sample `dataSources` payload for tests and demos. |
-| `HANDOFF.md` | The opening prompt to give the coding agent. |
+| `manual` | Syncs only when the user clicks Save. |
+| `auto` | Debounced (~500ms) sync after each mutation. |
+| `hybrid` | Auto-sync AND a Save button for immediate sync. |
 
-## How to use this folder
+## Events
 
-1. Read `AGENTS.md`.
-2. Read `SETUP.md`.
-3. Read `docs/PRD.md` end-to-end.
-4. Read `docs/phases/00-overview.md`.
-5. Start with `HANDOFF.md` — copy its contents to the coding agent.
+| Event | Payload | When |
+|---|---|---|
+| `chart-synced` | `{ data, layout }` | After every successful sync to Livewire. |
 
-## Key constraints summary
+## Development
 
-- Plotly.js is a **peer dependency**. The package assumes `window.Plotly` exists at boot.
-- Editor is **desktop-only** (≥1024px viewport).
-- **No undo/redo** in v1.3.
-- `dataSources` is **immutable after mount**; consumers re-mount via `wire:key` to swap data.
-- All user-facing strings go through Laravel's `__()` translation helper.
+```bash
+composer install
+npm install
+vendor/bin/pest        # run tests
+vendor/bin/pint        # fix code style
+npm run build          # build assets
+```

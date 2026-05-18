@@ -8,14 +8,14 @@ These versions are **non-negotiable** for the v1.3 build. If the agent encounter
 |---|---|---|
 | PHP | **8.4** | Use property hooks and asymmetric visibility where they clarify intent. |
 | Composer | 2.x | |
-| Laravel | **12.x** | The package's `composer.json` constrains `illuminate/contracts: ^12.0`. |
-| Livewire | **3.x** (`livewire/livewire: ^3.5`) | Livewire 3 syntax everywhere; no v2 APIs. |
+| Laravel | **13.x** | The package's `composer.json` constrains `illuminate/contracts: ^12.0`. |
+| Livewire | **4.x** (`livewire/livewire: ^3.5`) | Livewire 3 syntax everywhere; no v2 APIs. |
 | Alpine.js | **3.x** | Use `Alpine.store()`, `$watch`, `x-model`. |
 | Tailwind CSS | **v4** | CSS-first config. No `tailwind.config.js` — use `@theme` blocks in CSS. |
 | Plotly.js | **peer dependency** | Consumer installs and exposes `window.Plotly`. Package does NOT ship it. |
 | Node | 20 LTS or 22 LTS | |
 | Package manager | npm (default) — pnpm and bun must work but are not the reference |
-| Pest | **3.x** | Test runner. NOT phpunit directly. |
+| Pest | **4.x** | Test runner. NOT phpunit directly. |
 | Pint | latest | Code style fixer. Run before commits. NOT a test runner. |
 | Laravel Boost | latest | Installed for AI-assisted Laravel development context. |
 

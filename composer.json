@@ -1,12 +1,15 @@
 {
-    "name": "amestsantim/plotly-chart-editor",
-    "description": "Plotly chart editor",
+    "name": "uneca/plotly-chart-editor",
+    "description": "A reactive visual Plotly chart builder component for Laravel/Livewire.",
     "keywords": [
-        "UNECA",
+        "uneca",
         "laravel",
+        "livewire",
+        "plotly",
+        "chart",
         "plotly-chart-editor"
     ],
-    "homepage": "https://github.com/amestsantim/plotly-chart-editor",
+    "homepage": "https://github.com/uneca/plotly-chart-editor",
     "license": "MIT",
     "authors": [
         {
@@ -18,20 +21,21 @@
     "require": {
         "php": "^8.4",
         "spatie/laravel-package-tools": "^1.16",
-        "illuminate/contracts": "^11.0||^12.0||^13.0"
+        "illuminate/contracts": "^13.0",
+        "livewire/livewire": "^4.0"
     },
     "require-dev": {
         "laravel/pint": "^1.14",
         "nunomaduro/collision": "^8.8",
-        "orchestra/testbench": "^11.0.0||^10.0.0||^9.0.0",
+        "orchestra/testbench": "^11.0",
         "pestphp/pest": "^4.0",
         "pestphp/pest-plugin-arch": "^4.0",
-        "pestphp/pest-plugin-laravel": "^4.0"
+        "pestphp/pest-plugin-laravel": "^4.0",
+        "laravel/boost": "^2.0"
     },
     "autoload": {
         "psr-4": {
-            "Uneca\\PlotlyChartEditor\\": "src/",
-            "Uneca\\PlotlyChartEditor\\Database\\Factories\\": "database/factories/"
+            "Uneca\\PlotlyChartEditor\\": "src/"
         }
     },
     "autoload-dev": {
