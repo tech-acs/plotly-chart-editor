@@ -23,17 +23,28 @@ class WorkbenchServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Serve the package's compiled JS bundle directly from dist/
-        // so the demo view can load it via <script src="/plotly-chart-editor.umd.js">
-        Route::get('/plotly-chart-editor.umd.js', function () {
-            // __DIR__ = workbench/app/Providers — go up 3 levels to package root
-            $path = dirname(__DIR__, 3).'/dist/plotly-chart-editor.umd.js';
+        $packageRoot = dirname(__DIR__, 3);
+
+        // Serve compiled JS
+        Route::get('/plotly-chart-editor.umd.js', function () use ($packageRoot) {
+            $path = $packageRoot.'/dist/plotly-chart-editor.umd.js';
 
             if (! file_exists($path)) {
                 abort(404, 'Package JS not built. Run: npm run build');
             }
 
             return response()->file($path, ['Content-Type' => 'application/javascript']);
+        });
+
+        // Serve CSS
+        Route::get('/plotly-chart-editor.css', function () use ($packageRoot) {
+            $path = $packageRoot.'/resources/css/plotly-chart-editor.css';
+
+            if (! file_exists($path)) {
+                abort(404, 'Package CSS not found.');
+            }
+
+            return response()->file($path, ['Content-Type' => 'text/css']);
         });
     }
 }

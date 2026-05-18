@@ -1,0 +1,215 @@
+/*
+ * plotly-chart-editor.css
+ *
+ * CSS variable theme (§13.1) + structural layout for the chart builder.
+ * Consumers override variables in their own stylesheet to re-theme without
+ * modifying package files.
+ *
+ * No Tailwind directives here — this is the published CSS asset.
+ * The @theme block approach (Tailwind v4) is used when building via Vite.
+ */
+
+/* ── CSS variables (PRD §13.1) ───────────────────────────────────────────── */
+:root {
+    --plotly-editor-bg:           #ffffff;
+    --plotly-editor-surface:      #f8fafc;
+    --plotly-editor-border:       #e2e8f0;
+    --plotly-editor-text:         #0f172a;
+    --plotly-editor-text-muted:   #64748b;
+    --plotly-editor-accent:       #2563eb;
+    --plotly-editor-accent-fg:    #ffffff;
+    --plotly-editor-warning:      #d97706;
+    --plotly-editor-danger:       #dc2626;
+    --plotly-editor-radius:       6px;
+    --plotly-editor-sidebar-w:    380px;
+    --plotly-editor-font:         system-ui, sans-serif;
+}
+
+/* ── Root container (PRD §13.2) ──────────────────────────────────────────── */
+.chart-builder {
+    display: grid;
+    grid-template-columns: var(--plotly-editor-sidebar-w) 1fr;
+    grid-template-rows: 1fr;
+    height: 100%;
+    min-height: 520px;
+    font-family: var(--plotly-editor-font);
+    font-size: 0.875rem;
+    color: var(--plotly-editor-text);
+    background: var(--plotly-editor-bg);
+    border: 1px solid var(--plotly-editor-border);
+    border-radius: var(--plotly-editor-radius);
+    overflow: hidden;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────────────────── */
+.chart-builder__sidebar {
+    grid-column: 1;
+    background: var(--plotly-editor-surface);
+    border-right: 1px solid var(--plotly-editor-border);
+    overflow-y: auto;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* ── Canvas ──────────────────────────────────────────────────────────────── */
+.chart-builder__canvas {
+    grid-column: 2;
+    position: relative;
+    min-height: 400px;
+}
+
+/* ── Groups ──────────────────────────────────────────────────────────────── */
+.chart-builder__group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.chart-builder__group-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--plotly-editor-text-muted);
+    padding-bottom: 0.25rem;
+    border-bottom: 1px solid var(--plotly-editor-border);
+    margin-bottom: 0.25rem;
+}
+
+/* ── Fields ──────────────────────────────────────────────────────────────── */
+.chart-builder__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.chart-builder__field-label {
+    font-size: 0.75rem;
+    color: var(--plotly-editor-text-muted);
+    font-weight: 500;
+}
+
+/* ── Controls ────────────────────────────────────────────────────────────── */
+.chart-builder__control {
+    width: 100%;
+    font-size: 0.8125rem;
+    font-family: inherit;
+    color: var(--plotly-editor-text);
+    background: var(--plotly-editor-bg);
+    border: 1px solid var(--plotly-editor-border);
+    border-radius: var(--plotly-editor-radius);
+    padding: 0.3rem 0.5rem;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.chart-builder__control:focus {
+    border-color: var(--plotly-editor-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--plotly-editor-accent) 20%, transparent);
+}
+
+.chart-builder__control--select {
+    cursor: pointer;
+}
+
+.chart-builder__control--color {
+    height: 2rem;
+    padding: 0.125rem 0.25rem;
+    cursor: pointer;
+}
+
+.chart-builder__control--checkbox {
+    width: auto;
+    accent-color: var(--plotly-editor-accent);
+    cursor: pointer;
+}
+
+.chart-builder__control--range {
+    padding: 0;
+    border: none;
+    background: transparent;
+    accent-color: var(--plotly-editor-accent);
+    cursor: pointer;
+}
+
+.chart-builder__control-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.chart-builder__control-value {
+    font-size: 0.75rem;
+    color: var(--plotly-editor-text-muted);
+    min-width: 2.5rem;
+    text-align: right;
+}
+
+/* ── Folds (Phase 6) ─────────────────────────────────────────────────────── */
+.chart-builder__fold {
+    border: 1px solid var(--plotly-editor-border);
+    border-radius: var(--plotly-editor-radius);
+    overflow: hidden;
+}
+
+.chart-builder__fold-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    background: var(--plotly-editor-surface);
+    cursor: pointer;
+    user-select: none;
+    font-weight: 600;
+    font-size: 0.8125rem;
+}
+
+.chart-builder__fold-body {
+    padding: 0.75rem;
+    background: var(--plotly-editor-bg);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.chart-builder__fold--open .chart-builder__fold-header {
+    border-bottom: 1px solid var(--plotly-editor-border);
+}
+
+/* ── Footer (Phase 7) ────────────────────────────────────────────────────── */
+.chart-builder__footer {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-top: 1px solid var(--plotly-editor-border);
+    background: var(--plotly-editor-surface);
+}
+
+/* ── Warning indicator ───────────────────────────────────────────────────── */
+.chart-builder__warning {
+    color: var(--plotly-editor-warning);
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* ── Primitives (Phase 6) ────────────────────────────────────────────────── */
+.plotly-primitive {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+/* ── Misc ────────────────────────────────────────────────────────────────── */
+.chart-builder__no-profile {
+    font-size: 0.75rem;
+    color: var(--plotly-editor-text-muted);
+    font-style: italic;
+    padding: 0.5rem 0;
+}

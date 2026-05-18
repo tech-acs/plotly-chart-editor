@@ -13,6 +13,9 @@
     --}}
     <script src="https://cdn.plot.ly/plotly-3.5.0.min.js" charset="utf-8"></script>
 
+    {{-- Package CSS --}}
+    <link rel="stylesheet" href="/plotly-chart-editor.css">
+
     {{--
         Package UMD bundle — exposes window.initChartBuilder.
         Must load before @livewireScripts (which boots Alpine).
@@ -26,8 +29,8 @@
         * { box-sizing: border-box; }
         body { font-family: system-ui, sans-serif; margin: 0; padding: 24px; background: #f1f5f9; }
         h1 { font-size: 1.25rem; font-weight: 600; color: #0f172a; margin-bottom: 1rem; }
-        .chart-builder { background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 1rem; }
-        .chart-builder__canvas { min-height: 400px; }
+        /* Give the editor a fixed height so both columns fill the viewport */
+        #plotly-editor-root { height: calc(100vh - 100px); }
     </style>
 </head>
 <body>

@@ -23,10 +23,8 @@ class PlotlyChartEditorServiceProvider extends PackageServiceProvider
     {
         Livewire::component('plotly-editor', PlotlyEditor::class);
 
-        // Register translations as a flat publishable file so consumers can use
-        // __('plotly-chart-editor.key') without the :: namespace separator.
-        // The package ships the file at resources/lang/en/plotly-chart-editor.php;
-        // after publishing it lands at lang/plotly-chart-editor.php in the app.
+        // Translations — flat publishable file so consumers use
+        // __('plotly-chart-editor::plotly-chart-editor.key')
         $this->loadTranslationsFrom(
             __DIR__.'/../resources/lang',
             'plotly-chart-editor'
@@ -35,5 +33,15 @@ class PlotlyChartEditorServiceProvider extends PackageServiceProvider
         $this->publishes([
             __DIR__.'/../resources/lang' => $this->app->langPath(),
         ], 'plotly-chart-editor-translations');
+
+        // CSS asset — publish to public/vendor/plotly-chart-editor/
+        $this->publishes([
+            __DIR__.'/../resources/css/plotly-chart-editor.css' => public_path('vendor/plotly-chart-editor/plotly-chart-editor.css'),
+        ], 'plotly-chart-editor-assets');
+
+        // JS asset — publish alongside CSS
+        $this->publishes([
+            __DIR__.'/../dist/plotly-chart-editor.umd.js' => public_path('vendor/plotly-chart-editor/plotly-chart-editor.js'),
+        ], 'plotly-chart-editor-assets');
     }
 }
