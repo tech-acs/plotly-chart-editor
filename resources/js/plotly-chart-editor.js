@@ -2,15 +2,40 @@
  * plotly-chart-editor.js
  *
  * Registers Alpine.store('chartBuilder', ...) with the shape defined in PRD §4.
- * Must be loaded AFTER Alpine.js is available on window.Alpine.
+ * Livewire 4 bundles Alpine internally — do NOT load a second Alpine instance.
  *
  * Plotly.js is a peer dependency — this file expects window.Plotly to exist.
  */
 
 /**
+ * Unwrap an Alpine reactive proxy to a plain object so structuredClone() works.
+ * Alpine.raw() is the official way to do this (Alpine 3.x).
+ *
+ * @param {*} value
+ * @returns {*}
+ */
+function toRaw(value) {
+    // Alpine.raw() strips the Proxy wrapper; fall back to value if unavailable
+    if (typeof Alpine !== 'undefined' && typeof Alpine.raw === 'function') {
+        return Alpine.raw(value)
+    }
+    return value
+}
+
+/**
+ * Deep-clone any value, safely handling Alpine reactive proxies.
+ *
+ * @param {*} value
+ * @returns {*}
+ */
+function deepClone(value) {
+    return structuredClone(toRaw(value))
+}
+
+/**
  * Bootstrap the chart builder Alpine store.
  *
- * @param {object} payload  — serialized from the Livewire mount payload
+ * @param {object} payload              — serialized from the Livewire mount payload
  * @param {string} plotlyMissingMessage — translatable error string from PHP
  */
 function initChartBuilder(payload, plotlyMissingMessage) {
@@ -40,13 +65,15 @@ function initChartBuilder(payload, plotlyMissingMessage) {
 
         // ── Internal ──────────────────────────────────────────────────────
         _renderTimer: null,
+        _autoSyncTimer: null,
         _canvasEl: null,
         _plotlyMissingMessage: plotlyMissingMessage,
         _plotlyMissing: false,
+        _wire: undefined,
 
         /**
          * Call once after the store is registered, passing the canvas DOM element.
-         * Wires up the $watch debounce pipeline and performs the initial render.
+         * Wires up the effect-based debounce pipeline and performs the initial render.
          *
          * @param {HTMLElement} canvasEl
          */
@@ -64,18 +91,18 @@ function initChartBuilder(payload, plotlyMissingMessage) {
 
             // Watch traces (deep) → debounced render
             Alpine.effect(() => {
-                // Access traces deeply so Alpine tracks all nested changes
-                JSON.stringify(this.traces)
+                // JSON.stringify forces Alpine to track all nested reactive reads
+                JSON.stringify(toRaw(this.traces))
                 this._scheduleRender()
             })
 
             // Watch layout (deep) → debounced render
             Alpine.effect(() => {
-                JSON.stringify(this.layout)
+                JSON.stringify(toRaw(this.layout))
                 this._scheduleRender()
             })
 
-            // Initial render
+            // Initial render (outside effect so it fires once immediately)
             this._render()
         },
 
@@ -98,14 +125,19 @@ function initChartBuilder(payload, plotlyMissingMessage) {
         _render() {
             if (this._plotlyMissing || !this._canvasEl) return
 
-            const resolved = this.traces.map(t => this.resolveMeta(t))
-            window.Plotly.react(this._canvasEl, resolved, structuredClone(this.layout), structuredClone(this.config))
+            const resolved = toRaw(this.traces).map(t => this.resolveMeta(t))
+            window.Plotly.react(
+                this._canvasEl,
+                resolved,
+                deepClone(this.layout),
+                deepClone(this.config)
+            )
         },
 
         // ── Meta resolution ───────────────────────────────────────────────
 
         /**
-         * Given an internal trace (with meta.columnNames), return a NEW trace
+         * Given an internal trace (with meta.columnNames), return a NEW plain
          * object with actual data arrays attached — does NOT mutate the original.
          *
          * PRD §4 compilation pipeline.
@@ -114,12 +146,14 @@ function initChartBuilder(payload, plotlyMissingMessage) {
          * @returns {object}
          */
         resolveMeta(trace) {
-            const resolved = structuredClone(trace)
+            // deepClone via toRaw ensures we get a plain object, not an Alpine proxy
+            const resolved = deepClone(trace)
             const columnNames = resolved.meta?.columnNames ?? {}
 
             for (const [axis, columnName] of Object.entries(columnNames)) {
                 if (columnName && this.dataSources[columnName] !== undefined) {
-                    resolved[axis] = this.dataSources[columnName]
+                    // dataSources values are plain arrays from JSON — safe to assign directly
+                    resolved[axis] = toRaw(this.dataSources[columnName])
                 }
             }
 
@@ -162,14 +196,10 @@ function initChartBuilder(payload, plotlyMissingMessage) {
             this.syncing = true
 
             const payload = {
-                traces: this.traces.map(t => this.compileTrace(t)),
-                layout: structuredClone(this.layout),
+                traces: toRaw(this.traces).map(t => this.compileTrace(t)),
+                layout: deepClone(this.layout),
             }
 
-            // $wire is injected by Livewire into the Alpine scope of the component
-            // element; access via window.$wire is not available here. The Blade
-            // template wires this up via an Alpine component that has $wire in scope.
-            // syncToBackend() is called from within that scope — see plotly-editor.blade.php.
             if (typeof this._wire !== 'undefined') {
                 this._wire.syncFromAlpine(JSON.stringify(payload))
                     .finally(() => {
@@ -195,8 +225,9 @@ function initChartBuilder(payload, plotlyMissingMessage) {
 }
 
 /**
- * Auto-register when Alpine is available.
- * Consumers who use `type="module"` imports should call initChartBuilder() themselves.
+ * Expose globally so the Blade x-data init() can call it before Alpine
+ * has processed the component element. Consumers using ES module imports
+ * can import { initChartBuilder } instead.
  */
 if (typeof window !== 'undefined') {
     window.initChartBuilder = initChartBuilder

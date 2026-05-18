@@ -9,12 +9,13 @@
         'traceTypes'     => $traceTypes,
         'syncMode'       => $syncMode,
         'showExport'     => $showExport,
-        'schemaProfiles' => [],
+        // Cast to object so empty profiles encode as {} not []
+        'schemaProfiles' => (object) [],
     ]) }}"
     x-data="{
         init() {
             const payload = JSON.parse(this.$el.dataset.chartBuilderPayload)
-            const missingMsg = {{ Js::from(__('plotly-chart-editor.errors.plotly_missing')) }}
+            const missingMsg = @js(__('plotly-chart-editor.errors.plotly_missing'))
             initChartBuilder(payload, missingMsg)
             Alpine.store('chartBuilder').setWire(this.$wire)
             Alpine.store('chartBuilder').boot(this.$el.querySelector('[data-plotly-canvas]'))

@@ -5,13 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Plotly Chart Editor — Workbench Demo</title>
 
-    {{-- Peer dependency: Plotly.js must load BEFORE Alpine boots --}}
+    {{--
+        Peer dependency: Plotly.js MUST load before Alpine boots.
+        Livewire 4 boots Alpine on DOMContentLoaded, so a blocking <script>
+        in <head> is the safest way to ensure window.Plotly exists first.
+    --}}
     <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
 
-    {{-- Alpine.js CDN --}}
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
-    {{-- Package JS: served directly from dist/ via a symlink in public/ --}}
+    {{--
+        Package UMD bundle — exposes window.initChartBuilder.
+        Must load before @livewireScripts (which boots Alpine).
+        DO NOT load a second Alpine here — Livewire 4 bundles Alpine internally.
+    --}}
     <script src="/plotly-chart-editor.umd.js"></script>
 
     @livewireStyles

@@ -1,16 +1,22 @@
-function l(s, n) {
+function s(e) {
+  return typeof Alpine < "u" && typeof Alpine.raw == "function" ? Alpine.raw(e) : e;
+}
+function n(e) {
+  return structuredClone(s(e));
+}
+function u(e, c) {
   Alpine.store("chartBuilder", {
     // ── Loaded from Livewire on mount ─────────────────────────────────
-    dataSources: s.dataSources ?? {},
-    schemaProfiles: s.schemaProfiles ?? {},
+    dataSources: e.dataSources ?? {},
+    schemaProfiles: e.schemaProfiles ?? {},
     // ── Managed by Alpine ─────────────────────────────────────────────
-    traces: s.traces ?? [],
-    layout: s.layout ?? {},
-    config: s.config ?? { responsive: !0 },
+    traces: e.traces ?? [],
+    layout: e.layout ?? {},
+    config: e.config ?? { responsive: !0 },
     // ── Sync / UI config ──────────────────────────────────────────────
-    syncMode: s.syncMode ?? "manual",
-    traceTypes: s.traceTypes ?? ["bar"],
-    showExport: s.showExport ?? !0,
+    syncMode: e.syncMode ?? "manual",
+    traceTypes: e.traceTypes ?? ["bar"],
+    showExport: e.showExport ?? !0,
     // ── Derived ───────────────────────────────────────────────────────
     activeTraceIndex: 0,
     // ── Validation & sync state ───────────────────────────────────────
@@ -20,24 +26,26 @@ function l(s, n) {
     lastSyncAt: null,
     // ── Internal ──────────────────────────────────────────────────────
     _renderTimer: null,
+    _autoSyncTimer: null,
     _canvasEl: null,
-    _plotlyMissingMessage: n,
+    _plotlyMissingMessage: c,
     _plotlyMissing: !1,
+    _wire: void 0,
     /**
      * Call once after the store is registered, passing the canvas DOM element.
-     * Wires up the $watch debounce pipeline and performs the initial render.
+     * Wires up the effect-based debounce pipeline and performs the initial render.
      *
      * @param {HTMLElement} canvasEl
      */
-    boot(e) {
-      if (this._canvasEl = e, typeof window.Plotly > "u") {
-        this._plotlyMissing = !0, e && (e.textContent = this._plotlyMissingMessage);
+    boot(t) {
+      if (this._canvasEl = t, typeof window.Plotly > "u") {
+        this._plotlyMissing = !0, t && (t.textContent = this._plotlyMissingMessage);
         return;
       }
       Alpine.effect(() => {
-        JSON.stringify(this.traces), this._scheduleRender();
+        JSON.stringify(s(this.traces)), this._scheduleRender();
       }), Alpine.effect(() => {
-        JSON.stringify(this.layout), this._scheduleRender();
+        JSON.stringify(s(this.layout)), this._scheduleRender();
       }), this._render();
     },
     // ── Render pipeline ───────────────────────────────────────────────
@@ -54,12 +62,17 @@ function l(s, n) {
      */
     _render() {
       if (this._plotlyMissing || !this._canvasEl) return;
-      const e = this.traces.map((t) => this.resolveMeta(t));
-      window.Plotly.react(this._canvasEl, e, structuredClone(this.layout), structuredClone(this.config));
+      const t = s(this.traces).map((i) => this.resolveMeta(i));
+      window.Plotly.react(
+        this._canvasEl,
+        t,
+        n(this.layout),
+        n(this.config)
+      );
     },
     // ── Meta resolution ───────────────────────────────────────────────
     /**
-     * Given an internal trace (with meta.columnNames), return a NEW trace
+     * Given an internal trace (with meta.columnNames), return a NEW plain
      * object with actual data arrays attached — does NOT mutate the original.
      *
      * PRD §4 compilation pipeline.
@@ -67,12 +80,12 @@ function l(s, n) {
      * @param {object} trace
      * @returns {object}
      */
-    resolveMeta(e) {
-      var r;
-      const t = structuredClone(e), o = ((r = t.meta) == null ? void 0 : r.columnNames) ?? {};
-      for (const [c, i] of Object.entries(o))
-        i && this.dataSources[i] !== void 0 && (t[c] = this.dataSources[i]);
-      return t;
+    resolveMeta(t) {
+      var o;
+      const i = n(t), l = ((o = i.meta) == null ? void 0 : o.columnNames) ?? {};
+      for (const [a, r] of Object.entries(l))
+        r && this.dataSources[r] !== void 0 && (i[a] = s(this.dataSources[r]));
+      return i;
     },
     /**
      * Strip meta from a trace for export / sync payloads (PRD §4 compileTrace).
@@ -80,9 +93,9 @@ function l(s, n) {
      * @param {object} trace
      * @returns {object}
      */
-    compileTrace(e) {
-      const t = this.resolveMeta(e);
-      return delete t.meta, t;
+    compileTrace(t) {
+      const i = this.resolveMeta(t);
+      return delete i.meta, i;
     },
     // ── Sync state ────────────────────────────────────────────────────
     markDirty() {
@@ -98,11 +111,11 @@ function l(s, n) {
     syncToBackend() {
       if (this.syncing) return;
       this.syncing = !0;
-      const e = {
-        traces: this.traces.map((t) => this.compileTrace(t)),
-        layout: structuredClone(this.layout)
+      const t = {
+        traces: s(this.traces).map((i) => this.compileTrace(i)),
+        layout: n(this.layout)
       };
-      typeof this._wire < "u" ? this._wire.syncFromAlpine(JSON.stringify(e)).finally(() => {
+      typeof this._wire < "u" ? this._wire.syncFromAlpine(JSON.stringify(t)).finally(() => {
         this.syncing = !1, this.dirty = !1, this.lastSyncAt = Date.now();
       }) : this.syncing = !1;
     },
@@ -112,12 +125,12 @@ function l(s, n) {
      *
      * @param {object} wire  — the Livewire $wire proxy
      */
-    setWire(e) {
-      this._wire = e;
+    setWire(t) {
+      this._wire = t;
     }
   });
 }
-typeof window < "u" && (window.initChartBuilder = l);
+typeof window < "u" && (window.initChartBuilder = u);
 export {
-  l as initChartBuilder
+  u as initChartBuilder
 };
