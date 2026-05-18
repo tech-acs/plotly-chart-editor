@@ -4,7 +4,8 @@ function s(e) {
 function n(e) {
   return structuredClone(s(e));
 }
-function u(e, c) {
+function f(e, h) {
+  let r = null, o = null, c = null, a = null;
   Alpine.store("chartBuilder", {
     // ── Loaded from Livewire on mount ─────────────────────────────────
     dataSources: e.dataSources ?? {},
@@ -24,21 +25,16 @@ function u(e, c) {
     dirty: !1,
     syncing: !1,
     lastSyncAt: null,
-    // ── Internal ──────────────────────────────────────────────────────
-    _renderTimer: null,
-    _autoSyncTimer: null,
-    _canvasEl: null,
-    _plotlyMissingMessage: c,
+    // ── Internal flags (reactive — safe to make reactive) ─────────────
+    _plotlyMissingMessage: h,
     _plotlyMissing: !1,
-    _wire: void 0,
     /**
      * Call once after the store is registered, passing the canvas DOM element.
-     * Wires up the effect-based debounce pipeline and performs the initial render.
      *
      * @param {HTMLElement} canvasEl
      */
     boot(t) {
-      if (this._canvasEl = t, typeof window.Plotly > "u") {
+      if (o = t, typeof window.Plotly > "u") {
         this._plotlyMissing = !0, t && (t.textContent = this._plotlyMissingMessage);
         return;
       }
@@ -49,22 +45,16 @@ function u(e, c) {
       }), this._render();
     },
     // ── Render pipeline ───────────────────────────────────────────────
-    /**
-     * Schedule a render with a 50ms debounce (PRD §2 rule 3).
-     */
     _scheduleRender() {
-      clearTimeout(this._renderTimer), this._renderTimer = setTimeout(() => {
+      clearTimeout(c), c = setTimeout(() => {
         this._render(), this.markDirty();
       }, 50);
     },
-    /**
-     * Resolve all trace meta and call Plotly.react().
-     */
     _render() {
-      if (this._plotlyMissing || !this._canvasEl) return;
+      if (this._plotlyMissing || !o) return;
       const t = s(this.traces).map((i) => this.resolveMeta(i));
       window.Plotly.react(
-        this._canvasEl,
+        o,
         t,
         n(this.layout),
         n(this.config)
@@ -72,23 +62,21 @@ function u(e, c) {
     },
     // ── Meta resolution ───────────────────────────────────────────────
     /**
-     * Given an internal trace (with meta.columnNames), return a NEW plain
-     * object with actual data arrays attached — does NOT mutate the original.
-     *
-     * PRD §4 compilation pipeline.
+     * Resolve meta.columnNames → actual data arrays from dataSources.
+     * Returns a new plain object — never mutates the original trace.
      *
      * @param {object} trace
      * @returns {object}
      */
     resolveMeta(t) {
-      var o;
-      const i = n(t), l = ((o = i.meta) == null ? void 0 : o.columnNames) ?? {};
-      for (const [a, r] of Object.entries(l))
-        r && this.dataSources[r] !== void 0 && (i[a] = s(this.dataSources[r]));
+      var u;
+      const i = n(t), y = ((u = i.meta) == null ? void 0 : u.columnNames) ?? {};
+      for (const [d, l] of Object.entries(y))
+        l && this.dataSources[l] !== void 0 && (i[d] = s(this.dataSources[l]));
       return i;
     },
     /**
-     * Strip meta from a trace for export / sync payloads (PRD §4 compileTrace).
+     * Strip meta from a trace for export / sync payloads (PRD §4).
      *
      * @param {object} trace
      * @returns {object}
@@ -102,35 +90,35 @@ function u(e, c) {
       this.dirty = !0, this._maybeAutoSync();
     },
     _maybeAutoSync() {
-      (this.syncMode === "auto" || this.syncMode === "hybrid") && (clearTimeout(this._autoSyncTimer), this._autoSyncTimer = setTimeout(() => this.syncToBackend(), 500));
+      (this.syncMode === "auto" || this.syncMode === "hybrid") && (clearTimeout(a), a = setTimeout(() => this.syncToBackend(), 500));
     },
     /**
      * Sync current state back to Livewire (PRD §10).
-     * All sync calls route through this single method — never inline $wire calls.
+     * All sync calls route through this single method.
      */
     syncToBackend() {
-      if (this.syncing) return;
+      if (this.syncing || !r) return;
       this.syncing = !0;
       const t = {
         traces: s(this.traces).map((i) => this.compileTrace(i)),
         layout: n(this.layout)
       };
-      typeof this._wire < "u" ? this._wire.syncFromAlpine(JSON.stringify(t)).finally(() => {
+      r.syncFromAlpine(JSON.stringify(t)).finally(() => {
         this.syncing = !1, this.dirty = !1, this.lastSyncAt = Date.now();
-      }) : this.syncing = !1;
+      });
     },
     /**
-     * Register the $wire reference so syncToBackend() can reach Livewire.
-     * Called from the Blade template once Alpine has initialised.
+     * Register the $wire reference. Called from Blade x-init.
+     * Stored in the closure (not in the store) so Alpine never proxies it.
      *
      * @param {object} wire  — the Livewire $wire proxy
      */
     setWire(t) {
-      this._wire = t;
+      r = t;
     }
   });
 }
-typeof window < "u" && (window.initChartBuilder = u);
+typeof window < "u" && (window.initChartBuilder = f);
 export {
-  u as initChartBuilder
+  f as initChartBuilder
 };

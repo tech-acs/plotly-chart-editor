@@ -9,13 +9,12 @@
 
 /**
  * Unwrap an Alpine reactive proxy to a plain object so structuredClone() works.
- * Alpine.raw() is the official way to do this (Alpine 3.x).
+ * Alpine.raw() is the official API for this (Alpine 3.x).
  *
  * @param {*} value
  * @returns {*}
  */
 function toRaw(value) {
-    // Alpine.raw() strips the Proxy wrapper; fall back to value if unavailable
     if (typeof Alpine !== 'undefined' && typeof Alpine.raw === 'function') {
         return Alpine.raw(value)
     }
@@ -39,6 +38,13 @@ function deepClone(value) {
  * @param {string} plotlyMissingMessage — translatable error string from PHP
  */
 function initChartBuilder(payload, plotlyMissingMessage) {
+    // Store the $wire reference OUTSIDE the Alpine store so Alpine never wraps
+    // it in a reactive proxy — a proxied $wire proxy loses its method dispatch.
+    let _wire = null
+    let _canvasEl = null
+    let _renderTimer = null
+    let _autoSyncTimer = null
+
     Alpine.store('chartBuilder', {
         // ── Loaded from Livewire on mount ─────────────────────────────────
         dataSources: payload.dataSources ?? {},
@@ -63,22 +69,17 @@ function initChartBuilder(payload, plotlyMissingMessage) {
         syncing: false,
         lastSyncAt: null,
 
-        // ── Internal ──────────────────────────────────────────────────────
-        _renderTimer: null,
-        _autoSyncTimer: null,
-        _canvasEl: null,
+        // ── Internal flags (reactive — safe to make reactive) ─────────────
         _plotlyMissingMessage: plotlyMissingMessage,
         _plotlyMissing: false,
-        _wire: undefined,
 
         /**
          * Call once after the store is registered, passing the canvas DOM element.
-         * Wires up the effect-based debounce pipeline and performs the initial render.
          *
          * @param {HTMLElement} canvasEl
          */
         boot(canvasEl) {
-            this._canvasEl = canvasEl
+            _canvasEl = canvasEl
 
             // Peer-dep guard — PRD §2 rule 7
             if (typeof window.Plotly === 'undefined') {
@@ -91,7 +92,6 @@ function initChartBuilder(payload, plotlyMissingMessage) {
 
             // Watch traces (deep) → debounced render
             Alpine.effect(() => {
-                // JSON.stringify forces Alpine to track all nested reactive reads
                 JSON.stringify(toRaw(this.traces))
                 this._scheduleRender()
             })
@@ -102,32 +102,26 @@ function initChartBuilder(payload, plotlyMissingMessage) {
                 this._scheduleRender()
             })
 
-            // Initial render (outside effect so it fires once immediately)
+            // Initial render
             this._render()
         },
 
         // ── Render pipeline ───────────────────────────────────────────────
 
-        /**
-         * Schedule a render with a 50ms debounce (PRD §2 rule 3).
-         */
         _scheduleRender() {
-            clearTimeout(this._renderTimer)
-            this._renderTimer = setTimeout(() => {
+            clearTimeout(_renderTimer)
+            _renderTimer = setTimeout(() => {
                 this._render()
                 this.markDirty()
             }, 50)
         },
 
-        /**
-         * Resolve all trace meta and call Plotly.react().
-         */
         _render() {
-            if (this._plotlyMissing || !this._canvasEl) return
+            if (this._plotlyMissing || !_canvasEl) return
 
             const resolved = toRaw(this.traces).map(t => this.resolveMeta(t))
             window.Plotly.react(
-                this._canvasEl,
+                _canvasEl,
                 resolved,
                 deepClone(this.layout),
                 deepClone(this.config)
@@ -137,22 +131,18 @@ function initChartBuilder(payload, plotlyMissingMessage) {
         // ── Meta resolution ───────────────────────────────────────────────
 
         /**
-         * Given an internal trace (with meta.columnNames), return a NEW plain
-         * object with actual data arrays attached — does NOT mutate the original.
-         *
-         * PRD §4 compilation pipeline.
+         * Resolve meta.columnNames → actual data arrays from dataSources.
+         * Returns a new plain object — never mutates the original trace.
          *
          * @param {object} trace
          * @returns {object}
          */
         resolveMeta(trace) {
-            // deepClone via toRaw ensures we get a plain object, not an Alpine proxy
             const resolved = deepClone(trace)
             const columnNames = resolved.meta?.columnNames ?? {}
 
             for (const [axis, columnName] of Object.entries(columnNames)) {
                 if (columnName && this.dataSources[columnName] !== undefined) {
-                    // dataSources values are plain arrays from JSON — safe to assign directly
                     resolved[axis] = toRaw(this.dataSources[columnName])
                 }
             }
@@ -161,7 +151,7 @@ function initChartBuilder(payload, plotlyMissingMessage) {
         },
 
         /**
-         * Strip meta from a trace for export / sync payloads (PRD §4 compileTrace).
+         * Strip meta from a trace for export / sync payloads (PRD §4).
          *
          * @param {object} trace
          * @returns {object}
@@ -181,53 +171,47 @@ function initChartBuilder(payload, plotlyMissingMessage) {
 
         _maybeAutoSync() {
             if (this.syncMode === 'auto' || this.syncMode === 'hybrid') {
-                clearTimeout(this._autoSyncTimer)
-                this._autoSyncTimer = setTimeout(() => this.syncToBackend(), 500)
+                clearTimeout(_autoSyncTimer)
+                _autoSyncTimer = setTimeout(() => this.syncToBackend(), 500)
             }
         },
 
         /**
          * Sync current state back to Livewire (PRD §10).
-         * All sync calls route through this single method — never inline $wire calls.
+         * All sync calls route through this single method.
          */
         syncToBackend() {
-            if (this.syncing) return
+            if (this.syncing || !_wire) return
 
             this.syncing = true
 
-            const payload = {
+            const wirePayload = {
                 traces: toRaw(this.traces).map(t => this.compileTrace(t)),
                 layout: deepClone(this.layout),
             }
 
-            if (typeof this._wire !== 'undefined') {
-                this._wire.syncFromAlpine(JSON.stringify(payload))
-                    .finally(() => {
-                        this.syncing = false
-                        this.dirty = false
-                        this.lastSyncAt = Date.now()
-                    })
-            } else {
-                this.syncing = false
-            }
+            _wire.syncFromAlpine(JSON.stringify(wirePayload))
+                .finally(() => {
+                    this.syncing = false
+                    this.dirty = false
+                    this.lastSyncAt = Date.now()
+                })
         },
 
         /**
-         * Register the $wire reference so syncToBackend() can reach Livewire.
-         * Called from the Blade template once Alpine has initialised.
+         * Register the $wire reference. Called from Blade x-init.
+         * Stored in the closure (not in the store) so Alpine never proxies it.
          *
          * @param {object} wire  — the Livewire $wire proxy
          */
         setWire(wire) {
-            this._wire = wire
+            _wire = wire
         },
     })
 }
 
 /**
- * Expose globally so the Blade x-data init() can call it before Alpine
- * has processed the component element. Consumers using ES module imports
- * can import { initChartBuilder } instead.
+ * Expose globally so Blade x-init can call window.initChartBuilder().
  */
 if (typeof window !== 'undefined') {
     window.initChartBuilder = initChartBuilder
