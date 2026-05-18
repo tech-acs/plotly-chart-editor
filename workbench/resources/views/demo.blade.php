@@ -11,7 +11,7 @@
         Livewire 4 boots Alpine on DOMContentLoaded, so a blocking <script>
         in <head> is the safest way to ensure window.Plotly exists first.
     --}}
-    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+    <script src="https://cdn.plot.ly/plotly-3.5.0.min.js" charset="utf-8"></script>
 
     {{--
         Package UMD bundle — exposes window.initChartBuilder.

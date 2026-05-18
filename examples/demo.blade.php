@@ -24,7 +24,7 @@
     <title>Plotly Chart Editor — Demo</title>
 
     {{-- Peer dependency: Plotly.js must be available as window.Plotly BEFORE Alpine boots. --}}
-    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+    <script src="https://cdn.plot.ly/plotly-3.5.0.min.js" charset="utf-8"></script>
 
     {{-- Package assets — replace with your @vite() directive in a real app. --}}
     <link rel="stylesheet" href="/vendor/plotly-chart-editor/plotly-chart-editor.css">
