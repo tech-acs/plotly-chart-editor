@@ -32,10 +32,11 @@
 .chart-builder {
     display: grid;
     grid-template-columns: var(--plotly-editor-sidebar-w) 1fr;
-    /* Concrete height is required for overflow-y:auto on the sidebar to work.
-       grid-row:1fr only constrains children when the grid itself has a fixed
-       height. We use the CSS variable as the single source of truth so
-       consumers can override it without touching the component. */
+    /* grid-template-rows with a fixed height is the key to sidebar scroll:
+       the sidebar cell gets a concrete pixel size, so overflow-y:auto fires.
+       We use min-height on the row so the chart never collapses below 520px,
+       and cap at the editor height so it never exceeds the viewport. */
+    grid-template-rows: minmax(520px, var(--plotly-editor-height));
     height: var(--plotly-editor-height);
     min-height: 520px;
     font-family: var(--plotly-editor-font);
@@ -50,11 +51,13 @@
 /* ── Sidebar ─────────────────────────────────────────────────────────────── */
 .chart-builder__sidebar {
     grid-column: 1;
+    /* align-self:stretch + overflow-y:auto gives scroll when the flex
+       content exceeds the grid cell height. The grid cell height is now
+       concrete (see grid-template-rows above), so this reliably triggers. */
+    align-self: stretch;
     background: var(--plotly-editor-surface);
     border-right: 1px solid var(--plotly-editor-border);
     overflow-y: auto;
-    /* max-height matches grid parent so flex children don't push past it */
-    max-height: var(--plotly-editor-height);
     padding: 0.75rem;
     display: flex;
     flex-direction: column;
