@@ -164,6 +164,41 @@
     text-align: right;
 }
 
+/* ── Tabs (Axes fold) ────────────────────────────────────────────────────── */
+.chart-builder__tabs {
+    display: flex;
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.chart-builder__tab {
+    flex: 1;
+    padding: 0.35rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-family: inherit;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-align: center;
+    background: transparent;
+    border: 1px solid var(--plotly-editor-border);
+    border-radius: var(--plotly-editor-radius);
+    color: var(--plotly-editor-text-muted);
+    cursor: pointer;
+    transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+
+.chart-builder__tab:hover {
+    background: var(--plotly-editor-surface);
+    color: var(--plotly-editor-text);
+}
+
+.chart-builder__tab--active {
+    background: var(--plotly-editor-accent);
+    color: var(--plotly-editor-accent-fg);
+    border-color: var(--plotly-editor-accent);
+}
+
 /* ── Folds (Phase 6) ─────────────────────────────────────────────────────── */
 .chart-builder__fold {
     border: 1px solid var(--plotly-editor-border);

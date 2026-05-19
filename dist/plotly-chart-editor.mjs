@@ -85,6 +85,7 @@ function M(o, y, h) {
     showExport: o.showExport ?? !0,
     // ── Derived ───────────────────────────────────────────────────
     activeTraceIndex: 0,
+    activeAxis: "x",
     // ── Validation & sync state ───────────────────────────────────
     warnings: [],
     dirty: !1,

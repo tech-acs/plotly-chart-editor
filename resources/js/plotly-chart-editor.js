@@ -170,6 +170,7 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
 
             // ── Derived ───────────────────────────────────────────────────
             activeTraceIndex: 0,
+            activeAxis: 'x',
 
             // ── Validation & sync state ───────────────────────────────────
             warnings:   [],
