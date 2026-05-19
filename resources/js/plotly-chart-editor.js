@@ -655,15 +655,7 @@ function bootChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, c
         return
     }
 
-    if (!_booted) {
-        // Suppress the first markDirty() that fires after the initial render.
-        // Without this, the auto-sync would trigger a Livewire morph immediately
-        // on page load, destroying Alpine's event bindings on the sidebar buttons.
-        _suppressNextDirty = true
-        store._startEffects()
-        _booted = true
-        store._render()
-    } else {
+    if (_booted) {
         store._render()
     }
 
@@ -686,14 +678,35 @@ function bootChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, c
             if (tooSmall && _canvasEl && typeof window.Plotly !== 'undefined') {
                 window.Plotly.purge(_canvasEl)
                 _booted = false
-            } else if (!tooSmall && !_booted && _canvasEl) {
+            }
+            // Re-mount is handled by the canvas observer below — no immediate
+            // render here, so Plotly sees the canvas at its final size.
+        })
+        _resizeObserver.observe(rootEl)
+    }
+
+    // ── Canvas resize observer ──────────────────────────────────────────
+    // Delay the initial render until the canvas element actually has its
+    // final dimensions (the CSS Grid may not have settled yet). This avoids
+    // the visible "jump" from a wrong-sized chart to the correct size.
+    // On subsequent size changes, Plotly.Plots.resize() handles it silently.
+    if (canvasEl && typeof ResizeObserver !== 'undefined') {
+        const canvasObserver = new ResizeObserver(() => {
+            if (store._plotlyMissing || typeof window.Plotly === 'undefined') return
+            if (store._tooSmall) return
+            const rect = canvasEl.getBoundingClientRect()
+            if (rect.width === 0 || rect.height === 0) return
+
+            if (!_booted) {
                 _suppressNextDirty = true
                 store._startEffects()
                 _booted = true
                 store._render()
+            } else {
+                window.Plotly.Plots.resize(canvasEl)
             }
         })
-        _resizeObserver.observe(rootEl)
+        canvasObserver.observe(canvasEl)
     }
 }
 

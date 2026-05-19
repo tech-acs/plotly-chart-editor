@@ -45,14 +45,18 @@
 /* ── Sidebar ─────────────────────────────────────────────────────────────── */
 .chart-builder__sidebar {
     grid-column: 1;
+    grid-row: 1;
     align-self: stretch;
     background: var(--plotly-editor-surface);
     border-right: 1px solid var(--plotly-editor-border);
+    min-height: 0;
+    height: 100%;
     overflow-y: auto;
     padding: 0.75rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+}
+
+.chart-builder__sidebar > * + * {
+    margin-top: 0.5rem;
 }
 
 /* ── Canvas ──────────────────────────────────────────────────────────────── */
