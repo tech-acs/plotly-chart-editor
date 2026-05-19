@@ -465,6 +465,15 @@
                         x-model.number="{{ $store }}.layout.xaxis.tickangle"
                     >
                 </div>
+
+                <div class="chart-builder__field">
+                    <label class="chart-builder__field-label">
+                        {{ __('plotly-chart-editor::plotly-chart-editor.ui.tick_font') }}
+                    </label>
+                    <x-plotly-chart-editor::primitives.font
+                        :path="$store . '.layout.xaxis.tickfont'"
+                    />
+                </div>
             </div>
 
             {{-- Range (X) --}}
@@ -702,6 +711,15 @@
                         x-model="{{ $store }}.layout.yaxis.tickformat"
                     >
                 </div>
+
+                <div class="chart-builder__field">
+                    <label class="chart-builder__field-label">
+                        {{ __('plotly-chart-editor::plotly-chart-editor.ui.tick_font') }}
+                    </label>
+                    <x-plotly-chart-editor::primitives.font
+                        :path="$store . '.layout.yaxis.tickfont'"
+                    />
+                </div>
             </div>
 
             {{-- Range (Y) --}}
@@ -890,25 +908,6 @@
                 </div>
             </div>
 
-            {{-- Tick Font X (via primitive) --}}
-            <div class="chart-builder__group">
-                <div class="chart-builder__group-label">
-                    {{ __('plotly-chart-editor::plotly-chart-editor.ui.tick_font_x') }}
-                </div>
-                <x-plotly-chart-editor::primitives.font
-                    :path="$store . '.layout.xaxis.tickfont'"
-                />
-            </div>
-
-            {{-- Tick Font Y (via primitive) --}}
-            <div class="chart-builder__group">
-                <div class="chart-builder__group-label">
-                    {{ __('plotly-chart-editor::plotly-chart-editor.ui.tick_font_y') }}
-                </div>
-                <x-plotly-chart-editor::primitives.font
-                    :path="$store . '.layout.yaxis.tickfont'"
-                />
-            </div>
         </x-plotly-chart-editor::fold>
 
         {{-- ══════════════════════════════════════════════════════
