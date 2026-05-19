@@ -1044,10 +1044,8 @@
                         x-model="{{ $store }}.layout.showlegend"
                     >
                 </div>
-                <div
-                    class="chart-builder__field"
-                    x-show="{{ $store }}.layout.showlegend"
-                >
+
+                <div x-show="{{ $store }}.layout.showlegend" class="chart-builder__field" style="margin-top:0.25rem">
                     <label class="chart-builder__field-label">
                         {{ __('plotly-chart-editor::plotly-chart-editor.ui.legend_orient') }}
                     </label>
@@ -1058,6 +1056,117 @@
                         <option value="v">Vertical</option>
                         <option value="h">Horizontal</option>
                     </select>
+                </div>
+
+                <div x-show="{{ $store }}.layout.showlegend" class="chart-builder__field">
+                    <label class="chart-builder__field-label">
+                        {{ __('plotly-chart-editor::plotly-chart-editor.ui.legend_position') }}
+                    </label>
+                    <select
+                        class="chart-builder__control chart-builder__control--select"
+                        :value="{{ $store }}.getPath({{ $store }}.layout, 'legend._position') || 'auto'"
+                        @change="
+                            const v = $event.target.value;
+                            const l = {{ $store }}.layout;
+                            {{ $store }}.setPath(l, 'legend._position', v);
+                            if (v === 'top-right') {
+                                l.legend.xanchor = 'right'; l.legend.yanchor = 'top'; l.legend.x = 1; l.legend.y = 1;
+                            } else if (v === 'top-left') {
+                                l.legend.xanchor = 'left'; l.legend.yanchor = 'top'; l.legend.x = 0; l.legend.y = 1;
+                            } else if (v === 'bottom-right') {
+                                l.legend.xanchor = 'right'; l.legend.yanchor = 'bottom'; l.legend.x = 1; l.legend.y = 0;
+                            } else if (v === 'bottom-left') {
+                                l.legend.xanchor = 'left'; l.legend.yanchor = 'bottom'; l.legend.x = 0; l.legend.y = 0;
+                            } else if (v === 'top-center') {
+                                l.legend.xanchor = 'center'; l.legend.yanchor = 'top'; l.legend.x = 0.5; l.legend.y = 1;
+                            } else if (v === 'bottom-center') {
+                                l.legend.xanchor = 'center'; l.legend.yanchor = 'bottom'; l.legend.x = 0.5; l.legend.y = 0;
+                            } else if (v === 'left-center') {
+                                l.legend.xanchor = 'left'; l.legend.yanchor = 'middle'; l.legend.x = 0; l.legend.y = 0.5;
+                            } else if (v === 'right-center') {
+                                l.legend.xanchor = 'right'; l.legend.yanchor = 'middle'; l.legend.x = 1; l.legend.y = 0.5;
+                            }
+                            // auto — leave as-is
+                        "
+                    >
+                        <option value="auto">Auto</option>
+                        <option value="top-right">Top right</option>
+                        <option value="top-left">Top left</option>
+                        <option value="bottom-right">Bottom right</option>
+                        <option value="bottom-left">Bottom left</option>
+                        <option value="top-center">Top center</option>
+                        <option value="bottom-center">Bottom center</option>
+                        <option value="left-center">Left center</option>
+                        <option value="right-center">Right center</option>
+                    </select>
+                </div>
+
+                <div x-show="{{ $store }}.layout.showlegend" class="chart-builder__field">
+                    <label class="chart-builder__field-label">
+                        {{ __('plotly-chart-editor::plotly-chart-editor.ui.legend_title') }}
+                    </label>
+                    <input
+                        type="text"
+                        class="chart-builder__control chart-builder__control--text"
+                        :value="{{ $store }}.layout.legend.title?.text ?? ''"
+                        @change="{{ $store }}.layout.legend.title = { ...({{ $store }}.layout.legend.title || {}), text: $event.target.value }"
+                    >
+                </div>
+
+                <div x-show="{{ $store }}.layout.showlegend" class="chart-builder__field">
+                    <label class="chart-builder__field-label">
+                        {{ __('plotly-chart-editor::plotly-chart-editor.ui.legend_title_font') }}
+                    </label>
+                    <x-plotly-chart-editor::primitives.font
+                        :path="$store . '.layout.legend.title.font'"
+                    />
+                </div>
+
+                <div x-show="{{ $store }}.layout.showlegend" class="chart-builder__field">
+                    <label class="chart-builder__field-label">
+                        {{ __('plotly-chart-editor::plotly-chart-editor.ui.legend_font') }}
+                    </label>
+                    <x-plotly-chart-editor::primitives.font
+                        :path="$store . '.layout.legend.font'"
+                    />
+                </div>
+
+                <div x-show="{{ $store }}.layout.showlegend" class="chart-builder__field">
+                    <label class="chart-builder__field-label">
+                        {{ __('plotly-chart-editor::plotly-chart-editor.fields.bg_color') }}
+                    </label>
+                    <input
+                        type="color"
+                        class="chart-builder__control chart-builder__control--color"
+                        :value="{{ $store }}.layout.legend.bgcolor || 'transparent'"
+                        @change="{{ $store }}.layout.legend.bgcolor = $event.target.value"
+                    >
+                </div>
+
+                <div x-show="{{ $store }}.layout.showlegend" class="chart-builder__field">
+                    <label class="chart-builder__field-label">
+                        {{ __('plotly-chart-editor::plotly-chart-editor.fields.border_color') }}
+                    </label>
+                    <input
+                        type="color"
+                        class="chart-builder__control chart-builder__control--color"
+                        :value="{{ $store }}.layout.legend.bordercolor || '#444444'"
+                        @change="{{ $store }}.layout.legend.bordercolor = $event.target.value"
+                    >
+                </div>
+
+                <div x-show="{{ $store }}.layout.showlegend" class="chart-builder__field">
+                    <label class="chart-builder__field-label">
+                        {{ __('plotly-chart-editor::plotly-chart-editor.fields.border_width') }}
+                    </label>
+                    <input
+                        type="number"
+                        class="chart-builder__control chart-builder__control--number"
+                        min="0"
+                        max="10"
+                        :value="{{ $store }}.layout.legend.borderwidth ?? 0"
+                        @change="{{ $store }}.layout.legend.borderwidth = parseFloat($event.target.value)"
+                    >
                 </div>
             </div>
 

@@ -81,6 +81,9 @@ return [
         'show_legend' => 'Show legend',
         'legend_position' => 'Position',
         'legend_orient' => 'Orientation',
+        'legend_title' => 'Legend title',
+        'legend_title_font' => 'Title font',
+        'legend_font' => 'Item font',
         'hovermode' => 'Hover mode',
         'hover_label' => 'Hover label',
     ],
@@ -164,6 +167,9 @@ return [
         'hovertemplate' => 'Template',
         'hover_bgcolor' => 'Label BG',
         'hover_bordercolor' => 'Label border',
+        'bg_color' => 'BG color',
+        'border_color' => 'Border color',
+        'border_width' => 'Border width',
     ],
 
 ];
