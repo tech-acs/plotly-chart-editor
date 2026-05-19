@@ -534,7 +534,7 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
 
                 const pruned = { type: newType }
 
-                for (const k of ['name', 'meta']) {
+                for (const k of ['name', 'meta', 'transforms']) {
                     if (oldTrace[k] !== undefined) pruned[k] = oldTrace[k]
                 }
 
@@ -572,6 +572,46 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
                         type,
                     },
                 }))
+            },
+
+            // ── Transforms ────────────────────────────────────────────────
+
+            /**
+             * Add a transform to the active trace.
+             * Creates the transforms array if it doesn't exist.
+             *
+             * @param {'filter'|'sort'} type
+             */
+            addTransform(type) {
+                const trace = toRaw(this.traces)[this.activeTraceIndex]
+                if (!trace) return
+                if (!Array.isArray(trace.transforms)) {
+                    trace.transforms = []
+                }
+                const scaffolds = {
+                    filter: { type: 'filter', target: 'y', operation: '>', value: 0 },
+                    sort:   { type: 'sort',   target: 'y', order: 'ascending' },
+                }
+                trace.transforms.push(scaffolds[type] ?? { type })
+                // Replace the trace to trigger reactivity
+                this.traces[this.activeTraceIndex] = trace
+            },
+
+            /**
+             * Remove a transform from the active trace by index.
+             * Deletes the transforms key if the array becomes empty.
+             *
+             * @param {number} idx
+             */
+            removeTransform(idx) {
+                const trace = toRaw(this.traces)[this.activeTraceIndex]
+                if (!trace || !Array.isArray(trace.transforms)) return
+                trace.transforms.splice(idx, 1)
+                if (trace.transforms.length === 0) {
+                    delete trace.transforms
+                }
+                // Replace the trace to trigger reactivity
+                this.traces[this.activeTraceIndex] = trace
             },
 
             // ── Export (PRD §10) ──────────────────────────────────────────

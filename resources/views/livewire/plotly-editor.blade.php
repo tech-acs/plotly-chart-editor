@@ -404,6 +404,123 @@
                         </div>
                     </template>
                 </div>
+
+                {{-- ── Transforms (filter / sort) ─────────────────────────── --}}
+                <div class="chart-builder__group" x-data="{
+                    _transformToAdd: '',
+                    get _existingTypes() {
+                        var s = {{ $store }};
+                        return (s.traces[s.activeTraceIndex]?.transforms ?? []).map(function(t) { return t.type });
+                    }
+                }">
+                    <div class="chart-builder__group-label">
+                        {{ __('plotly-chart-editor::plotly-chart-editor.ui.transforms') }}
+                    </div>
+
+                    <select
+                        class="chart-builder__control chart-builder__control--select"
+                        x-model="_transformToAdd"
+                        @change="if (_transformToAdd) { Alpine.store('chartBuilder').addTransform(_transformToAdd); _transformToAdd = '' }"
+                    >
+                        <option value="">{{ __('plotly-chart-editor::plotly-chart-editor.ui.transform_add') }}</option>
+                        <option value="filter" :disabled="_existingTypes.includes('filter')">
+                            {{ __('plotly-chart-editor::plotly-chart-editor.ui.transform_filter') }}
+                        </option>
+                        <option value="sort" :disabled="_existingTypes.includes('sort')">
+                            {{ __('plotly-chart-editor::plotly-chart-editor.ui.transform_sort') }}
+                        </option>
+                    </select>
+
+                    <template
+                        x-for="(tr, idx) in ({{ $store }}.traces[{{ $store }}.activeTraceIndex]?.transforms ?? [])"
+                        :key="idx"
+                    >
+                        <div class="chart-builder__transform-card">
+                            <div class="chart-builder__group-label" x-text="tr.type === 'filter'
+                                ? '{{ __('plotly-chart-editor::plotly-chart-editor.ui.transform_filter') }}'
+                                : '{{ __('plotly-chart-editor::plotly-chart-editor.ui.transform_sort') }}'"></div>
+
+                            {{-- Filter --}}
+                            <template x-if="tr.type === 'filter'">
+                                <div>
+                                    <div class="chart-builder__field">
+                                        <label class="chart-builder__field-label">
+                                            {{ __('plotly-chart-editor::plotly-chart-editor.fields.transform_target') }}
+                                        </label>
+                                        <input
+                                            type="text"
+                                            class="chart-builder__control chart-builder__control--text"
+                                            x-model="tr.target"
+                                        >
+                                    </div>
+                                    <div class="chart-builder__field">
+                                        <label class="chart-builder__field-label">
+                                            {{ __('plotly-chart-editor::plotly-chart-editor.fields.transform_op') }}
+                                        </label>
+                                        <select class="chart-builder__control chart-builder__control--select" x-model="tr.operation">
+                                            <option>=</option>
+                                            <option>!=</option>
+                                            <option><</option>
+                                            <option><=</option>
+                                            <option>></option>
+                                            <option>>=</option>
+                                        </select>
+                                    </div>
+                                    <div class="chart-builder__field">
+                                        <label class="chart-builder__field-label">
+                                            {{ __('plotly-chart-editor::plotly-chart-editor.fields.transform_value') }}
+                                        </label>
+                                        <input
+                                            type="number"
+                                            class="chart-builder__control chart-builder__control--number"
+                                            :value="tr.value"
+                                            @change="tr.value = parseFloat($event.target.value)"
+                                        >
+                                    </div>
+                                    <div class="chart-builder__field">
+                                        <button
+                                            type="button"
+                                            class="chart-builder__btn chart-builder__btn--danger"
+                                            @click="Alpine.store('chartBuilder').removeTransform(idx)"
+                                        >×</button>
+                                    </div>
+                                </div>
+                            </template>
+
+                            {{-- Sort --}}
+                            <template x-if="tr.type === 'sort'">
+                                <div>
+                                    <div class="chart-builder__field">
+                                        <label class="chart-builder__field-label">
+                                            {{ __('plotly-chart-editor::plotly-chart-editor.fields.transform_target') }}
+                                        </label>
+                                        <input
+                                            type="text"
+                                            class="chart-builder__control chart-builder__control--text"
+                                            x-model="tr.target"
+                                        >
+                                    </div>
+                                    <div class="chart-builder__field">
+                                        <label class="chart-builder__field-label">
+                                            {{ __('plotly-chart-editor::plotly-chart-editor.fields.transform_order') }}
+                                        </label>
+                                        <select class="chart-builder__control chart-builder__control--select" x-model="tr.order">
+                                            <option value="ascending">{{ __('plotly-chart-editor::plotly-chart-editor.fields.transform_order_asc') }}</option>
+                                            <option value="descending">{{ __('plotly-chart-editor::plotly-chart-editor.fields.transform_order_desc') }}</option>
+                                        </select>
+                                    </div>
+                                    <div class="chart-builder__field">
+                                        <button
+                                            type="button"
+                                            class="chart-builder__btn chart-builder__btn--danger"
+                                            @click="Alpine.store('chartBuilder').removeTransform(idx)"
+                                        >×</button>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
             </div>
         </x-plotly-chart-editor::fold>
 

@@ -478,6 +478,14 @@
     flex-shrink: 0;
 }
 
+/* ── Transform cards ─────────────────────────────────────────────────────── */
+.chart-builder__transform-card {
+    border: 1px solid var(--plotly-editor-border);
+    border-radius: var(--plotly-editor-radius);
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
 /* ── Active trace panel ──────────────────────────────────────────────────── */
 .chart-builder__active-trace {
     display: flex;
