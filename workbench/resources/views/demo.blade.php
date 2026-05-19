@@ -52,7 +52,7 @@
             'yaxis'  => ['title' => ['text' => 'Population (millions)']],
             'margin' => ['t' => 60, 'b' => 80, 'l' => 70, 'r' => 30],
         ]"
-        :trace-types="['bar', 'scatter', 'line', 'pie', 'histogram']"
+        :trace-types="['bar', 'scatter', 'line', 'pie', 'histogram', 'area']"
         sync-mode="hybrid"
         :show-export="false"
     />
