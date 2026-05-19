@@ -77,7 +77,18 @@ return [
     ],
 
     'viewport' => [
-        'too_small' => 'The chart editor requires a viewport of at least 1024px wide.',
+        'too_small' => 'This chart editor requires a screen at least 1024px wide.',
+    ],
+
+    'sync' => [
+        'save_button' => 'Save',
+        'saved' => 'Saved ✓',
+        'saving' => 'Saving…',
+    ],
+
+    'warnings' => [
+        'length_mismatch' => "Column ':field' has :columnLen values but trace expects :expectedLen. Showing first :shown.",
+        'badge' => ':count warning|:count warnings',
     ],
 
     'fields' => [

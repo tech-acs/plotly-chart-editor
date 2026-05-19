@@ -33,7 +33,9 @@ let _renderTimer = null
 let _autoSyncTimer = null
 let _booted = false
 let _suppressNextDirty = false   // blocks the first markDirty() after initial render
-let _deleteConfirmMsg = 'Delete this trace? This cannot be undone.'
+let _deleteConfirmMsg  = 'Delete this trace? This cannot be undone.'
+let _savedTimer        = null    // clears the "Saved ✓" transient message
+let _resizeObserver    = null    // ResizeObserver for viewport gate
 
 /**
  * Bootstrap the chart builder Alpine store.
@@ -132,10 +134,12 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
             dirty:      false,
             syncing:    false,
             lastSyncAt: null,
+            savedAt:    null,   // timestamp of last successful sync (drives "Saved ✓")
 
             // ── Internal flags ────────────────────────────────────────────
             _plotlyMissingMessage: plotlyMissingMessage,
             _plotlyMissing:        false,
+            _tooSmall:             false,
 
             // ── Conditional visibility helpers (PRD §8) ───────────────────
 
@@ -232,6 +236,7 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
             _scheduleRender() {
                 clearTimeout(_renderTimer)
                 _renderTimer = setTimeout(() => {
+                    this.validate()
                     this._render()
                     if (_suppressNextDirty) {
                         // Swallow the first auto-sync triggered by the initial
@@ -254,6 +259,61 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
                     deepClone(this.layout),
                     deepClone(this.config)
                 )
+            },
+
+            // ── Validation (PRD §11) ──────────────────────────────────────
+
+            /**
+             * Run all validations against current traces and dataSources.
+             * Mutates this.warnings in place — replaces the entire array so
+             * Alpine tracks the change.
+             */
+            validate() {
+                const warnings = []
+
+                toRaw(this.traces).forEach((trace, traceIndex) => {
+                    const columnNames = trace.meta?.columnNames ?? {}
+
+                    // Collect resolved column lengths for this trace
+                    const lengths = {}
+                    for (const [field, colName] of Object.entries(columnNames)) {
+                        if (colName && this.dataSources[colName]) {
+                            lengths[field] = toRaw(this.dataSources[colName]).length
+                        }
+                    }
+
+                    const lengthValues = Object.values(lengths)
+                    if (lengthValues.length < 2) return
+
+                    const expectedLen = Math.min(...lengthValues)
+                    const maxLen      = Math.max(...lengthValues)
+
+                    if (expectedLen !== maxLen) {
+                        for (const [field, colLen] of Object.entries(lengths)) {
+                            if (colLen !== expectedLen) {
+                                warnings.push({
+                                    traceIndex,
+                                    field,
+                                    code:    'LENGTH_MISMATCH',
+                                    message: `Column '${field}' has ${colLen} values but trace expects ${expectedLen}. Showing first ${expectedLen}.`,
+                                })
+                            }
+                        }
+                    }
+                })
+
+                // Replace array contents reactively
+                this.warnings.splice(0, this.warnings.length, ...warnings)
+            },
+
+            /**
+             * Return the warning (if any) for a specific trace+field combination.
+             * Used by the inline warning in the column selector.
+             */
+            warningFor(traceIndex, field) {
+                return toRaw(this.warnings).find(
+                    w => w.traceIndex === traceIndex && w.field === field
+                ) ?? null
             },
 
             // ── Meta resolution ───────────────────────────────────────────
@@ -466,10 +526,15 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
                 }
 
                 _wire.syncFromAlpine(JSON.stringify(wirePayload))
+                    .then(() => {
+                        this.savedAt = Date.now()
+                        clearTimeout(_savedTimer)
+                        _savedTimer = setTimeout(() => { this.savedAt = null }, 2000)
+                    })
                     .finally(() => {
-                        this.syncing      = false
-                        this.dirty        = false
-                        this.lastSyncAt   = Date.now()
+                        this.syncing    = false
+                        this.dirty      = false
+                        this.lastSyncAt = Date.now()
                     })
             },
 
@@ -522,6 +587,35 @@ function bootChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, c
         store._render()
     } else {
         store._render()
+    }
+
+    // ── Viewport gate (PRD §13.3) ─────────────────────────────────────────
+    // Observe the root element's width. When it drops below 1024px, set the
+    // _tooSmall flag (x-show hides the sidebar/canvas in Blade), purge Plotly
+    // to release memory, and mark not-booted so it re-initialises on resize up.
+    if (_resizeObserver) {
+        _resizeObserver.disconnect()
+    }
+
+    const rootEl = canvasEl?.closest('.chart-builder')
+
+    if (rootEl && typeof ResizeObserver !== 'undefined') {
+        _resizeObserver = new ResizeObserver(entries => {
+            const width     = entries[0]?.contentRect?.width ?? window.innerWidth
+            const tooSmall  = width < 1024
+            store._tooSmall = tooSmall
+
+            if (tooSmall && _canvasEl && typeof window.Plotly !== 'undefined') {
+                window.Plotly.purge(_canvasEl)
+                _booted = false
+            } else if (!tooSmall && !_booted && _canvasEl) {
+                _suppressNextDirty = true
+                store._startEffects()
+                _booted = true
+                store._render()
+            }
+        })
+        _resizeObserver.observe(rootEl)
     }
 }
 

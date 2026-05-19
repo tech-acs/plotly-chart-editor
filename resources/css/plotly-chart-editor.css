@@ -29,7 +29,7 @@
 .chart-builder {
     display: grid;
     grid-template-columns: var(--plotly-editor-sidebar-w) 1fr;
-    grid-template-rows: 1fr;
+    grid-template-rows: 1fr auto;
     height: 100%;
     min-height: 520px;
     font-family: var(--plotly-editor-font);
@@ -198,6 +198,45 @@
     display: flex;
     align-items: center;
     gap: 0.25rem;
+    flex: 1;
+}
+
+.chart-builder__warning--inline {
+    margin-top: 0.2rem;
+    font-size: 0.7rem;
+    flex: unset;
+}
+
+/* ── Dirty indicator ─────────────────────────────────────────────────────── */
+.chart-builder__dirty-indicator {
+    color: var(--plotly-editor-accent);
+    font-size: 0.75rem;
+}
+
+/* ── Saved message ───────────────────────────────────────────────────────── */
+.chart-builder__saved-msg {
+    font-size: 0.75rem;
+    color: #16a34a;
+}
+
+/* ── Save button ─────────────────────────────────────────────────────────── */
+.chart-builder__btn--save {
+    font-weight: 600;
+    padding: 0.3rem 0.9rem;
+    background: var(--plotly-editor-accent);
+    color: var(--plotly-editor-accent-fg);
+    border-color: var(--plotly-editor-accent);
+}
+
+.chart-builder__btn--save:hover:not(:disabled) {
+    filter: brightness(1.1);
+    background: var(--plotly-editor-accent);
+    border-color: var(--plotly-editor-accent);
+}
+
+.chart-builder__btn--save:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
 }
 
 /* ── Primitives (Phase 6) ────────────────────────────────────────────────── */

@@ -89,14 +89,44 @@ class PlotlyEditor extends Component
     }
 
     /**
-     * Receive compiled state from Alpine and dispatch the chart-synced event.
-     * Full sync implementation in Phase 7.
+     * Receive compiled state from Alpine, validate it, strip internal meta,
+     * and dispatch the chart-synced event.
+     *
+     * @throws InvalidArgumentException When the payload is malformed.
      */
     public function syncFromAlpine(string $payload): void
     {
-        $state = json_decode($payload, true) ?? [];
-        $this->data = $state['traces'] ?? $this->data;
-        $this->layout = $state['layout'] ?? $this->layout;
+        $state = json_decode($payload, true);
+
+        if (! is_array($state)) {
+            throw new InvalidArgumentException(
+                'syncFromAlpine: payload is not valid JSON or is not an object.'
+            );
+        }
+
+        if (! array_key_exists('traces', $state) || ! is_array($state['traces'])) {
+            throw new InvalidArgumentException(
+                'syncFromAlpine: payload must contain a "traces" array.'
+            );
+        }
+
+        if (! array_key_exists('layout', $state) || ! is_array($state['layout'])) {
+            throw new InvalidArgumentException(
+                'syncFromAlpine: payload must contain a "layout" object.'
+            );
+        }
+
+        // Strip the internal meta key that Alpine uses for column bindings.
+        // It must never be stored server-side or forwarded to consumers.
+        $traces = array_map(function (array $trace): array {
+            unset($trace['meta']);
+
+            return $trace;
+        }, $state['traces']);
+
+        $this->data = $traces;
+        $this->layout = $state['layout'];
+
         $this->dispatch('chart-synced', data: $this->data, layout: $this->layout);
     }
 

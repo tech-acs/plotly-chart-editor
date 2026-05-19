@@ -16,23 +16,21 @@
         'showExport'     => $showExport,
         'schemaProfiles' => empty($schemaProfiles) ? (object) [] : $schemaProfiles,
     ]) }}"
-    x-data="{ _tooSmall: window.innerWidth < 1024 }"
+    x-data
     x-init="
-        if (!_tooSmall) {
-            (function () {
-                var payload    = JSON.parse($el.dataset.chartBuilderPayload);
-                var missingMsg = @js(__('plotly-chart-editor::plotly-chart-editor.errors.plotly_missing'));
-                var deleteMsg  = @js(__('plotly-chart-editor::plotly-chart-editor.confirmations.delete_trace'));
-                var canvas     = $el.querySelector('[data-plotly-canvas]');
-                window.bootChartBuilder(payload, missingMsg, deleteMsg, canvas, $wire);
-            })();
-        }
+        (function () {
+            var payload    = JSON.parse($el.dataset.chartBuilderPayload);
+            var missingMsg = @js(__('plotly-chart-editor::plotly-chart-editor.errors.plotly_missing'));
+            var deleteMsg  = @js(__('plotly-chart-editor::plotly-chart-editor.confirmations.delete_trace'));
+            var canvas     = $el.querySelector('[data-plotly-canvas]');
+            window.bootChartBuilder(payload, missingMsg, deleteMsg, canvas, $wire);
+        })();
     "
 >
     {{-- ── Viewport-too-small placeholder (PRD §13.3) ───────────────── --}}
     <div
         class="chart-builder__too-small-msg"
-        x-show="_tooSmall"
+        x-show="{{ $store }}._tooSmall"
         style="padding:2rem;text-align:center;color:var(--plotly-editor-text-muted);"
     >
         {{ __('plotly-chart-editor::plotly-chart-editor.viewport.too_small') }}
@@ -41,7 +39,7 @@
     {{-- ═══════════════════════════════════════════════════════════════
          SIDEBAR
     ══════════════════════════════════════════════════════════════════ --}}
-    <div class="chart-builder__sidebar" x-show="!_tooSmall">
+    <div class="chart-builder__sidebar" x-show="!{{ $store }}._tooSmall">
 
         {{-- ══════════════════════════════════════════════════════
              FOLD 1 — TRACES
@@ -192,20 +190,28 @@
 
                                             {{-- column --}}
                                             <template x-if="field.type === 'column'">
-                                                <select
-                                                    class="chart-builder__control chart-builder__control--select"
-                                                    :value="{{ $atrace }}.meta?.columnNames?.[field.key]"
-                                                    @change="{{ $atrace }}.meta.columnNames[field.key] = $event.target.value"
-                                                >
-                                                    <option value="" :selected="!{{ $atrace }}.meta?.columnNames?.[field.key]">— select column —</option>
-                                                    <template x-for="col in Object.keys({{ $store }}.dataSources)" :key="col">
-                                                        <option
-                                                            :value="col"
-                                                            x-text="col"
-                                                            :selected="{{ $atrace }}.meta?.columnNames?.[field.key] === col"
-                                                        ></option>
-                                                    </template>
-                                                </select>
+                                                <div>
+                                                    <select
+                                                        class="chart-builder__control chart-builder__control--select"
+                                                        :value="{{ $atrace }}.meta?.columnNames?.[field.key]"
+                                                        @change="{{ $atrace }}.meta.columnNames[field.key] = $event.target.value"
+                                                    >
+                                                        <option value="" :selected="!{{ $atrace }}.meta?.columnNames?.[field.key]">— select column —</option>
+                                                        <template x-for="col in Object.keys({{ $store }}.dataSources)" :key="col">
+                                                            <option
+                                                                :value="col"
+                                                                x-text="col"
+                                                                :selected="{{ $atrace }}.meta?.columnNames?.[field.key] === col"
+                                                            ></option>
+                                                        </template>
+                                                    </select>
+                                                    {{-- Inline column-length mismatch warning --}}
+                                                    <div
+                                                        class="chart-builder__warning chart-builder__warning--inline"
+                                                        x-show="{{ $store }}.warningFor({{ $store }}.activeTraceIndex, field.key) !== null"
+                                                        x-text="{{ $store }}.warningFor({{ $store }}.activeTraceIndex, field.key)?.message ?? ''"
+                                                    ></div>
+                                                </div>
                                             </template>
 
                                             {{-- enumerated --}}
@@ -533,7 +539,48 @@
         class="chart-builder__canvas"
         data-plotly-canvas
         wire:ignore
-        x-show="!_tooSmall"
+        x-show="!{{ $store }}._tooSmall"
     ></div>
+
+    {{-- ═══════════════════════════════════════════════════════════════
+         FOOTER
+    ══════════════════════════════════════════════════════════════════ --}}
+    <div
+        class="chart-builder__footer"
+        x-show="!{{ $store }}._tooSmall"
+    >
+        {{-- Warning badge --}}
+        <div
+            class="chart-builder__warning"
+            x-show="{{ $store }}.warnings.length > 0"
+            x-text="'⚠ ' + {{ $store }}.warnings.length + ({{ $store }}.warnings.length === 1 ? ' warning' : ' warnings')"
+        ></div>
+
+        {{-- Dirty indicator --}}
+        <span
+            class="chart-builder__dirty-indicator"
+            x-show="{{ $store }}.dirty && !{{ $store }}.syncing"
+            title="{{ __('plotly-chart-editor::plotly-chart-editor.sync.save_button') }}"
+        >●</span>
+
+        {{-- "Saved ✓" transient message (auto mode) --}}
+        <span
+            class="chart-builder__saved-msg"
+            x-show="{{ $store }}.savedAt !== null"
+            x-text="@js(__('plotly-chart-editor::plotly-chart-editor.sync.saved'))"
+        ></span>
+
+        {{-- Save button: visible in manual + hybrid, hidden in auto --}}
+        <button
+            type="button"
+            class="chart-builder__btn chart-builder__btn--save"
+            x-show="{{ $store }}.syncMode !== 'auto'"
+            x-bind:disabled="{{ $store }}.syncing || !{{ $store }}.dirty"
+            x-on:click="{{ $store }}.syncToBackend()"
+            x-text="{{ $store }}.syncing
+                ? @js(__('plotly-chart-editor::plotly-chart-editor.sync.saving'))
+                : @js(__('plotly-chart-editor::plotly-chart-editor.sync.save_button'))"
+        ></button>
+    </div>
 
 </div>
