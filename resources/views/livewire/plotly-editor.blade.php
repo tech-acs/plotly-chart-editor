@@ -115,17 +115,18 @@
                 </label>
                 <select
                     class="chart-builder__control chart-builder__control--select"
-                    x-model="Alpine.store('chartBuilder').traces[Alpine.store('chartBuilder').activeTraceIndex].type"
-                    x-on:change="Alpine.store('chartBuilder').setTraceType(
-                        Alpine.store('chartBuilder').activeTraceIndex,
-                        Alpine.store('chartBuilder').traces[Alpine.store('chartBuilder').activeTraceIndex].type
-                    )"
+                    :value="Alpine.store('chartBuilder').traces[Alpine.store('chartBuilder').activeTraceIndex]?.type"
+                    @change="Alpine.store('chartBuilder').setTraceType(Alpine.store('chartBuilder').activeTraceIndex, $event.target.value)"
                 >
                     <template
                         x-for="t in Alpine.store('chartBuilder').traceTypes"
                         :key="t"
                     >
-                        <option :value="t" x-text="t"></option>
+                        <option
+                            :value="t"
+                            x-text="t"
+                            :selected="Alpine.store('chartBuilder').traces[Alpine.store('chartBuilder').activeTraceIndex]?.type === t"
+                        ></option>
                     </template>
                 </select>
             </div>
@@ -158,27 +159,39 @@
                             >
                                 <label class="chart-builder__field-label" x-text="field.label"></label>
 
-                                {{-- column --}}
+                                {{-- column: use :value + @change + :selected per option
+                                     to avoid x-model timing bug when options are
+                                     populated via x-for after x-model first evaluates --}}
                                 <template x-if="field.type === 'column'">
                                     <select
                                         class="chart-builder__control chart-builder__control--select"
-                                        x-model="Alpine.store('chartBuilder').traces[Alpine.store('chartBuilder').activeTraceIndex].meta.columnNames[field.key]"
+                                        :value="Alpine.store('chartBuilder').traces[Alpine.store('chartBuilder').activeTraceIndex].meta.columnNames[field.key]"
+                                        @change="Alpine.store('chartBuilder').traces[Alpine.store('chartBuilder').activeTraceIndex].meta.columnNames[field.key] = $event.target.value"
                                     >
-                                        <option value="">— select column —</option>
+                                        <option value="" :selected="!Alpine.store('chartBuilder').traces[Alpine.store('chartBuilder').activeTraceIndex].meta.columnNames[field.key]">— select column —</option>
                                         <template x-for="col in Object.keys(Alpine.store('chartBuilder').dataSources)" :key="col">
-                                            <option :value="col" x-text="col"></option>
+                                            <option
+                                                :value="col"
+                                                x-text="col"
+                                                :selected="Alpine.store('chartBuilder').traces[Alpine.store('chartBuilder').activeTraceIndex].meta.columnNames[field.key] === col"
+                                            ></option>
                                         </template>
                                     </select>
                                 </template>
 
-                                {{-- enumerated --}}
+                                {{-- enumerated: same pattern --}}
                                 <template x-if="field.type === 'enumerated'">
                                     <select
                                         class="chart-builder__control chart-builder__control--select"
-                                        x-model="Alpine.store('chartBuilder').traces[Alpine.store('chartBuilder').activeTraceIndex][field.key]"
+                                        :value="Alpine.store('chartBuilder').traces[Alpine.store('chartBuilder').activeTraceIndex][field.key]"
+                                        @change="Alpine.store('chartBuilder').traces[Alpine.store('chartBuilder').activeTraceIndex][field.key] = $event.target.value"
                                     >
                                         <template x-for="val in (field.values ?? [])" :key="val">
-                                            <option :value="val" x-text="val || '(none)'"></option>
+                                            <option
+                                                :value="val"
+                                                x-text="val || '(none)'"
+                                                :selected="Alpine.store('chartBuilder').traces[Alpine.store('chartBuilder').activeTraceIndex][field.key] === val"
+                                            ></option>
                                         </template>
                                     </select>
                                 </template>
