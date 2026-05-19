@@ -570,6 +570,56 @@
             x-text="@js(__('plotly-chart-editor::plotly-chart-editor.sync.saved'))"
         ></span>
 
+        {{-- Export dropdown (shown when showExport is true) --}}
+        <div
+            class="chart-builder__export-wrap"
+            x-show="{{ $store }}.showExport"
+            x-data="{ open: false }"
+            x-on:click.outside="open = false"
+        >
+            <button
+                type="button"
+                class="chart-builder__btn"
+                x-on:click="open = !open"
+                :aria-expanded="open"
+            >{{ __('plotly-chart-editor::plotly-chart-editor.export.button') }} ▾</button>
+
+            <div class="chart-builder__export-menu" x-show="open" x-cloak>
+
+                {{-- "Copied ✓" transient --}}
+                <span
+                    class="chart-builder__export-copied"
+                    x-show="{{ $store }}.copiedAt !== null"
+                    x-text="@js(__('plotly-chart-editor::plotly-chart-editor.export.copied'))"
+                ></span>
+
+                <button
+                    type="button"
+                    class="chart-builder__export-item"
+                    x-on:click="{{ $store }}.exportJSON(); open = false"
+                >{{ __('plotly-chart-editor::plotly-chart-editor.export.json') }}</button>
+
+                <button
+                    type="button"
+                    class="chart-builder__export-item"
+                    x-on:click="{{ $store }}.exportImage('png'); open = false"
+                >{{ __('plotly-chart-editor::plotly-chart-editor.export.png') }}</button>
+
+                <button
+                    type="button"
+                    class="chart-builder__export-item"
+                    x-on:click="{{ $store }}.exportImage('svg'); open = false"
+                >{{ __('plotly-chart-editor::plotly-chart-editor.export.svg') }}</button>
+
+                <button
+                    type="button"
+                    class="chart-builder__export-item"
+                    x-on:click="{{ $store }}.copyConfig(); open = false"
+                >{{ __('plotly-chart-editor::plotly-chart-editor.export.copy') }}</button>
+
+            </div>
+        </div>
+
         {{-- Save button: visible in manual + hybrid, hidden in auto --}}
         <button
             type="button"

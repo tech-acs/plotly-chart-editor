@@ -80,6 +80,15 @@ return [
         'too_small' => 'This chart editor requires a screen at least 1024px wide.',
     ],
 
+    'export' => [
+        'button' => 'Export',
+        'json' => 'JSON config',
+        'png' => 'PNG image',
+        'svg' => 'SVG image',
+        'copy' => 'Copy to clipboard',
+        'copied' => 'Copied ✓',
+    ],
+
     'sync' => [
         'save_button' => 'Save',
         'saved' => 'Saved ✓',

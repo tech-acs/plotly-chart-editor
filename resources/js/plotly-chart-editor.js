@@ -35,6 +35,7 @@ let _booted = false
 let _suppressNextDirty = false   // blocks the first markDirty() after initial render
 let _deleteConfirmMsg  = 'Delete this trace? This cannot be undone.'
 let _savedTimer        = null    // clears the "Saved ✓" transient message
+let _copiedTimer       = null    // clears the "Copied ✓" transient message
 let _resizeObserver    = null    // ResizeObserver for viewport gate
 
 /**
@@ -135,6 +136,7 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
             syncing:    false,
             lastSyncAt: null,
             savedAt:    null,   // timestamp of last successful sync (drives "Saved ✓")
+            copiedAt:   null,   // timestamp of last clipboard copy (drives "Copied ✓")
 
             // ── Internal flags ────────────────────────────────────────────
             _plotlyMissingMessage: plotlyMissingMessage,
@@ -499,6 +501,82 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
                         type,
                     },
                 }))
+            },
+
+            // ── Export (PRD §10) ──────────────────────────────────────────
+
+            /**
+             * Download the full chart config as chart.json.
+             * meta is stripped — the file is ready for direct use with Plotly.newPlot().
+             */
+            exportJSON() {
+                const data = toRaw(this.traces).map(t => this.compileTrace(t))
+                const payload = JSON.stringify(
+                    { data, layout: deepClone(this.layout), config: deepClone(this.config) },
+                    null,
+                    2
+                )
+                this._download('chart.json', 'application/json', payload)
+            },
+
+            /**
+             * Export the current chart canvas as an image.
+             *
+             * @param {'png'|'jpeg'|'svg'|'webp'} format
+             */
+            async exportImage(format = 'png') {
+                if (this._plotlyMissing || !_canvasEl) return
+
+                try {
+                    const dataUrl = await window.Plotly.toImage(_canvasEl, {
+                        format,
+                        width:  _canvasEl.offsetWidth  || 1200,
+                        height: _canvasEl.offsetHeight || 600,
+                    })
+                    this._download(`chart.${format}`, `image/${format}`, dataUrl, true)
+                } catch (err) {
+                    console.error('[plotly-chart-editor] exportImage failed:', err)
+                }
+            },
+
+            /**
+             * Copy the chart config JSON to the clipboard.
+             * Shows a transient "Copied ✓" indicator via copiedAt.
+             */
+            async copyConfig() {
+                const data = toRaw(this.traces).map(t => this.compileTrace(t))
+                const text = JSON.stringify(
+                    { data, layout: deepClone(this.layout), config: deepClone(this.config) },
+                    null,
+                    2
+                )
+
+                try {
+                    await navigator.clipboard.writeText(text)
+                    this.copiedAt = Date.now()
+                    clearTimeout(_copiedTimer)
+                    _copiedTimer = setTimeout(() => { this.copiedAt = null }, 2000)
+                } catch (err) {
+                    console.error('[plotly-chart-editor] copyConfig failed:', err)
+                }
+            },
+
+            /**
+             * Trigger a browser download of content as a file.
+             *
+             * @param {string}  filename
+             * @param {string}  mimeType
+             * @param {string}  content
+             * @param {boolean} isDataUrl  When true, content is already a data URL.
+             */
+            _download(filename, mimeType, content, isDataUrl = false) {
+                const a    = document.createElement('a')
+                a.href     = isDataUrl ? content : `data:${mimeType};charset=utf-8,${encodeURIComponent(content)}`
+                a.download = filename
+                a.style.display = 'none'
+                document.body.appendChild(a)
+                a.click()
+                document.body.removeChild(a)
             },
 
             // ── Sync state ────────────────────────────────────────────────
