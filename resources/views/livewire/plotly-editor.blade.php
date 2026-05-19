@@ -498,6 +498,22 @@
                     </div>
                     <div class="chart-builder__field">
                         <label class="chart-builder__field-label">
+                            {{ __('plotly-chart-editor::plotly-chart-editor.fields.axis_type') }}
+                        </label>
+                        <select
+                            class="chart-builder__control chart-builder__control--select"
+                            x-model="{{ $store }}.layout.xaxis.type"
+                        >
+                            <option value="-">Auto</option>
+                            <option value="linear">Linear</option>
+                            <option value="log">Log</option>
+                            <option value="date">Date</option>
+                            <option value="category">Category</option>
+                            <option value="multicategory">Multi-category</option>
+                        </select>
+                    </div>
+                    <div class="chart-builder__field">
+                        <label class="chart-builder__field-label">
                             {{ __('plotly-chart-editor::plotly-chart-editor.fields.axis_auto_range') }}
                         </label>
                         <input
@@ -739,6 +755,22 @@
                 <div class="chart-builder__group">
                     <div class="chart-builder__group-label">
                         {{ __('plotly-chart-editor::plotly-chart-editor.ui.range') }}
+                    </div>
+                    <div class="chart-builder__field">
+                        <label class="chart-builder__field-label">
+                            {{ __('plotly-chart-editor::plotly-chart-editor.fields.axis_type') }}
+                        </label>
+                        <select
+                            class="chart-builder__control chart-builder__control--select"
+                            x-model="{{ $store }}.layout.yaxis.type"
+                        >
+                            <option value="-">Auto</option>
+                            <option value="linear">Linear</option>
+                            <option value="log">Log</option>
+                            <option value="date">Date</option>
+                            <option value="category">Category</option>
+                            <option value="multicategory">Multi-category</option>
+                        </select>
                     </div>
                     <div class="chart-builder__field">
                         <label class="chart-builder__field-label">

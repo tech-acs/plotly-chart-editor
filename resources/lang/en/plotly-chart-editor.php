@@ -145,6 +145,7 @@ return [
         'stackgroup' => 'Stack group',
         'groupnorm' => 'Group norm',
         'axis_auto_range' => 'Auto range',
+        'axis_type' => 'Type',
         'show_line' => 'Show line',
         'axis_line_color' => 'Line color',
         'axis_line_width' => 'Line width',
