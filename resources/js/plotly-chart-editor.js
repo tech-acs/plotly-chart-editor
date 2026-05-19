@@ -32,6 +32,7 @@ let _canvasEl = null
 let _renderTimer = null
 let _autoSyncTimer = null
 let _booted = false
+let _suppressNextDirty = false   // blocks the first markDirty() after initial render
 let _deleteConfirmMsg = 'Delete this trace? This cannot be undone.'
 
 /**
@@ -85,19 +86,18 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
             // ── Effects ───────────────────────────────────────────────────
 
             _startEffects() {
-                // Access this.traces THROUGH the reactive proxy first so Alpine
-                // registers the dependency, THEN toRaw for structuredClone safety.
-                // If toRaw is called first, Alpine sees no reactive read and the
-                // effect never re-runs on mutation.
+                const self = this
+
                 Alpine.effect(() => {
-                    const t = this.traces          // reactive read — Alpine tracks this
-                    JSON.stringify(toRaw(t))        // deep read to track nested changes
-                    this._scheduleRender()
+                    const t = self.traces
+                    JSON.stringify(toRaw(t))
+                    self._scheduleRender()
                 })
+
                 Alpine.effect(() => {
-                    const l = this.layout          // reactive read
+                    const l = self.layout
                     JSON.stringify(toRaw(l))
-                    this._scheduleRender()
+                    self._scheduleRender()
                 })
             },
 
@@ -107,7 +107,12 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
                 clearTimeout(_renderTimer)
                 _renderTimer = setTimeout(() => {
                     this._render()
-                    if (_booted) {
+                    if (_suppressNextDirty) {
+                        // Swallow the first auto-sync triggered by the initial
+                        // render — it would cause Livewire to morph the DOM and
+                        // destroy Alpine's event bindings before any user interaction.
+                        _suppressNextDirty = false
+                    } else {
                         this.markDirty()
                     }
                 }, 50)
@@ -382,6 +387,10 @@ function bootChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, c
     }
 
     if (!_booted) {
+        // Suppress the first markDirty() that fires after the initial render.
+        // Without this, the auto-sync would trigger a Livewire morph immediately
+        // on page load, destroying Alpine's event bindings on the sidebar buttons.
+        _suppressNextDirty = true
         store._startEffects()
         _booted = true
         store._render()
