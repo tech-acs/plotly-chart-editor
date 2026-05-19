@@ -28,23 +28,11 @@
     --plotly-editor-height:       calc(100vh - 80px);
 }
 
-/* ── Livewire outer wrapper ──────────────────────────────────────────────── */
-/* Livewire 4 wraps components in an anonymous <div wire:key="..."> with no
-   class or dimensions. display:contents removes it from the layout model so
-   .chart-builder behaves as a direct child of the page container, inheriting
-   full block width and allowing height:100% to resolve correctly. */
-:has(> .chart-builder) {
-    display: contents;
-}
-
 /* ── Root container (PRD §13.2) ──────────────────────────────────────────── */
 .chart-builder {
-    /* Flex row mirrors the react-chart-editor approach:
-       a concrete height on this container lets children use height:100%
-       reliably for their own overflow-y:auto scrolling. */
-    display: flex;
-    flex-direction: row;
-    width: 100%;
+    display: grid;
+    grid-template-columns: var(--plotly-editor-sidebar-w) 1fr;
+    grid-template-rows: minmax(520px, var(--plotly-editor-height));
     height: var(--plotly-editor-height);
     min-height: 520px;
     font-family: var(--plotly-editor-font);
@@ -58,17 +46,12 @@
 
 /* ── Sidebar ─────────────────────────────────────────────────────────────── */
 .chart-builder__sidebar {
-    /* height:100% works because the flex parent has a concrete height.
-       overflow-y:auto then triggers a scrollbar whenever content exceeds it. */
-    flex-shrink: 0;
-    width: var(--plotly-editor-sidebar-w);
-    height: 100%;
+    grid-column: 1;
+    align-self: stretch;
     background: var(--plotly-editor-surface);
     border-right: 1px solid var(--plotly-editor-border);
     overflow-y: auto;
-    overflow-x: hidden;
     padding: 0.75rem;
-    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -76,10 +59,9 @@
 
 /* ── Canvas ──────────────────────────────────────────────────────────────── */
 .chart-builder__canvas {
-    flex: 1;
+    grid-column: 2;
     position: relative;
     min-height: 400px;
-    overflow: hidden;
 }
 
 /* ── Groups ──────────────────────────────────────────────────────────────── */
