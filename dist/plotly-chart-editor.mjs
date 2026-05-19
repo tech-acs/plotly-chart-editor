@@ -10,7 +10,7 @@ const P = {
 }, C = {
   area: { mode: "none", fill: "tozeroy", fillcolor: "#1f77b4" }
 };
-let u = null, A = null, k = null, T = !1, b = !1, v = "Delete this trace? This cannot be undone.", S = null, O = null, _ = null;
+let u = null, A = null, k = null, T = !1, b = !1, _ = "Delete this trace? This cannot be undone.", S = null, O = null, v = null;
 function I(o, y) {
   for (const [f, c] of Object.entries(y))
     o[f] === void 0 || o[f] === null ? o[f] = structuredClone(c) : typeof c == "object" && !Array.isArray(c) && typeof o[f] == "object" && !Array.isArray(o[f]) && I(o[f], c);
@@ -78,8 +78,7 @@ const N = {
     bordercolor: "#444444",
     borderwidth: 0,
     font: { family: "Arial", size: 12, color: "#000000" },
-    title: { text: "", font: { family: "Arial", size: 12, color: "#000000" } },
-    _position: "auto"
+    title: { text: "", font: { family: "Arial", size: 12, color: "#000000" } }
   },
   hovermode: "x",
   hoverlabel: {
@@ -89,7 +88,7 @@ const N = {
   }
 };
 function M(o, y, f) {
-  v = f ?? v;
+  _ = f ?? _;
   const c = I(o.layout ?? {}, N);
   !!Alpine.store("chartBuilder") || Alpine.store("chartBuilder", {
     // ── Loaded from Livewire on mount ─────────────────────────────
@@ -281,7 +280,7 @@ function M(o, y, f) {
      */
     removeTrace(e) {
       const t = e ?? this.activeTraceIndex;
-      window.confirm(v) && (this.traces.splice(t, 1), this.traces.length === 0 ? this.activeTraceIndex = 0 : this.activeTraceIndex >= this.traces.length && (this.activeTraceIndex = this.traces.length - 1));
+      window.confirm(_) && (this.traces.splice(t, 1), this.traces.length === 0 ? this.activeTraceIndex = 0 : this.activeTraceIndex >= this.traces.length && (this.activeTraceIndex = this.traces.length - 1));
     },
     /**
      * Swap trace at `from` with trace at `to`.
@@ -458,13 +457,13 @@ function z(o, y, f, c, x) {
     e._plotlyMissing = !0, c && (c.textContent = y);
     return;
   }
-  T && e._render(), _ && _.disconnect();
+  T && e._render(), v && v.disconnect();
   const t = c == null ? void 0 : c.closest(".chart-builder");
-  t && typeof ResizeObserver < "u" && (_ = new ResizeObserver((i) => {
+  t && typeof ResizeObserver < "u" && (v = new ResizeObserver((i) => {
     var n, h;
     const s = (((h = (n = i[0]) == null ? void 0 : n.contentRect) == null ? void 0 : h.width) ?? window.innerWidth) < 1024;
     e._tooSmall = s, s && u && typeof window.Plotly < "u" && (window.Plotly.purge(u), T = !1);
-  }), _.observe(t)), c && typeof ResizeObserver < "u" && new ResizeObserver(() => {
+  }), v.observe(t)), c && typeof ResizeObserver < "u" && new ResizeObserver(() => {
     if (e._plotlyMissing || typeof window.Plotly > "u" || e._tooSmall) return;
     const r = c.getBoundingClientRect();
     r.width === 0 || r.height === 0 || (T ? window.Plotly.Plots.resize(c) : (b = !0, e._startEffects(), T = !0, e._render()));

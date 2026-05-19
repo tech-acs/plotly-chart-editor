@@ -1064,7 +1064,7 @@
                     </label>
                     <select
                         class="chart-builder__control chart-builder__control--select"
-                        :value="{{ $store }}.getPath({{ $store }}.layout, 'legend._position') || 'auto'"
+                        :value="{{ $store }}.getPath({{ $store }}.layout, 'legend._position') || 'top-right'"
                         @change="
                             const v = $event.target.value;
                             const l = {{ $store }}.layout;
@@ -1085,12 +1085,9 @@
                                 l.legend.xanchor = 'left'; l.legend.yanchor = 'middle'; l.legend.x = 0; l.legend.y = 0.5;
                             } else if (v === 'right-center') {
                                 l.legend.xanchor = 'right'; l.legend.yanchor = 'middle'; l.legend.x = 1; l.legend.y = 0.5;
-                            } else if (v === 'auto') {
-                                l.legend.xanchor = 'right'; l.legend.yanchor = 'top'; l.legend.x = 1; l.legend.y = 1;
                             }
                         "
                     >
-                        <option value="auto">Auto</option>
                         <option value="top-right">Top right</option>
                         <option value="top-left">Top left</option>
                         <option value="bottom-right">Bottom right</option>

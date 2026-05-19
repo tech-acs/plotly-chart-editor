@@ -151,7 +151,6 @@ const LAYOUT_DEFAULTS = {
         borderwidth: 0,
         font: { family: 'Arial', size: 12, color: '#000000' },
         title: { text: '', font: { family: 'Arial', size: 12, color: '#000000' } },
-        _position: 'auto',
     },
     hovermode:  'x',
     hoverlabel: {
