@@ -66,6 +66,9 @@ return [
         'tick_angle' => 'Tick angle',
         'tick_format' => 'Tick format',
         'tick_font' => 'Tick font',
+        'range' => 'Range',
+        'axis_line' => 'Axis line',
+        'tick_labels' => 'Tick labels',
 
         // Canvas & Titles fold
         'chart_title' => 'Chart title',
@@ -141,6 +144,18 @@ return [
         'extendpiecolors' => 'Extend pie colors',
         'stackgroup' => 'Stack group',
         'groupnorm' => 'Group norm',
+        'axis_auto_range' => 'Auto range',
+        'show_line' => 'Show line',
+        'axis_line_color' => 'Line color',
+        'axis_line_width' => 'Line width',
+        'mirror' => 'Mirror',
+        'show_tick_labels' => 'Show labels',
+        'tick_prefix' => 'Prefix',
+        'tick_suffix' => 'Suffix',
+        'tick_color' => 'Tick color',
+        'tick_width' => 'Tick width',
+        'tick_len' => 'Tick length',
+        'ticks' => 'Ticks',
     ],
 
 ];
