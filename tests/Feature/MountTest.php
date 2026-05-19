@@ -24,7 +24,7 @@ it('uses defaults for optional props', function (): void {
     ]);
 
     $component
-        ->assertSet('traceTypes', ['bar'])
+        ->assertSet('traceTypes', ['bar', 'scatter', 'pie', 'histogram', 'line', 'area'])
         ->assertSet('syncMode', 'manual')
         ->assertSet('preloadSchema', true)
         ->assertSet('showExport', true);

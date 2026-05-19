@@ -56,7 +56,7 @@ function M(o, y, h) {
     config: o.config ?? { responsive: !0 },
     // ── Sync / UI config ──────────────────────────────────────────
     syncMode: o.syncMode ?? "manual",
-    traceTypes: o.traceTypes ?? ["bar"],
+    traceTypes: o.traceTypes ?? ["bar", "scatter", "pie", "histogram", "line", "area"],
     showExport: o.showExport ?? !0,
     // ── Derived ───────────────────────────────────────────────────
     activeTraceIndex: 0,
