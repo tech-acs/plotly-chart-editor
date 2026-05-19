@@ -434,59 +434,61 @@
 
             {{-- ── X Axis panel ─────────────────────────────────────--}}
             <div x-show="{{ $store }}.activeAxis === 'x'" x-cloak>
-                <div class="chart-builder__field">
-                    <label class="chart-builder__field-label">
-                        {{ __('plotly-chart-editor::plotly-chart-editor.ui.axis_title') }}
-                    </label>
-                    <input
-                        type="text"
-                        class="chart-builder__control chart-builder__control--text"
-                        x-model="{{ $store }}.layout.xaxis.title.text"
-                    >
-                </div>
+                <div class="chart-builder__group">
+                    <div class="chart-builder__field">
+                        <label class="chart-builder__field-label">
+                            {{ __('plotly-chart-editor::plotly-chart-editor.ui.axis_title') }}
+                        </label>
+                        <input
+                            type="text"
+                            class="chart-builder__control chart-builder__control--text"
+                            x-model="{{ $store }}.layout.xaxis.title.text"
+                        >
+                    </div>
 
-                <div class="chart-builder__field">
-                    <label class="chart-builder__field-label">
-                        {{ __('plotly-chart-editor::plotly-chart-editor.ui.gridlines') }}
-                    </label>
-                    <input
-                        type="checkbox"
-                        class="chart-builder__control chart-builder__control--checkbox"
-                        x-model="{{ $store }}.layout.xaxis.showgrid"
-                    >
-                </div>
+                    <div class="chart-builder__field">
+                        <label class="chart-builder__field-label">
+                            {{ __('plotly-chart-editor::plotly-chart-editor.ui.gridlines') }}
+                        </label>
+                        <input
+                            type="checkbox"
+                            class="chart-builder__control chart-builder__control--checkbox"
+                            x-model="{{ $store }}.layout.xaxis.showgrid"
+                        >
+                    </div>
 
-                <div class="chart-builder__field">
-                    <label class="chart-builder__field-label">
-                        {{ __('plotly-chart-editor::plotly-chart-editor.ui.zeroline') }}
-                    </label>
-                    <input
-                        type="checkbox"
-                        class="chart-builder__control chart-builder__control--checkbox"
-                        x-model="{{ $store }}.layout.xaxis.zeroline"
-                    >
-                </div>
+                    <div class="chart-builder__field">
+                        <label class="chart-builder__field-label">
+                            {{ __('plotly-chart-editor::plotly-chart-editor.ui.zeroline') }}
+                        </label>
+                        <input
+                            type="checkbox"
+                            class="chart-builder__control chart-builder__control--checkbox"
+                            x-model="{{ $store }}.layout.xaxis.zeroline"
+                        >
+                    </div>
 
-                <div class="chart-builder__field">
-                    <label class="chart-builder__field-label">
-                        {{ __('plotly-chart-editor::plotly-chart-editor.ui.tick_angle') }}
-                    </label>
-                    <input
-                        type="number"
-                        class="chart-builder__control chart-builder__control--number"
-                        min="-90"
-                        max="90"
-                        x-model.number="{{ $store }}.layout.xaxis.tickangle"
-                    >
-                </div>
+                    <div class="chart-builder__field">
+                        <label class="chart-builder__field-label">
+                            {{ __('plotly-chart-editor::plotly-chart-editor.ui.tick_angle') }}
+                        </label>
+                        <input
+                            type="number"
+                            class="chart-builder__control chart-builder__control--number"
+                            min="-90"
+                            max="90"
+                            x-model.number="{{ $store }}.layout.xaxis.tickangle"
+                        >
+                    </div>
 
-                <div class="chart-builder__field">
-                    <label class="chart-builder__field-label">
-                        {{ __('plotly-chart-editor::plotly-chart-editor.ui.tick_font') }}
-                    </label>
-                    <x-plotly-chart-editor::primitives.font
-                        :path="$store . '.layout.xaxis.tickfont'"
-                    />
+                    <div class="chart-builder__field">
+                        <label class="chart-builder__field-label">
+                            {{ __('plotly-chart-editor::plotly-chart-editor.ui.tick_font') }}
+                        </label>
+                        <x-plotly-chart-editor::primitives.font
+                            :path="$store . '.layout.xaxis.tickfont'"
+                        />
+                    </div>
                 </div>
 
                 {{-- Range (X) --}}
@@ -678,57 +680,59 @@
 
             {{-- ── Y Axis panel ─────────────────────────────────────--}}
             <div x-show="{{ $store }}.activeAxis === 'y'" x-cloak>
-                <div class="chart-builder__field">
-                    <label class="chart-builder__field-label">
-                        {{ __('plotly-chart-editor::plotly-chart-editor.ui.axis_title') }}
-                    </label>
-                    <input
-                        type="text"
-                        class="chart-builder__control chart-builder__control--text"
-                        x-model="{{ $store }}.layout.yaxis.title.text"
-                    >
-                </div>
+                <div class="chart-builder__group">
+                    <div class="chart-builder__field">
+                        <label class="chart-builder__field-label">
+                            {{ __('plotly-chart-editor::plotly-chart-editor.ui.axis_title') }}
+                        </label>
+                        <input
+                            type="text"
+                            class="chart-builder__control chart-builder__control--text"
+                            x-model="{{ $store }}.layout.yaxis.title.text"
+                        >
+                    </div>
 
-                <div class="chart-builder__field">
-                    <label class="chart-builder__field-label">
-                        {{ __('plotly-chart-editor::plotly-chart-editor.ui.gridlines') }}
-                    </label>
-                    <input
-                        type="checkbox"
-                        class="chart-builder__control chart-builder__control--checkbox"
-                        x-model="{{ $store }}.layout.yaxis.showgrid"
-                    >
-                </div>
+                    <div class="chart-builder__field">
+                        <label class="chart-builder__field-label">
+                            {{ __('plotly-chart-editor::plotly-chart-editor.ui.gridlines') }}
+                        </label>
+                        <input
+                            type="checkbox"
+                            class="chart-builder__control chart-builder__control--checkbox"
+                            x-model="{{ $store }}.layout.yaxis.showgrid"
+                        >
+                    </div>
 
-                <div class="chart-builder__field">
-                    <label class="chart-builder__field-label">
-                        {{ __('plotly-chart-editor::plotly-chart-editor.ui.zeroline') }}
-                    </label>
-                    <input
-                        type="checkbox"
-                        class="chart-builder__control chart-builder__control--checkbox"
-                        x-model="{{ $store }}.layout.yaxis.zeroline"
-                    >
-                </div>
+                    <div class="chart-builder__field">
+                        <label class="chart-builder__field-label">
+                            {{ __('plotly-chart-editor::plotly-chart-editor.ui.zeroline') }}
+                        </label>
+                        <input
+                            type="checkbox"
+                            class="chart-builder__control chart-builder__control--checkbox"
+                            x-model="{{ $store }}.layout.yaxis.zeroline"
+                        >
+                    </div>
 
-                <div class="chart-builder__field">
-                    <label class="chart-builder__field-label">
-                        {{ __('plotly-chart-editor::plotly-chart-editor.ui.tick_format') }}
-                    </label>
-                    <input
-                        type="text"
-                        class="chart-builder__control chart-builder__control--text"
-                        x-model="{{ $store }}.layout.yaxis.tickformat"
-                    >
-                </div>
+                    <div class="chart-builder__field">
+                        <label class="chart-builder__field-label">
+                            {{ __('plotly-chart-editor::plotly-chart-editor.ui.tick_format') }}
+                        </label>
+                        <input
+                            type="text"
+                            class="chart-builder__control chart-builder__control--text"
+                            x-model="{{ $store }}.layout.yaxis.tickformat"
+                        >
+                    </div>
 
-                <div class="chart-builder__field">
-                    <label class="chart-builder__field-label">
-                        {{ __('plotly-chart-editor::plotly-chart-editor.ui.tick_font') }}
-                    </label>
-                    <x-plotly-chart-editor::primitives.font
-                        :path="$store . '.layout.yaxis.tickfont'"
-                    />
+                    <div class="chart-builder__field">
+                        <label class="chart-builder__field-label">
+                            {{ __('plotly-chart-editor::plotly-chart-editor.ui.tick_font') }}
+                        </label>
+                        <x-plotly-chart-editor::primitives.font
+                            :path="$store . '.layout.yaxis.tickfont'"
+                        />
+                    </div>
                 </div>
 
                 {{-- Range (Y) --}}
