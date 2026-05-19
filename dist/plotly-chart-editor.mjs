@@ -2,12 +2,12 @@ function a(o) {
   return typeof Alpine < "u" && typeof Alpine.raw == "function" ? Alpine.raw(o) : o;
 }
 function d(o) {
-  return structuredClone(a(o));
+  return JSON.parse(JSON.stringify(a(o)));
 }
 let m = null;
-const C = {
+const P = {
   area: "scatter"
-}, P = {
+}, C = {
   area: { mode: "none", fill: "tozeroy", fillcolor: "#1f77b4" }
 };
 let u = null, A = null, k = null, T = !1, b = !1, v = "Delete this trace? This cannot be undone.", S = null, O = null, _ = null;
@@ -16,7 +16,7 @@ function I(o, y) {
     o[f] === void 0 || o[f] === null ? o[f] = structuredClone(c) : typeof c == "object" && !Array.isArray(c) && typeof o[f] == "object" && !Array.isArray(o[f]) && I(o[f], c);
   return o;
 }
-const z = {
+const N = {
   // Nested sub-objects that primitives bind into must always exist.
   // We provide structural defaults only — values that match Plotly's own
   // defaults so the controls reflect the actual chart state on first render.
@@ -74,7 +74,7 @@ const z = {
     yanchor: "top",
     x: 1,
     y: 1,
-    bgcolor: "transparent",
+    bgcolor: "",
     bordercolor: "#444444",
     borderwidth: 0,
     font: { family: "Arial", size: 12, color: "#000000" },
@@ -90,7 +90,7 @@ const z = {
 };
 function M(o, y, f) {
   v = f ?? v;
-  const c = I(o.layout ?? {}, z);
+  const c = I(o.layout ?? {}, N);
   !!Alpine.store("chartBuilder") || Alpine.store("chartBuilder", {
     // ── Loaded from Livewire on mount ─────────────────────────────
     dataSources: o.dataSources ?? {},
@@ -247,7 +247,7 @@ function M(o, y, f) {
     },
     compileTrace(e) {
       const t = this.resolveMeta(e);
-      return t.type = C[t.type] ?? t.type, delete t.meta, t;
+      return t.type = P[t.type] ?? t.type, delete t.meta, t;
     },
     // ── Trace operations (PRD §6) ─────────────────────────────────
     /**
@@ -342,7 +342,7 @@ function M(o, y, f) {
         r[l] !== void 0 && (n[l] = r[l]);
       for (const l of Object.keys(r))
         ["type", "name", "meta"].includes(l) || s.has(l) && (n[l] = r[l]);
-      const h = P[t] ?? {};
+      const h = C[t] ?? {};
       for (const [l, g] of Object.entries(h))
         n[l] = g;
       this.traces[e] = n;
@@ -451,7 +451,7 @@ function M(o, y, f) {
     }
   });
 }
-function N(o, y, f, c, x) {
+function z(o, y, f, c, x) {
   M(o, y, f);
   const e = Alpine.store("chartBuilder");
   if (u = c, m = x, typeof window.Plotly > "u") {
@@ -470,8 +470,8 @@ function N(o, y, f, c, x) {
     r.width === 0 || r.height === 0 || (T ? window.Plotly.Plots.resize(c) : (b = !0, e._startEffects(), T = !0, e._render()));
   }).observe(c);
 }
-typeof window < "u" && (window.initChartBuilder = M, window.bootChartBuilder = N);
+typeof window < "u" && (window.initChartBuilder = M, window.bootChartBuilder = z);
 export {
-  N as bootChartBuilder,
+  z as bootChartBuilder,
   M as initChartBuilder
 };

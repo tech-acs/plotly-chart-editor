@@ -22,7 +22,10 @@ function toRaw(value) {
  * Deep-clone any value, safely handling Alpine reactive proxies.
  */
 function deepClone(value) {
-    return structuredClone(toRaw(value))
+    // JSON round-trip safely strips all nested Alpine reactive proxies.
+    // structuredClone(toRaw(value)) fails because Alpine.raw() only unwraps
+    // the top level — nested objects remain proxied and unclonable.
+    return JSON.parse(JSON.stringify(toRaw(value)))
 }
 
 // Module-level closure state — outside the Alpine store so Alpine never
@@ -143,7 +146,7 @@ const LAYOUT_DEFAULTS = {
         yanchor: 'top',
         x: 1,
         y: 1,
-        bgcolor: 'transparent',
+        bgcolor: '',
         bordercolor: '#444444',
         borderwidth: 0,
         font: { family: 'Arial', size: 12, color: '#000000' },

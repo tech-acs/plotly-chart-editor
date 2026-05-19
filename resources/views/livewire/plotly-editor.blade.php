@@ -1109,7 +1109,7 @@
                         type="text"
                         class="chart-builder__control chart-builder__control--text"
                         :value="{{ $store }}.layout.legend.title?.text ?? ''"
-                        @change="{{ $store }}.layout.legend.title = { ...({{ $store }}.layout.legend.title || {}), text: $event.target.value }"
+                        @change="{{ $store }}.layout.legend.title.text = $event.target.value"
                     >
                 </div>
 
@@ -1138,7 +1138,7 @@
                     <input
                         type="color"
                         class="chart-builder__control chart-builder__control--color"
-                        :value="{{ $store }}.layout.legend.bgcolor || 'transparent'"
+                        :value="{{ $store }}.layout.legend.bgcolor || '#ffffff'"
                         @change="{{ $store }}.layout.legend.bgcolor = $event.target.value"
                     >
                 </div>
