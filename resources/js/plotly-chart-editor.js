@@ -28,6 +28,22 @@ function deepClone(value) {
 // Module-level closure state — outside the Alpine store so Alpine never
 // wraps them in reactive proxies.
 let _wire = null
+
+/**
+ * Map of display trace type → actual Plotly trace type.
+ * Used in compileTrace() so non-native types like "area" render correctly.
+ */
+const _plotlyTypeMap = {
+    area: 'scatter',
+}
+
+/**
+ * Defaults applied when switching to a display type (in _applyTraceType).
+ * Keys/values are merged into the new trace.
+ */
+const _typeDefaults = {
+    area: { mode: 'none', fill: 'tozeroy' },
+}
 let _canvasEl = null
 let _renderTimer = null
 let _autoSyncTimer = null
@@ -335,6 +351,7 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
 
             compileTrace(trace) {
                 const compiled = this.resolveMeta(trace)
+                compiled.type = _plotlyTypeMap[compiled.type] ?? compiled.type
                 delete compiled.meta
                 return compiled
             },
@@ -476,6 +493,12 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
                 for (const k of Object.keys(oldTrace)) {
                     if (['type', 'name', 'meta'].includes(k)) continue
                     if (keepKeys.has(k)) pruned[k] = oldTrace[k]
+                }
+
+                // Apply type-specific defaults (e.g. area → mode='none', fill='tozeroy')
+                const defaults = _typeDefaults[newType] ?? {}
+                for (const [k, v] of Object.entries(defaults)) {
+                    pruned[k] = v
                 }
 
                 this.traces[index] = pruned

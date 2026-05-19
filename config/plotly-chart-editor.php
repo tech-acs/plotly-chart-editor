@@ -423,6 +423,7 @@ return [
 
     'aliases' => [
         'line' => 'scatter',
+        'area' => 'scatter',
     ],
 
     /*
