@@ -1,23 +1,51 @@
-function a(s) {
-  return typeof Alpine < "u" && typeof Alpine.raw == "function" ? Alpine.raw(s) : s;
+function a(r) {
+  return typeof Alpine < "u" && typeof Alpine.raw == "function" ? Alpine.raw(r) : r;
 }
-function l(s) {
-  return structuredClone(a(s));
+function h(r) {
+  return structuredClone(a(r));
 }
-let h = null, p = null, T = null, _ = null, g = !1, m = !1, y = "Delete this trace? This cannot be undone.";
-function v(s, d, f) {
-  y = f ?? y, !!Alpine.store("chartBuilder") || Alpine.store("chartBuilder", {
+let d = null, p = null, _ = null, g = null, v = !1, m = !1, y = "Delete this trace? This cannot be undone.";
+function w(r, u) {
+  for (const [c, n] of Object.entries(u))
+    r[c] === void 0 || r[c] === null ? r[c] = structuredClone(n) : typeof n == "object" && !Array.isArray(n) && typeof r[c] == "object" && !Array.isArray(r[c]) && w(r[c], n);
+  return r;
+}
+const x = {
+  title: { text: "", font: { family: "Arial", size: 16, color: "#000000" } },
+  xaxis: {
+    title: { text: "" },
+    showgrid: !0,
+    zeroline: !0,
+    tickangle: 0,
+    tickfont: { family: "Arial", size: 12, color: "#000000" }
+  },
+  yaxis: {
+    title: { text: "" },
+    showgrid: !0,
+    zeroline: !0,
+    tickformat: ""
+  },
+  margin: { t: 50, b: 50, l: 60, r: 30 },
+  showlegend: !0,
+  legend: { orientation: "v" },
+  plot_bgcolor: "#ffffff",
+  paper_bgcolor: "#ffffff"
+};
+function A(r, u, c) {
+  y = c ?? y;
+  const n = w(r.layout ?? {}, x);
+  !!Alpine.store("chartBuilder") || Alpine.store("chartBuilder", {
     // ── Loaded from Livewire on mount ─────────────────────────────
-    dataSources: s.dataSources ?? {},
-    schemaProfiles: s.schemaProfiles ?? {},
+    dataSources: r.dataSources ?? {},
+    schemaProfiles: r.schemaProfiles ?? {},
     // ── Managed by Alpine ─────────────────────────────────────────
-    traces: s.traces ?? [],
-    layout: s.layout ?? {},
-    config: s.config ?? { responsive: !0 },
+    traces: r.traces ?? [],
+    layout: n,
+    config: r.config ?? { responsive: !0 },
     // ── Sync / UI config ──────────────────────────────────────────
-    syncMode: s.syncMode ?? "manual",
-    traceTypes: s.traceTypes ?? ["bar"],
-    showExport: s.showExport ?? !0,
+    syncMode: r.syncMode ?? "manual",
+    traceTypes: r.traceTypes ?? ["bar"],
+    showExport: r.showExport ?? !0,
     // ── Derived ───────────────────────────────────────────────────
     activeTraceIndex: 0,
     // ── Validation & sync state ───────────────────────────────────
@@ -26,7 +54,7 @@ function v(s, d, f) {
     syncing: !1,
     lastSyncAt: null,
     // ── Internal flags ────────────────────────────────────────────
-    _plotlyMissingMessage: d,
+    _plotlyMissingMessage: u,
     _plotlyMissing: !1,
     // ── Conditional visibility helpers (PRD §8) ───────────────────
     /**
@@ -71,7 +99,7 @@ function v(s, d, f) {
     },
     // ── Render pipeline ───────────────────────────────────────────
     _scheduleRender() {
-      clearTimeout(T), T = setTimeout(() => {
+      clearTimeout(_), _ = setTimeout(() => {
         this._render(), m ? m = !1 : this.markDirty();
       }, 50);
     },
@@ -81,16 +109,16 @@ function v(s, d, f) {
       window.Plotly.react(
         p,
         e,
-        l(this.layout),
-        l(this.config)
+        h(this.layout),
+        h(this.config)
       );
     },
     // ── Meta resolution ───────────────────────────────────────────
     resolveMeta(e) {
       var i;
-      const t = l(e), r = ((i = t.meta) == null ? void 0 : i.columnNames) ?? {};
-      for (const [c, o] of Object.entries(r))
-        o && this.dataSources[o] !== void 0 && (t[c] = a(this.dataSources[o]));
+      const t = h(e), s = ((i = t.meta) == null ? void 0 : i.columnNames) ?? {};
+      for (const [o, f] of Object.entries(s))
+        f && this.dataSources[f] !== void 0 && (t[o] = a(this.dataSources[f]));
       return t;
     },
     compileTrace(e) {
@@ -118,8 +146,8 @@ function v(s, d, f) {
      * @param {number} [index]
      */
     duplicateTrace(e) {
-      const t = e ?? this.activeTraceIndex, r = l(a(this.traces)[t]);
-      r.name = (r.name ?? `Trace ${t + 1}`) + " (copy)", this.traces.push(r), this.activeTraceIndex = this.traces.length - 1;
+      const t = e ?? this.activeTraceIndex, s = h(a(this.traces)[t]);
+      s.name = (s.name ?? `Trace ${t + 1}`) + " (copy)", this.traces.push(s), this.activeTraceIndex = this.traces.length - 1;
     },
     /**
      * Remove a trace after native confirm(). Adjusts activeTraceIndex
@@ -138,9 +166,9 @@ function v(s, d, f) {
      * @param {number} to
      */
     moveTrace(e, t) {
-      const r = this.traces.length;
-      if (t < 0 || t >= r) return;
-      const i = l(a(this.traces[e]));
+      const s = this.traces.length;
+      if (t < 0 || t >= s) return;
+      const i = h(a(this.traces[e]));
       this.traces.splice(e, 1), this.traces.splice(t, 0, i), this.activeTraceIndex = t;
     },
     /**
@@ -173,29 +201,29 @@ function v(s, d, f) {
           this._applyTraceType(e, t);
           return;
         }
-        if (h)
+        if (d)
           try {
-            const c = await h.getSchemaProfile(t);
-            if (!c || typeof c != "object" || !c.groups)
+            const o = await d.getSchemaProfile(t);
+            if (!o || typeof o != "object" || !o.groups)
               throw new Error(`Invalid profile returned for type "${t}"`);
-            this.schemaProfiles[t] = c, this._applyTraceType(e, t);
-          } catch (c) {
-            console.error(`[plotly-chart-editor] Failed to load profile for "${t}":`, c), this._dispatchToast(t);
+            this.schemaProfiles[t] = o, this._applyTraceType(e, t);
+          } catch (o) {
+            console.error(`[plotly-chart-editor] Failed to load profile for "${t}":`, o), this._dispatchToast(t);
           }
       }
     },
     _applyTraceType(e, t) {
-      const r = this.schemaProfiles[t], i = l(a(this.traces)[e] ?? {}), c = this._profileFieldKeys(r), o = { type: t };
-      for (const n of ["name", "meta"])
-        i[n] !== void 0 && (o[n] = i[n]);
-      for (const n of Object.keys(i))
-        ["type", "name", "meta"].includes(n) || c.has(n) && (o[n] = i[n]);
-      this.traces[e] = o;
+      const s = this.schemaProfiles[t], i = h(a(this.traces)[e] ?? {}), o = this._profileFieldKeys(s), f = { type: t };
+      for (const l of ["name", "meta"])
+        i[l] !== void 0 && (f[l] = i[l]);
+      for (const l of Object.keys(i))
+        ["type", "name", "meta"].includes(l) || o.has(l) && (f[l] = i[l]);
+      this.traces[e] = f;
     },
     _profileFieldKeys(e) {
       const t = /* @__PURE__ */ new Set();
-      for (const r of Object.values((e == null ? void 0 : e.groups) ?? {}))
-        for (const i of (r == null ? void 0 : r.fields) ?? [])
+      for (const s of Object.values((e == null ? void 0 : e.groups) ?? {}))
+        for (const i of (s == null ? void 0 : s.fields) ?? [])
           t.add(i.key.split(".")[0]);
       return t;
     },
@@ -213,35 +241,35 @@ function v(s, d, f) {
       this.dirty = !0, this._maybeAutoSync();
     },
     _maybeAutoSync() {
-      (this.syncMode === "auto" || this.syncMode === "hybrid") && (clearTimeout(_), _ = setTimeout(() => this.syncToBackend(), 500));
+      (this.syncMode === "auto" || this.syncMode === "hybrid") && (clearTimeout(g), g = setTimeout(() => this.syncToBackend(), 500));
     },
     syncToBackend() {
-      if (this.syncing || !h) return;
+      if (this.syncing || !d) return;
       this.syncing = !0;
       const e = {
         traces: a(this.traces).map((t) => this.compileTrace(t)),
-        layout: l(this.layout)
+        layout: h(this.layout)
       };
-      h.syncFromAlpine(JSON.stringify(e)).finally(() => {
+      d.syncFromAlpine(JSON.stringify(e)).finally(() => {
         this.syncing = !1, this.dirty = !1, this.lastSyncAt = Date.now();
       });
     },
     setWire(e) {
-      h = e;
+      d = e;
     }
   });
 }
-function w(s, d, f, u, e) {
-  v(s, d, f);
-  const t = Alpine.store("chartBuilder");
-  if (p = u, h = e, typeof window.Plotly > "u") {
-    t._plotlyMissing = !0, u && (u.textContent = d);
+function b(r, u, c, n, T) {
+  A(r, u, c);
+  const e = Alpine.store("chartBuilder");
+  if (p = n, d = T, typeof window.Plotly > "u") {
+    e._plotlyMissing = !0, n && (n.textContent = u);
     return;
   }
-  g || (m = !0, t._startEffects(), g = !0), t._render();
+  v || (m = !0, e._startEffects(), v = !0), e._render();
 }
-typeof window < "u" && (window.initChartBuilder = v, window.bootChartBuilder = w);
+typeof window < "u" && (window.initChartBuilder = A, window.bootChartBuilder = b);
 export {
-  w as bootChartBuilder,
-  v as initChartBuilder
+  b as bootChartBuilder,
+  A as initChartBuilder
 };

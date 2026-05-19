@@ -43,8 +43,56 @@ let _deleteConfirmMsg = 'Delete this trace? This cannot be undone.'
  * @param {string} plotlyMissingMessage
  * @param {string} deleteConfirmMessage
  */
+/**
+ * Deep-merge `defaults` into `target` without overwriting existing values.
+ * Only plain objects are recursed; arrays and primitives are left as-is.
+ */
+function mergeDefaults(target, defaults) {
+    for (const [key, val] of Object.entries(defaults)) {
+        if (target[key] === undefined || target[key] === null) {
+            target[key] = structuredClone(val)
+        } else if (
+            typeof val === 'object' && !Array.isArray(val) &&
+            typeof target[key] === 'object' && !Array.isArray(target[key])
+        ) {
+            mergeDefaults(target[key], val)
+        }
+    }
+    return target
+}
+
+/**
+ * Ensure the layout object always contains the nested sub-objects that the
+ * Fold 2 / Fold 3 primitives bind into. Without these, Alpine throws
+ * "Cannot read properties of undefined" on first render.
+ */
+const LAYOUT_DEFAULTS = {
+    title:  { text: '', font: { family: 'Arial', size: 16, color: '#000000' } },
+    xaxis:  {
+        title: { text: '' },
+        showgrid: true,
+        zeroline: true,
+        tickangle: 0,
+        tickfont: { family: 'Arial', size: 12, color: '#000000' },
+    },
+    yaxis:  {
+        title: { text: '' },
+        showgrid: true,
+        zeroline: true,
+        tickformat: '',
+    },
+    margin: { t: 50, b: 50, l: 60, r: 30 },
+    showlegend: true,
+    legend: { orientation: 'v' },
+    plot_bgcolor:  '#ffffff',
+    paper_bgcolor: '#ffffff',
+}
+
 function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
     _deleteConfirmMsg = deleteConfirmMessage ?? _deleteConfirmMsg
+
+    // Ensure layout sub-objects always exist before the store is registered.
+    const layout = mergeDefaults(payload.layout ?? {}, LAYOUT_DEFAULTS)
 
     // Register the store only on first call.
     // IMPORTANT: Alpine.store(name, value) returns void, not the store.
@@ -62,7 +110,7 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
 
             // ── Managed by Alpine ─────────────────────────────────────────
             traces:     payload.traces     ?? [],
-            layout:     payload.layout     ?? {},
+            layout,
             config:     payload.config     ?? { responsive: true },
 
             // ── Sync / UI config ──────────────────────────────────────────
