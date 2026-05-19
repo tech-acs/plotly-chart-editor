@@ -5,8 +5,8 @@ function l(s) {
   return structuredClone(c(s));
 }
 let h = null, p = null, T = null, _ = null, m = !1, y = "Delete this trace? This cannot be undone.";
-function v(s, d, u) {
-  return y = u ?? y, !!Alpine.store("chartBuilder") || Alpine.store("chartBuilder", {
+function g(s, d, u) {
+  y = u ?? y, !!Alpine.store("chartBuilder") || Alpine.store("chartBuilder", {
     // ── Loaded from Livewire on mount ─────────────────────────────
     dataSources: s.dataSources ?? {},
     schemaProfiles: s.schemaProfiles ?? {},
@@ -58,8 +58,8 @@ function v(s, d, u) {
     resolveMeta(t) {
       var r;
       const e = l(t), i = ((r = e.meta) == null ? void 0 : r.columnNames) ?? {};
-      for (const [n, o] of Object.entries(i))
-        o && this.dataSources[o] !== void 0 && (e[n] = c(this.dataSources[o]));
+      for (const [n, a] of Object.entries(i))
+        a && this.dataSources[a] !== void 0 && (e[n] = c(this.dataSources[a]));
       return e;
     },
     compileTrace(t) {
@@ -154,12 +154,12 @@ function v(s, d, u) {
       }
     },
     _applyTraceType(t, e) {
-      const i = this.schemaProfiles[e], r = l(c(this.traces)[t] ?? {}), n = this._profileFieldKeys(i), o = { type: e };
-      for (const a of ["name", "meta"])
-        r[a] !== void 0 && (o[a] = r[a]);
-      for (const a of Object.keys(r))
-        ["type", "name", "meta"].includes(a) || n.has(a) && (o[a] = r[a]);
-      this.traces[t] = o;
+      const i = this.schemaProfiles[e], r = l(c(this.traces)[t] ?? {}), n = this._profileFieldKeys(i), a = { type: e };
+      for (const o of ["name", "meta"])
+        r[o] !== void 0 && (a[o] = r[o]);
+      for (const o of Object.keys(r))
+        ["type", "name", "meta"].includes(o) || n.has(o) && (a[o] = r[o]);
+      this.traces[t] = a;
     },
     _profileFieldKeys(t) {
       const e = /* @__PURE__ */ new Set();
@@ -198,18 +198,19 @@ function v(s, d, u) {
     setWire(t) {
       h = t;
     }
-  }), Alpine.store("chartBuilder");
+  });
 }
-function g(s, d, u, f, t) {
-  const e = v(s, d, u);
+function v(s, d, u, f, t) {
+  g(s, d, u);
+  const e = Alpine.store("chartBuilder");
   if (p = f, h = t, typeof window.Plotly > "u") {
     e._plotlyMissing = !0, f && (f.textContent = d);
     return;
   }
   m || (e._startEffects(), m = !0), e._render();
 }
-typeof window < "u" && (window.initChartBuilder = v, window.bootChartBuilder = g);
+typeof window < "u" && (window.initChartBuilder = g, window.bootChartBuilder = v);
 export {
-  g as bootChartBuilder,
-  v as initChartBuilder
+  v as bootChartBuilder,
+  g as initChartBuilder
 };

@@ -45,9 +45,15 @@ let _deleteConfirmMsg = 'Delete this trace? This cannot be undone.'
 function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
     _deleteConfirmMsg = deleteConfirmMessage ?? _deleteConfirmMsg
 
-    const alreadyExists = !!Alpine.store('chartBuilder')
-
-    if (!alreadyExists) {
+    // Register the store only on first call.
+    // IMPORTANT: Alpine.store(name, value) returns void, not the store.
+    // We must call Alpine.store(name) separately after registration.
+    // Do NOT combine registration + retrieval in one expression — Vite
+    // minifies `if (!s) { Alpine.store(n, v) } return Alpine.store(n)`
+    // into `Alpine.store(n) || Alpine.store(n, v)` which returns undefined
+    // on the first call (because Alpine.store(n,v) returns void).
+    let _storeAlreadyRegistered = !!Alpine.store('chartBuilder')
+    if (!_storeAlreadyRegistered) {
         Alpine.store('chartBuilder', {
             // ── Loaded from Livewire on mount ─────────────────────────────
             dataSources:    payload.dataSources    ?? {},
@@ -342,8 +348,12 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
         })
     }
 
-    return Alpine.store('chartBuilder')
+    // NOTE: do not return Alpine.store('chartBuilder') here.
+    // Vite collapses the if-block + return into an || expression that
+    // returns void on the first call. Callers must call
+    // Alpine.store('chartBuilder') themselves after this function runs.
 }
+
 
 /**
  * Boot (or re-boot) the store against a canvas DOM element.
@@ -355,7 +365,12 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
  * @param {object}      wire
  */
 function bootChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, canvasEl, wire) {
-    const store = initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage)
+    // Register the store (side effect) — do NOT use its return value,
+    // Vite minification makes it unreliable (see initChartBuilder comment).
+    initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage)
+
+    // Retrieve the store directly — always returns the registered object.
+    const store = Alpine.store('chartBuilder')
 
     _canvasEl = canvasEl
     _wire     = wire
