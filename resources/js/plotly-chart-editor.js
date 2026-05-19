@@ -156,6 +156,38 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
             },
 
             /**
+             * Read a dot-separated path from an object.
+             * e.g. getPath(trace, 'marker.color') === trace.marker.color
+             *
+             * @param {object} obj
+             * @param {string} path  dot-separated key string
+             * @returns {*}
+             */
+            getPath(obj, path) {
+                return path.split('.').reduce((o, k) => (o == null ? undefined : o[k]), obj)
+            },
+
+            /**
+             * Write a value at a dot-separated path on an object,
+             * creating intermediate objects as needed.
+             *
+             * @param {object} obj
+             * @param {string} path  dot-separated key string
+             * @param {*}      value
+             */
+            setPath(obj, path, value) {
+                const keys = path.split('.')
+                let cur = obj
+                for (let i = 0; i < keys.length - 1; i++) {
+                    if (cur[keys[i]] == null || typeof cur[keys[i]] !== 'object') {
+                        cur[keys[i]] = {}
+                    }
+                    cur = cur[keys[i]]
+                }
+                cur[keys[keys.length - 1]] = value
+            },
+
+            /**
              * Whether the given trace type supports marker config.
              * @param {string} type
              * @returns {boolean}

@@ -209,28 +209,30 @@
                                             </template>
 
                                             {{-- enumerated --}}
+                                            {{-- Uses getPath/setPath to handle dot-notation keys like "marker.symbol" --}}
                                             <template x-if="field.type === 'enumerated'">
                                                 <select
                                                     class="chart-builder__control chart-builder__control--select"
-                                                    :value="{{ $atrace }}[field.key]"
-                                                    @change="{{ $atrace }}[field.key] = $event.target.value"
+                                                    :value="{{ $store }}.getPath({{ $atrace }}, field.key)"
+                                                    @change="{{ $store }}.setPath({{ $atrace }}, field.key, $event.target.value)"
                                                 >
                                                     <template x-for="val in (field.values ?? [])" :key="val">
                                                         <option
                                                             :value="val"
                                                             x-text="val || '(none)'"
-                                                            :selected="{{ $atrace }}[field.key] === val"
+                                                            :selected="{{ $store }}.getPath({{ $atrace }}, field.key) === val"
                                                         ></option>
                                                     </template>
                                                 </select>
                                             </template>
 
-                                            {{-- color --}}
+                                            {{-- color: use :value+@change so undefined shows field.dflt, not black --}}
                                             <template x-if="field.type === 'color'">
                                                 <input
                                                     type="color"
                                                     class="chart-builder__control chart-builder__control--color"
-                                                    x-model="{{ $atrace }}[field.key]"
+                                                    :value="{{ $store }}.getPath({{ $atrace }}, field.key) || field.dflt || '#000000'"
+                                                    @change="{{ $store }}.setPath({{ $atrace }}, field.key, $event.target.value)"
                                                 >
                                             </template>
 
@@ -243,11 +245,12 @@
                                                         :min="field.min ?? 0"
                                                         :max="field.max ?? 1"
                                                         :step="field.step ?? 0.05"
-                                                        x-model.number="{{ $atrace }}[field.key]"
+                                                        :value="{{ $store }}.getPath({{ $atrace }}, field.key) ?? field.dflt ?? 1"
+                                                        @change="{{ $store }}.setPath({{ $atrace }}, field.key, parseFloat($event.target.value))"
                                                     >
                                                     <span
                                                         class="chart-builder__control-value"
-                                                        x-text="{{ $atrace }}[field.key]"
+                                                        x-text="{{ $store }}.getPath({{ $atrace }}, field.key) ?? field.dflt ?? ''"
                                                     ></span>
                                                 </div>
                                             </template>
@@ -259,7 +262,8 @@
                                                     class="chart-builder__control chart-builder__control--number"
                                                     :min="field.min ?? undefined"
                                                     :max="field.max ?? undefined"
-                                                    x-model.number="{{ $atrace }}[field.key]"
+                                                    :value="{{ $store }}.getPath({{ $atrace }}, field.key) ?? field.dflt ?? ''"
+                                                    @change="{{ $store }}.setPath({{ $atrace }}, field.key, $event.target.value === '' ? null : parseFloat($event.target.value))"
                                                 >
                                             </template>
 
@@ -268,7 +272,8 @@
                                                 <input
                                                     type="text"
                                                     class="chart-builder__control chart-builder__control--text"
-                                                    x-model="{{ $atrace }}[field.key]"
+                                                    :value="{{ $store }}.getPath({{ $atrace }}, field.key) ?? ''"
+                                                    @change="{{ $store }}.setPath({{ $atrace }}, field.key, $event.target.value)"
                                                 >
                                             </template>
 
@@ -277,7 +282,8 @@
                                                 <input
                                                     type="checkbox"
                                                     class="chart-builder__control chart-builder__control--checkbox"
-                                                    x-model="{{ $atrace }}[field.key]"
+                                                    :checked="{{ $store }}.getPath({{ $atrace }}, field.key)"
+                                                    @change="{{ $store }}.setPath({{ $atrace }}, field.key, $event.target.checked)"
                                                 >
                                             </template>
                                         </div>
