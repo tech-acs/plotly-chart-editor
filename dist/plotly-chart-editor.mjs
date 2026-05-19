@@ -8,7 +8,7 @@ let m = null;
 const C = {
   area: "scatter"
 }, P = {
-  area: { mode: "none", fill: "tozeroy" }
+  area: { mode: "none", fill: "tozeroy", fillcolor: "#1f77b4" }
 };
 let u = null, A = null, S = null, w = !1, b = !1, v = "Delete this trace? This cannot be undone.", O = null, I = null, _ = null;
 function k(o, y) {

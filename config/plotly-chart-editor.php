@@ -236,6 +236,7 @@ return [
                             'key' => 'fillcolor',
                             'label' => 'plotly-chart-editor::plotly-chart-editor.fields.fillcolor',
                             'type' => 'color',
+                            'dflt' => '#1f77b4',
                             'xshow' => "trace.fill && trace.fill !== 'none'",
                         ],
                     ],

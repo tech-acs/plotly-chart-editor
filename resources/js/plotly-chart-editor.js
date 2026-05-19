@@ -42,7 +42,7 @@ const _plotlyTypeMap = {
  * Keys/values are merged into the new trace.
  */
 const _typeDefaults = {
-    area: { mode: 'none', fill: 'tozeroy' },
+    area: { mode: 'none', fill: 'tozeroy', fillcolor: '#1f77b4' },
 }
 let _canvasEl = null
 let _renderTimer = null
