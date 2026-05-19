@@ -30,13 +30,11 @@
 
 /* ── Root container (PRD §13.2) ──────────────────────────────────────────── */
 .chart-builder {
-    display: grid;
-    grid-template-columns: var(--plotly-editor-sidebar-w) 1fr;
-    /* grid-template-rows with a fixed height is the key to sidebar scroll:
-       the sidebar cell gets a concrete pixel size, so overflow-y:auto fires.
-       We use min-height on the row so the chart never collapses below 520px,
-       and cap at the editor height so it never exceeds the viewport. */
-    grid-template-rows: minmax(520px, var(--plotly-editor-height));
+    /* Flex row mirrors the react-chart-editor approach:
+       a concrete height on this container lets children use height:100%
+       reliably for their own overflow-y:auto scrolling. */
+    display: flex;
+    flex-direction: row;
     height: var(--plotly-editor-height);
     min-height: 520px;
     font-family: var(--plotly-editor-font);
@@ -50,15 +48,15 @@
 
 /* ── Sidebar ─────────────────────────────────────────────────────────────── */
 .chart-builder__sidebar {
-    grid-column: 1;
-    /* Explicit height is required for overflow-y:auto to show a scrollbar.
-       height:100% resolves against the grid cell, which has a concrete size
-       from grid-template-rows. Without this the sidebar grows with content
-       and overflow never triggers. */
+    /* height:100% works because the flex parent has a concrete height.
+       overflow-y:auto then triggers a scrollbar whenever content exceeds it. */
+    flex-shrink: 0;
+    width: var(--plotly-editor-sidebar-w);
     height: 100%;
     background: var(--plotly-editor-surface);
     border-right: 1px solid var(--plotly-editor-border);
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 0.75rem;
     box-sizing: border-box;
     display: flex;
@@ -68,9 +66,10 @@
 
 /* ── Canvas ──────────────────────────────────────────────────────────────── */
 .chart-builder__canvas {
-    grid-column: 2;
+    flex: 1;
     position: relative;
     min-height: 400px;
+    overflow: hidden;
 }
 
 /* ── Groups ──────────────────────────────────────────────────────────────── */
