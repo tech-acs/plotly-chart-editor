@@ -1085,8 +1085,9 @@
                                 l.legend.xanchor = 'left'; l.legend.yanchor = 'middle'; l.legend.x = 0; l.legend.y = 0.5;
                             } else if (v === 'right-center') {
                                 l.legend.xanchor = 'right'; l.legend.yanchor = 'middle'; l.legend.x = 1; l.legend.y = 0.5;
+                            } else if (v === 'auto') {
+                                l.legend.xanchor = 'right'; l.legend.yanchor = 'top'; l.legend.x = 1; l.legend.y = 1;
                             }
-                            // auto — leave as-is
                         "
                     >
                         <option value="auto">Auto</option>
