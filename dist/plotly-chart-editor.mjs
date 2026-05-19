@@ -1,23 +1,23 @@
-function n(i) {
-  return typeof Alpine < "u" && typeof Alpine.raw == "function" ? Alpine.raw(i) : i;
+function c(s) {
+  return typeof Alpine < "u" && typeof Alpine.raw == "function" ? Alpine.raw(s) : s;
 }
-function l(i) {
-  return structuredClone(n(i));
+function l(s) {
+  return structuredClone(c(s));
 }
 let h = null, p = null, T = null, _ = null, m = !1, y = "Delete this trace? This cannot be undone.";
-function v(i, d, u) {
+function v(s, d, u) {
   return y = u ?? y, !!Alpine.store("chartBuilder") || Alpine.store("chartBuilder", {
     // ── Loaded from Livewire on mount ─────────────────────────────
-    dataSources: i.dataSources ?? {},
-    schemaProfiles: i.schemaProfiles ?? {},
+    dataSources: s.dataSources ?? {},
+    schemaProfiles: s.schemaProfiles ?? {},
     // ── Managed by Alpine ─────────────────────────────────────────
-    traces: i.traces ?? [],
-    layout: i.layout ?? {},
-    config: i.config ?? { responsive: !0 },
+    traces: s.traces ?? [],
+    layout: s.layout ?? {},
+    config: s.config ?? { responsive: !0 },
     // ── Sync / UI config ──────────────────────────────────────────
-    syncMode: i.syncMode ?? "manual",
-    traceTypes: i.traceTypes ?? ["bar"],
-    showExport: i.showExport ?? !0,
+    syncMode: s.syncMode ?? "manual",
+    traceTypes: s.traceTypes ?? ["bar"],
+    showExport: s.showExport ?? !0,
     // ── Derived ───────────────────────────────────────────────────
     activeTraceIndex: 0,
     // ── Validation & sync state ───────────────────────────────────
@@ -31,9 +31,11 @@ function v(i, d, u) {
     // ── Effects ───────────────────────────────────────────────────
     _startEffects() {
       Alpine.effect(() => {
-        JSON.stringify(n(this.traces)), this._scheduleRender();
+        const t = this.traces;
+        JSON.stringify(c(t)), this._scheduleRender();
       }), Alpine.effect(() => {
-        JSON.stringify(n(this.layout)), this._scheduleRender();
+        const t = this.layout;
+        JSON.stringify(c(t)), this._scheduleRender();
       });
     },
     // ── Render pipeline ───────────────────────────────────────────
@@ -44,7 +46,7 @@ function v(i, d, u) {
     },
     _render() {
       if (this._plotlyMissing || !p) return;
-      const t = n(this.traces).map((e) => this.resolveMeta(e));
+      const t = c(this.traces).map((e) => this.resolveMeta(e));
       window.Plotly.react(
         p,
         t,
@@ -54,10 +56,10 @@ function v(i, d, u) {
     },
     // ── Meta resolution ───────────────────────────────────────────
     resolveMeta(t) {
-      var s;
-      const e = l(t), r = ((s = e.meta) == null ? void 0 : s.columnNames) ?? {};
-      for (const [c, o] of Object.entries(r))
-        o && this.dataSources[o] !== void 0 && (e[c] = n(this.dataSources[o]));
+      var r;
+      const e = l(t), i = ((r = e.meta) == null ? void 0 : r.columnNames) ?? {};
+      for (const [n, o] of Object.entries(i))
+        o && this.dataSources[o] !== void 0 && (e[n] = c(this.dataSources[o]));
       return e;
     },
     compileTrace(t) {
@@ -72,7 +74,7 @@ function v(i, d, u) {
      * @param {string} [type]
      */
     addTrace(t) {
-      const e = t ?? n(this.traceTypes)[0] ?? "bar";
+      const e = t ?? c(this.traceTypes)[0] ?? "bar";
       this.traces.push({
         type: e,
         name: `Trace ${this.traces.length + 1}`,
@@ -85,8 +87,8 @@ function v(i, d, u) {
      * @param {number} [index]
      */
     duplicateTrace(t) {
-      const e = t ?? this.activeTraceIndex, r = l(n(this.traces)[e]);
-      r.name = (r.name ?? `Trace ${e + 1}`) + " (copy)", this.traces.push(r), this.activeTraceIndex = this.traces.length - 1;
+      const e = t ?? this.activeTraceIndex, i = l(c(this.traces)[e]);
+      i.name = (i.name ?? `Trace ${e + 1}`) + " (copy)", this.traces.push(i), this.activeTraceIndex = this.traces.length - 1;
     },
     /**
      * Remove a trace after native confirm(). Adjusts activeTraceIndex
@@ -105,10 +107,10 @@ function v(i, d, u) {
      * @param {number} to
      */
     moveTrace(t, e) {
-      const r = this.traces.length;
-      if (e < 0 || e >= r) return;
-      const s = n(this.traces), c = s.splice(t, 1)[0];
-      s.splice(e, 0, c), this.traces = s, this.activeTraceIndex = e;
+      const i = this.traces.length;
+      if (e < 0 || e >= i) return;
+      const r = l(c(this.traces[t]));
+      this.traces.splice(t, 1), this.traces.splice(e, 0, r), this.activeTraceIndex = e;
     },
     /**
      * Move the active trace one step up (lower index = rendered first).
@@ -134,36 +136,36 @@ function v(i, d, u) {
      * @param {string} newType
      */
     async setTraceType(t, e) {
-      var s;
-      if (((s = n(this.traces)[t]) == null ? void 0 : s.type) !== e) {
+      var r;
+      if (((r = c(this.traces)[t]) == null ? void 0 : r.type) !== e) {
         if (this.schemaProfiles[e]) {
           this._applyTraceType(t, e);
           return;
         }
         if (h)
           try {
-            const c = await h.getSchemaProfile(e);
-            if (!c || typeof c != "object" || !c.groups)
+            const n = await h.getSchemaProfile(e);
+            if (!n || typeof n != "object" || !n.groups)
               throw new Error(`Invalid profile returned for type "${e}"`);
-            this.schemaProfiles[e] = c, this._applyTraceType(t, e);
-          } catch (c) {
-            console.error(`[plotly-chart-editor] Failed to load profile for "${e}":`, c), this._dispatchToast(e);
+            this.schemaProfiles[e] = n, this._applyTraceType(t, e);
+          } catch (n) {
+            console.error(`[plotly-chart-editor] Failed to load profile for "${e}":`, n), this._dispatchToast(e);
           }
       }
     },
     _applyTraceType(t, e) {
-      const r = this.schemaProfiles[e], s = l(n(this.traces)[t] ?? {}), c = this._profileFieldKeys(r), o = { type: e };
+      const i = this.schemaProfiles[e], r = l(c(this.traces)[t] ?? {}), n = this._profileFieldKeys(i), o = { type: e };
       for (const a of ["name", "meta"])
-        s[a] !== void 0 && (o[a] = s[a]);
-      for (const a of Object.keys(s))
-        ["type", "name", "meta"].includes(a) || c.has(a) && (o[a] = s[a]);
+        r[a] !== void 0 && (o[a] = r[a]);
+      for (const a of Object.keys(r))
+        ["type", "name", "meta"].includes(a) || n.has(a) && (o[a] = r[a]);
       this.traces[t] = o;
     },
     _profileFieldKeys(t) {
       const e = /* @__PURE__ */ new Set();
-      for (const r of Object.values((t == null ? void 0 : t.groups) ?? {}))
-        for (const s of (r == null ? void 0 : r.fields) ?? [])
-          e.add(s.key.split(".")[0]);
+      for (const i of Object.values((t == null ? void 0 : t.groups) ?? {}))
+        for (const r of (i == null ? void 0 : i.fields) ?? [])
+          e.add(r.key.split(".")[0]);
       return e;
     },
     _dispatchToast(t) {
@@ -186,7 +188,7 @@ function v(i, d, u) {
       if (this.syncing || !h) return;
       this.syncing = !0;
       const t = {
-        traces: n(this.traces).map((e) => this.compileTrace(e)),
+        traces: c(this.traces).map((e) => this.compileTrace(e)),
         layout: l(this.layout)
       };
       h.syncFromAlpine(JSON.stringify(t)).finally(() => {
@@ -198,8 +200,8 @@ function v(i, d, u) {
     }
   }), Alpine.store("chartBuilder");
 }
-function g(i, d, u, f, t) {
-  const e = v(i, d, u);
+function g(s, d, u, f, t) {
+  const e = v(s, d, u);
   if (p = f, h = t, typeof window.Plotly > "u") {
     e._plotlyMissing = !0, f && (f.textContent = d);
     return;

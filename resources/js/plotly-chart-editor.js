@@ -79,12 +79,18 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
             // ── Effects ───────────────────────────────────────────────────
 
             _startEffects() {
+                // Access this.traces THROUGH the reactive proxy first so Alpine
+                // registers the dependency, THEN toRaw for structuredClone safety.
+                // If toRaw is called first, Alpine sees no reactive read and the
+                // effect never re-runs on mutation.
                 Alpine.effect(() => {
-                    JSON.stringify(toRaw(this.traces))
+                    const t = this.traces          // reactive read — Alpine tracks this
+                    JSON.stringify(toRaw(t))        // deep read to track nested changes
                     this._scheduleRender()
                 })
                 Alpine.effect(() => {
-                    JSON.stringify(toRaw(this.layout))
+                    const l = this.layout          // reactive read
+                    JSON.stringify(toRaw(l))
                     this._scheduleRender()
                 })
             },
@@ -196,10 +202,11 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
                 const len = this.traces.length
                 if (to < 0 || to >= len) return
 
-                const traces = toRaw(this.traces)
-                const moved  = traces.splice(from, 1)[0]
-                traces.splice(to, 0, moved)
-                this.traces = traces
+                // Splice the reactive array directly — do NOT assign a new array,
+                // as that would replace the reactive proxy with a plain value.
+                const moved = deepClone(toRaw(this.traces[from]))
+                this.traces.splice(from, 1)
+                this.traces.splice(to, 0, moved)
                 this.activeTraceIndex = to
             },
 
