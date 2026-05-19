@@ -33,6 +33,21 @@ return [
         'bins' => 'Bins',
     ],
 
+    'confirmations' => [
+        'delete_trace' => 'Delete this trace? This cannot be undone.',
+    ],
+
+    'ui' => [
+        'add_trace' => 'Add trace',
+        'duplicate_trace' => 'Duplicate',
+        'delete_trace' => 'Delete',
+        'move_up' => 'Move up',
+        'move_down' => 'Move down',
+        'trace_label' => 'Trace :n',
+        'type_label' => 'Type',
+        'traces_section' => 'Traces',
+    ],
+
     'fields' => [
         'x' => 'X',
         'y' => 'Y',

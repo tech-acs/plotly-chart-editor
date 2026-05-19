@@ -10,9 +10,6 @@
 /**
  * Unwrap an Alpine reactive proxy to a plain object so structuredClone() works.
  * Alpine.raw() is the official API for this (Alpine 3.x).
- *
- * @param {*} value
- * @returns {*}
  */
 function toRaw(value) {
     if (typeof Alpine !== 'undefined' && typeof Alpine.raw === 'function') {
@@ -23,30 +20,31 @@ function toRaw(value) {
 
 /**
  * Deep-clone any value, safely handling Alpine reactive proxies.
- *
- * @param {*} value
- * @returns {*}
  */
 function deepClone(value) {
     return structuredClone(toRaw(value))
 }
 
-// Module-level closure state — lives outside the Alpine store so Alpine
-// never wraps these in reactive proxies.
+// Module-level closure state — outside the Alpine store so Alpine never
+// wraps them in reactive proxies.
 let _wire = null
 let _canvasEl = null
 let _renderTimer = null
 let _autoSyncTimer = null
 let _booted = false
+let _deleteConfirmMsg = 'Delete this trace? This cannot be undone.'
 
 /**
  * Bootstrap the chart builder Alpine store.
  * Safe to call multiple times (idempotent after first call).
  *
- * @param {object} payload              — serialized from the Livewire mount payload
- * @param {string} plotlyMissingMessage — translatable error string from PHP
+ * @param {object} payload
+ * @param {string} plotlyMissingMessage
+ * @param {string} deleteConfirmMessage
  */
-function initChartBuilder(payload, plotlyMissingMessage) {
+function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
+    _deleteConfirmMsg = deleteConfirmMessage ?? _deleteConfirmMsg
+
     const alreadyExists = !!Alpine.store('chartBuilder')
 
     if (!alreadyExists) {
@@ -56,14 +54,14 @@ function initChartBuilder(payload, plotlyMissingMessage) {
             schemaProfiles: payload.schemaProfiles ?? {},
 
             // ── Managed by Alpine ─────────────────────────────────────────
-            traces: payload.traces ?? [],
-            layout: payload.layout ?? {},
-            config: payload.config ?? { responsive: true },
+            traces:     payload.traces     ?? [],
+            layout:     payload.layout     ?? {},
+            config:     payload.config     ?? { responsive: true },
 
             // ── Sync / UI config ──────────────────────────────────────────
-            syncMode:    payload.syncMode    ?? 'manual',
-            traceTypes:  payload.traceTypes  ?? ['bar'],
-            showExport:  payload.showExport  ?? true,
+            syncMode:   payload.syncMode   ?? 'manual',
+            traceTypes: payload.traceTypes ?? ['bar'],
+            showExport: payload.showExport ?? true,
 
             // ── Derived ───────────────────────────────────────────────────
             activeTraceIndex: 0,
@@ -74,11 +72,11 @@ function initChartBuilder(payload, plotlyMissingMessage) {
             syncing:    false,
             lastSyncAt: null,
 
-            // ── Internal flags (reactive — safe) ──────────────────────────
+            // ── Internal flags ────────────────────────────────────────────
             _plotlyMissingMessage: plotlyMissingMessage,
             _plotlyMissing:        false,
 
-            // ── Effects setup ─────────────────────────────────────────────
+            // ── Effects ───────────────────────────────────────────────────
 
             _startEffects() {
                 Alpine.effect(() => {
@@ -136,27 +134,111 @@ function initChartBuilder(payload, plotlyMissingMessage) {
                 return compiled
             },
 
+            // ── Trace operations (PRD §6) ─────────────────────────────────
+
+            /**
+             * Append a new empty trace with the given type (defaults to first
+             * enabled type). Sets it as active.
+             *
+             * @param {string} [type]
+             */
+            addTrace(type) {
+                const traceType = type ?? toRaw(this.traceTypes)[0] ?? 'bar'
+                this.traces.push({
+                    type: traceType,
+                    name: `Trace ${this.traces.length + 1}`,
+                    meta: { columnNames: {} },
+                })
+                this.activeTraceIndex = this.traces.length - 1
+            },
+
+            /**
+             * Deep-copy the active trace and append it. Sets the copy active.
+             *
+             * @param {number} [index]
+             */
+            duplicateTrace(index) {
+                const i = index ?? this.activeTraceIndex
+                const copy = deepClone(toRaw(this.traces)[i])
+                copy.name = (copy.name ?? `Trace ${i + 1}`) + ' (copy)'
+                this.traces.push(copy)
+                this.activeTraceIndex = this.traces.length - 1
+            },
+
+            /**
+             * Remove a trace after native confirm(). Adjusts activeTraceIndex
+             * so it never goes out of bounds.
+             *
+             * @param {number} [index]
+             */
+            removeTrace(index) {
+                const i = index ?? this.activeTraceIndex
+
+                if (!window.confirm(_deleteConfirmMsg)) return
+
+                this.traces.splice(i, 1)
+
+                // Clamp activeTraceIndex to valid range
+                if (this.traces.length === 0) {
+                    this.activeTraceIndex = 0
+                } else if (this.activeTraceIndex >= this.traces.length) {
+                    this.activeTraceIndex = this.traces.length - 1
+                }
+            },
+
+            /**
+             * Swap trace at `from` with trace at `to`.
+             *
+             * @param {number} from
+             * @param {number} to
+             */
+            moveTrace(from, to) {
+                const len = this.traces.length
+                if (to < 0 || to >= len) return
+
+                const traces = toRaw(this.traces)
+                const moved  = traces.splice(from, 1)[0]
+                traces.splice(to, 0, moved)
+                this.traces = traces
+                this.activeTraceIndex = to
+            },
+
+            /**
+             * Move the active trace one step up (lower index = rendered first).
+             */
+            moveTraceUp(index) {
+                const i = index ?? this.activeTraceIndex
+                this.moveTrace(i, i - 1)
+            },
+
+            /**
+             * Move the active trace one step down.
+             */
+            moveTraceDown(index) {
+                const i = index ?? this.activeTraceIndex
+                this.moveTrace(i, i + 1)
+            },
+
             // ── Trace type switching (PRD §6) ─────────────────────────────
 
             /**
-             * Change a trace's type. If the profile is not yet cached, lazy-loads
-             * it via $wire.getSchemaProfile(). On failure: reverts type, emits toast.
+             * Change a trace's type. If the profile is not yet cached,
+             * lazy-loads via $wire.getSchemaProfile(). On failure: revert +
+             * dispatch toast (PRD §11.2).
              *
-             * @param {number} index    — trace index in this.traces
-             * @param {string} newType  — target trace type
+             * @param {number} index
+             * @param {string} newType
              */
             async setTraceType(index, newType) {
                 const previousType = toRaw(this.traces)[index]?.type
 
                 if (previousType === newType) return
 
-                // If profile already cached, proceed immediately (no network call)
                 if (this.schemaProfiles[newType]) {
                     this._applyTraceType(index, newType)
                     return
                 }
 
-                // Lazy-load via Livewire
                 if (!_wire) return
 
                 try {
@@ -166,37 +248,25 @@ function initChartBuilder(payload, plotlyMissingMessage) {
                         throw new Error(`Invalid profile returned for type "${newType}"`)
                     }
 
-                    // Cache and apply
                     this.schemaProfiles[newType] = profile
                     this._applyTraceType(index, newType)
                 } catch (err) {
-                    // PRD §11.2: revert type, do NOT cache failure, dispatch toast
-                    // (type was not changed yet — nothing to revert in traces)
                     console.error(`[plotly-chart-editor] Failed to load profile for "${newType}":`, err)
                     this._dispatchToast(newType)
                 }
             },
 
-            /**
-             * Apply a type change: update type, prune fields not in new profile,
-             * preserve meta/name/type.
-             *
-             * @param {number} index
-             * @param {string} newType
-             */
             _applyTraceType(index, newType) {
-                const profile    = this.schemaProfiles[newType]
-                const oldTrace   = deepClone(toRaw(this.traces)[index] ?? {})
-                const keepKeys   = this._profileFieldKeys(profile)
+                const profile  = this.schemaProfiles[newType]
+                const oldTrace = deepClone(toRaw(this.traces)[index] ?? {})
+                const keepKeys = this._profileFieldKeys(profile)
 
                 const pruned = { type: newType }
 
-                // Preserve identity and meta fields always
                 for (const k of ['name', 'meta']) {
                     if (oldTrace[k] !== undefined) pruned[k] = oldTrace[k]
                 }
 
-                // Keep fields that exist in the new profile
                 for (const k of Object.keys(oldTrace)) {
                     if (['type', 'name', 'meta'].includes(k)) continue
                     if (keepKeys.has(k)) pruned[k] = oldTrace[k]
@@ -205,18 +275,11 @@ function initChartBuilder(payload, plotlyMissingMessage) {
                 this.traces[index] = pruned
             },
 
-            /**
-             * Collect the top-level key names declared in a profile's fields.
-             *
-             * @param {object} profile
-             * @returns {Set<string>}
-             */
             _profileFieldKeys(profile) {
                 const keys = new Set()
 
                 for (const group of Object.values(profile?.groups ?? {})) {
                     for (const field of group?.fields ?? []) {
-                        // dot-separated key → only the top-level segment
                         keys.add(field.key.split('.')[0])
                     }
                 }
@@ -224,20 +287,12 @@ function initChartBuilder(payload, plotlyMissingMessage) {
                 return keys
             },
 
-            /**
-             * Dispatch a toast event for a failed profile load (PRD §11.2).
-             *
-             * @param {string} type
-             */
             _dispatchToast(type) {
                 window.dispatchEvent(new CustomEvent('plotly-editor:toast', {
                     detail: {
                         key:     'errors.profile_load_failed',
-                        message: this._plotlyMissingMessage
-                            .replace
-                            ? `Failed to load profile for ${type}. Please try again.`
-                            : `Failed to load profile for ${type}. Please try again.`,
-                        type:    type,
+                        message: `Failed to load profile for ${type}. Please try again.`,
+                        type,
                     },
                 }))
             },
@@ -268,9 +323,9 @@ function initChartBuilder(payload, plotlyMissingMessage) {
 
                 _wire.syncFromAlpine(JSON.stringify(wirePayload))
                     .finally(() => {
-                        this.syncing = false
-                        this.dirty      = false
-                        this.lastSyncAt = Date.now()
+                        this.syncing      = false
+                        this.dirty        = false
+                        this.lastSyncAt   = Date.now()
                     })
             },
 
@@ -285,15 +340,15 @@ function initChartBuilder(payload, plotlyMissingMessage) {
 
 /**
  * Boot (or re-boot) the store against a canvas DOM element.
- * Called from Blade x-init on every mount and every Livewire morph.
  *
  * @param {object}      payload
  * @param {string}      plotlyMissingMessage
+ * @param {string}      deleteConfirmMessage
  * @param {HTMLElement} canvasEl
  * @param {object}      wire
  */
-function bootChartBuilder(payload, plotlyMissingMessage, canvasEl, wire) {
-    const store = initChartBuilder(payload, plotlyMissingMessage)
+function bootChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, canvasEl, wire) {
+    const store = initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage)
 
     _canvasEl = canvasEl
     _wire     = wire
@@ -314,8 +369,8 @@ function bootChartBuilder(payload, plotlyMissingMessage, canvasEl, wire) {
 }
 
 if (typeof window !== 'undefined') {
-    window.initChartBuilder  = initChartBuilder
-    window.bootChartBuilder  = bootChartBuilder
+    window.initChartBuilder = initChartBuilder
+    window.bootChartBuilder = bootChartBuilder
 }
 
 export { initChartBuilder, bootChartBuilder }

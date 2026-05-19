@@ -213,3 +213,132 @@
     font-style: italic;
     padding: 0.5rem 0;
 }
+
+/* ── Buttons (Phase 5) ───────────────────────────────────────────────────── */
+.chart-builder__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--plotly-editor-border);
+    border-radius: var(--plotly-editor-radius);
+    background: var(--plotly-editor-bg);
+    color: var(--plotly-editor-text);
+    font-size: 0.8125rem;
+    font-family: inherit;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: background 0.1s, border-color 0.1s;
+}
+
+.chart-builder__btn:hover:not(:disabled) {
+    background: var(--plotly-editor-surface);
+    border-color: var(--plotly-editor-accent);
+}
+
+.chart-builder__btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.chart-builder__btn--icon {
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 0;
+    font-size: 1rem;
+}
+
+.chart-builder__btn--xs {
+    width: 1.4rem;
+    height: 1.4rem;
+    padding: 0;
+    font-size: 0.75rem;
+    border-color: transparent;
+    background: transparent;
+}
+
+.chart-builder__btn--xs:hover:not(:disabled) {
+    background: var(--plotly-editor-surface);
+    border-color: var(--plotly-editor-border);
+}
+
+.chart-builder__btn--danger:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--plotly-editor-danger) 10%, transparent);
+    border-color: var(--plotly-editor-danger);
+    color: var(--plotly-editor-danger);
+}
+
+/* ── Section header (traces toolbar) ────────────────────────────────────── */
+.chart-builder__section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--plotly-editor-border);
+    margin-bottom: 0.25rem;
+}
+
+.chart-builder__section-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--plotly-editor-text-muted);
+}
+
+.chart-builder__section-actions {
+    display: flex;
+    gap: 0.25rem;
+}
+
+/* ── Trace list ──────────────────────────────────────────────────────────── */
+.chart-builder__trace-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    margin-bottom: 0.5rem;
+}
+
+.chart-builder__trace-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.35rem 0.5rem;
+    border-radius: var(--plotly-editor-radius);
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background 0.1s;
+}
+
+.chart-builder__trace-row:hover {
+    background: var(--plotly-editor-surface);
+}
+
+.chart-builder__trace-row--active {
+    background: color-mix(in srgb, var(--plotly-editor-accent) 10%, transparent);
+    border-color: color-mix(in srgb, var(--plotly-editor-accent) 30%, transparent);
+}
+
+.chart-builder__trace-name {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+}
+
+.chart-builder__trace-actions {
+    display: flex;
+    gap: 0.15rem;
+    flex-shrink: 0;
+}
+
+/* ── Active trace panel ──────────────────────────────────────────────────── */
+.chart-builder__active-trace {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--plotly-editor-border);
+}
