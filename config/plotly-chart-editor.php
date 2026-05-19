@@ -96,6 +96,43 @@ return [
                     ],
                 ],
             ],
+            'layout_groups' => [
+                'BarLayout' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.bar_layout',
+                    'fields' => [
+                        [
+                            'key' => 'barmode',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.barmode',
+                            'type' => 'enumerated',
+                            'values' => ['group', 'stack', 'overlay', 'relative'],
+                            'dflt' => 'group',
+                        ],
+                        [
+                            'key' => 'barnorm',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.barnorm',
+                            'type' => 'enumerated',
+                            'values' => ['', 'fraction', 'percent'],
+                            'dflt' => '',
+                        ],
+                        [
+                            'key' => 'bargap',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.bargap',
+                            'type' => 'range',
+                            'min' => 0,
+                            'max' => 1,
+                            'dflt' => 0.2,
+                        ],
+                        [
+                            'key' => 'bargroupgap',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.bargroupgap',
+                            'type' => 'range',
+                            'min' => 0,
+                            'max' => 1,
+                            'dflt' => 0,
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ── scatter ───────────────────────────────────────────────────────────
@@ -203,6 +240,23 @@ return [
                         ],
                     ],
                 ],
+                'Stacking' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.stacking',
+                    'fields' => [
+                        [
+                            'key' => 'stackgroup',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.stackgroup',
+                            'type' => 'text',
+                        ],
+                        [
+                            'key' => 'groupnorm',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.groupnorm',
+                            'type' => 'enumerated',
+                            'values' => ['', 'fraction', 'percent'],
+                            'dflt' => '',
+                        ],
+                    ],
+                ],
             ],
         ],
 
@@ -253,6 +307,19 @@ return [
                     ],
                 ],
             ],
+            'layout_groups' => [
+                'PieLayout' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.pie_layout',
+                    'fields' => [
+                        [
+                            'key' => 'extendpiecolors',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.extendpiecolors',
+                            'type' => 'boolean',
+                            'dflt' => true,
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ── histogram ─────────────────────────────────────────────────────────
@@ -299,6 +366,43 @@ return [
                             'min' => 0,
                             'max' => 1,
                             'dflt' => 1,
+                        ],
+                    ],
+                ],
+            ],
+            'layout_groups' => [
+                'HistogramLayout' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.bar_layout',
+                    'fields' => [
+                        [
+                            'key' => 'barmode',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.barmode',
+                            'type' => 'enumerated',
+                            'values' => ['group', 'stack', 'overlay', 'relative'],
+                            'dflt' => 'group',
+                        ],
+                        [
+                            'key' => 'barnorm',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.barnorm',
+                            'type' => 'enumerated',
+                            'values' => ['', 'fraction', 'percent'],
+                            'dflt' => '',
+                        ],
+                        [
+                            'key' => 'bargap',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.bargap',
+                            'type' => 'range',
+                            'min' => 0,
+                            'max' => 1,
+                            'dflt' => 0.2,
+                        ],
+                        [
+                            'key' => 'bargroupgap',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.bargroupgap',
+                            'type' => 'range',
+                            'min' => 0,
+                            'max' => 1,
+                            'dflt' => 0,
                         ],
                     ],
                 ],

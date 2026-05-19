@@ -98,6 +98,25 @@ class SchemaProfileLoader
             }
         }
 
-        return array_merge($profile, ['groups' => $groups]);
+        $layoutGroups = $profile['layout_groups'] ?? [];
+
+        foreach ($layoutGroups as $key => $group) {
+            if (isset($group['label'])) {
+                $layoutGroups[$key]['label'] = __($group['label']);
+            }
+
+            foreach ($group['fields'] ?? [] as $fi => $field) {
+                if (isset($field['label'])) {
+                    $layoutGroups[$key]['fields'][$fi]['label'] = __($field['label']);
+                }
+            }
+        }
+
+        $result = array_merge($profile, ['groups' => $groups]);
+        if ($layoutGroups !== []) {
+            $result['layout_groups'] = $layoutGroups;
+        }
+
+        return $result;
     }
 }

@@ -31,6 +31,9 @@ return [
         'fill' => 'Fill',
         'sectors' => 'Sectors',
         'bins' => 'Bins',
+        'bar_layout' => 'Bar Layout',
+        'pie_layout' => 'Pie Layout',
+        'stacking' => 'Stacking',
     ],
 
     'confirmations' => [
@@ -131,6 +134,13 @@ return [
         'pull' => 'Pull',
         'nbinsx' => 'Bin count',
         'histnorm' => 'Normalisation',
+        'barmode' => 'Bar mode',
+        'barnorm' => 'Bar norm',
+        'bargap' => 'Bar gap',
+        'bargroupgap' => 'Bar group gap',
+        'extendpiecolors' => 'Extend pie colors',
+        'stackgroup' => 'Stack group',
+        'groupnorm' => 'Group norm',
     ],
 
 ];

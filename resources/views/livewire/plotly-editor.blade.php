@@ -296,6 +296,109 @@
                                     </template>
                                 </div>
                             </template>
+
+                            {{-- layout_groups: trace-type-specific layout-level attributes --}}
+                            <template x-for="(group, groupKey) in _profile.layout_groups ?? {}" :key="'layout-'+groupKey">
+                                <div
+                                    class="chart-builder__group"
+                                    x-show="group.xshow
+                                        ? (new Function('store','trace','traceType','hasMarkerSupport','hasFillSupport','return ' + group.xshow))(
+                                            {{ $store }},
+                                            {{ $store }}.trace,
+                                            {{ $store }}.traceType,
+                                            {{ $store }}.hasMarkerSupport.bind({{ $store }}),
+                                            {{ $store }}.hasFillSupport.bind({{ $store }})
+                                          )
+                                        : true"
+                                >
+                                    <div class="chart-builder__group-label" x-text="group.label"></div>
+
+                                    <template x-for="field in group.fields" :key="'layout-'+field.key">
+                                        <div
+                                            class="chart-builder__field"
+                                            x-show="field.xshow
+                                                ? (new Function('store','trace','traceType','hasMarkerSupport','hasFillSupport','return ' + field.xshow))(
+                                                    {{ $store }},
+                                                    {{ $store }}.trace,
+                                                    {{ $store }}.traceType,
+                                                    {{ $store }}.hasMarkerSupport.bind({{ $store }}),
+                                                    {{ $store }}.hasFillSupport.bind({{ $store }})
+                                                  )
+                                                : true"
+                                        >
+                                            <label class="chart-builder__field-label" x-text="field.label"></label>
+
+                                            {{-- enumerated --}}
+                                            <template x-if="field.type === 'enumerated'">
+                                                <select
+                                                    class="chart-builder__control chart-builder__control--select"
+                                                    :value="{{ $store }}.getPath({{ $store }}.layout, field.key)"
+                                                    @change="{{ $store }}.setPath({{ $store }}.layout, field.key, $event.target.value)"
+                                                >
+                                                    <template x-for="val in (field.values ?? [])" :key="val">
+                                                        <option
+                                                            :value="val"
+                                                            x-text="val || '(none)'"
+                                                            :selected="{{ $store }}.getPath({{ $store }}.layout, field.key) === val"
+                                                        ></option>
+                                                    </template>
+                                                </select>
+                                            </template>
+
+                                            {{-- range --}}
+                                            <template x-if="field.type === 'range'">
+                                                <div class="chart-builder__control-row">
+                                                    <input
+                                                        type="range"
+                                                        class="chart-builder__control chart-builder__control--range"
+                                                        :min="field.min ?? 0"
+                                                        :max="field.max ?? 1"
+                                                        :step="field.step ?? 0.05"
+                                                        :value="{{ $store }}.getPath({{ $store }}.layout, field.key) ?? field.dflt ?? 1"
+                                                        @change="{{ $store }}.setPath({{ $store }}.layout, field.key, parseFloat($event.target.value))"
+                                                    >
+                                                    <span
+                                                        class="chart-builder__control-value"
+                                                        x-text="{{ $store }}.getPath({{ $store }}.layout, field.key) ?? field.dflt ?? ''"
+                                                    ></span>
+                                                </div>
+                                            </template>
+
+                                            {{-- number --}}
+                                            <template x-if="field.type === 'number'">
+                                                <input
+                                                    type="number"
+                                                    class="chart-builder__control chart-builder__control--number"
+                                                    :min="field.min ?? undefined"
+                                                    :max="field.max ?? undefined"
+                                                    :value="{{ $store }}.getPath({{ $store }}.layout, field.key) ?? field.dflt ?? ''"
+                                                    @change="{{ $store }}.setPath({{ $store }}.layout, field.key, $event.target.value === '' ? null : parseFloat($event.target.value))"
+                                                >
+                                            </template>
+
+                                            {{-- text --}}
+                                            <template x-if="field.type === 'text'">
+                                                <input
+                                                    type="text"
+                                                    class="chart-builder__control chart-builder__control--text"
+                                                    :value="{{ $store }}.getPath({{ $store }}.layout, field.key) ?? ''"
+                                                    @change="{{ $store }}.setPath({{ $store }}.layout, field.key, $event.target.value)"
+                                                >
+                                            </template>
+
+                                            {{-- boolean --}}
+                                            <template x-if="field.type === 'boolean'">
+                                                <input
+                                                    type="checkbox"
+                                                    class="chart-builder__control chart-builder__control--checkbox"
+                                                    :checked="{{ $store }}.getPath({{ $store }}.layout, field.key)"
+                                                    @change="{{ $store }}.setPath({{ $store }}.layout, field.key, $event.target.checked)"
+                                                >
+                                            </template>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
                         </div>
                     </template>
                 </div>
