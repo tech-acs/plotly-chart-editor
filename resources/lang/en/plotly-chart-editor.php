@@ -34,6 +34,7 @@ return [
         'bar_layout' => 'Bar Layout',
         'pie_layout' => 'Pie Layout',
         'stacking' => 'Stacking',
+        'hover' => 'Hover',
     ],
 
     'confirmations' => [
@@ -80,6 +81,8 @@ return [
         'show_legend' => 'Show legend',
         'legend_position' => 'Position',
         'legend_orient' => 'Orientation',
+        'hovermode' => 'Hover mode',
+        'hover_label' => 'Hover label',
     ],
 
     'viewport' => [
@@ -157,6 +160,10 @@ return [
         'tick_width' => 'Tick width',
         'tick_len' => 'Tick length',
         'ticks' => 'Ticks',
+        'hoverinfo' => 'Info',
+        'hovertemplate' => 'Template',
+        'hover_bgcolor' => 'Label BG',
+        'hover_bordercolor' => 'Label border',
     ],
 
 ];

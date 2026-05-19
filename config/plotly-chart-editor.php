@@ -95,6 +95,35 @@ return [
                         ],
                     ],
                 ],
+                'Hover' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.hover',
+                    'fields' => [
+                        [
+                            'key' => 'hoverinfo',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.hoverinfo',
+                            'type' => 'enumerated',
+                            'values' => ['all', 'x', 'y', 'x+y', 'text', 'name', 'skip', 'none'],
+                            'dflt' => 'all',
+                        ],
+                        [
+                            'key' => 'hovertemplate',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.hovertemplate',
+                            'type' => 'text',
+                        ],
+                        [
+                            'key' => 'hoverlabel.bgcolor',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.hover_bgcolor',
+                            'type' => 'color',
+                            'dflt' => '#ffffff',
+                        ],
+                        [
+                            'key' => 'hoverlabel.bordercolor',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.hover_bordercolor',
+                            'type' => 'color',
+                            'dflt' => '#444444',
+                        ],
+                    ],
+                ],
             ],
             'layout_groups' => [
                 'BarLayout' => [
@@ -258,6 +287,35 @@ return [
                         ],
                     ],
                 ],
+                'Hover' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.hover',
+                    'fields' => [
+                        [
+                            'key' => 'hoverinfo',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.hoverinfo',
+                            'type' => 'enumerated',
+                            'values' => ['all', 'x', 'y', 'x+y', 'text', 'name', 'skip', 'none'],
+                            'dflt' => 'all',
+                        ],
+                        [
+                            'key' => 'hovertemplate',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.hovertemplate',
+                            'type' => 'text',
+                        ],
+                        [
+                            'key' => 'hoverlabel.bgcolor',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.hover_bgcolor',
+                            'type' => 'color',
+                            'dflt' => '#ffffff',
+                        ],
+                        [
+                            'key' => 'hoverlabel.bordercolor',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.hover_bordercolor',
+                            'type' => 'color',
+                            'dflt' => '#444444',
+                        ],
+                    ],
+                ],
             ],
         ],
 
@@ -304,6 +362,35 @@ return [
                             'min' => 0,
                             'max' => 1,
                             'dflt' => 1,
+                        ],
+                    ],
+                ],
+                'Hover' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.hover',
+                    'fields' => [
+                        [
+                            'key' => 'hoverinfo',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.hoverinfo',
+                            'type' => 'enumerated',
+                            'values' => ['all', 'x', 'y', 'x+y', 'text', 'name', 'skip', 'none'],
+                            'dflt' => 'all',
+                        ],
+                        [
+                            'key' => 'hovertemplate',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.hovertemplate',
+                            'type' => 'text',
+                        ],
+                        [
+                            'key' => 'hoverlabel.bgcolor',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.hover_bgcolor',
+                            'type' => 'color',
+                            'dflt' => '#ffffff',
+                        ],
+                        [
+                            'key' => 'hoverlabel.bordercolor',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.hover_bordercolor',
+                            'type' => 'color',
+                            'dflt' => '#444444',
                         ],
                     ],
                 ],
@@ -367,6 +454,35 @@ return [
                             'min' => 0,
                             'max' => 1,
                             'dflt' => 1,
+                        ],
+                    ],
+                ],
+                'Hover' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.hover',
+                    'fields' => [
+                        [
+                            'key' => 'hoverinfo',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.hoverinfo',
+                            'type' => 'enumerated',
+                            'values' => ['all', 'x', 'y', 'x+y', 'text', 'name', 'skip', 'none'],
+                            'dflt' => 'all',
+                        ],
+                        [
+                            'key' => 'hovertemplate',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.hovertemplate',
+                            'type' => 'text',
+                        ],
+                        [
+                            'key' => 'hoverlabel.bgcolor',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.hover_bgcolor',
+                            'type' => 'color',
+                            'dflt' => '#ffffff',
+                        ],
+                        [
+                            'key' => 'hoverlabel.bordercolor',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.hover_bordercolor',
+                            'type' => 'color',
+                            'dflt' => '#444444',
                         ],
                     ],
                 ],

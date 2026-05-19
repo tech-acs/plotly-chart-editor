@@ -10,10 +10,10 @@ const C = {
 }, P = {
   area: { mode: "none", fill: "tozeroy", fillcolor: "#1f77b4" }
 };
-let u = null, k = null, A = null, T = !1, b = !1, v = "Delete this trace? This cannot be undone.", S = null, O = null, _ = null;
+let u = null, k = null, A = null, T = !1, b = !1, _ = "Delete this trace? This cannot be undone.", S = null, O = null, v = null;
 function I(o, y) {
-  for (const [h, c] of Object.entries(y))
-    o[h] === void 0 || o[h] === null ? o[h] = structuredClone(c) : typeof c == "object" && !Array.isArray(c) && typeof o[h] == "object" && !Array.isArray(o[h]) && I(o[h], c);
+  for (const [f, c] of Object.entries(y))
+    o[f] === void 0 || o[f] === null ? o[f] = structuredClone(c) : typeof c == "object" && !Array.isArray(c) && typeof o[f] == "object" && !Array.isArray(o[f]) && I(o[f], c);
   return o;
 }
 const N = {
@@ -68,10 +68,16 @@ const N = {
   },
   margin: { t: 50, b: 50, l: 60, r: 30 },
   showlegend: !1,
-  legend: { orientation: "v" }
+  legend: { orientation: "v" },
+  hovermode: "x",
+  hoverlabel: {
+    bgcolor: "#ffffff",
+    bordercolor: "#444444",
+    font: { family: "Arial", size: 12, color: "#000000" }
+  }
 };
-function M(o, y, h) {
-  v = h ?? v;
+function M(o, y, f) {
+  _ = f ?? _;
   const c = I(o.layout ?? {}, N);
   !!Alpine.store("chartBuilder") || Alpine.store("chartBuilder", {
     // ── Loaded from Livewire on mount ─────────────────────────────
@@ -199,14 +205,14 @@ function M(o, y, h) {
           p && this.dataSources[p] && (r[w] = a(this.dataSources[p]).length);
         const n = Object.values(r);
         if (n.length < 2) return;
-        const f = Math.min(...n), l = Math.max(...n);
-        if (f !== l)
+        const h = Math.min(...n), l = Math.max(...n);
+        if (h !== l)
           for (const [w, p] of Object.entries(r))
-            p !== f && e.push({
+            p !== h && e.push({
               traceIndex: i,
               field: w,
               code: "LENGTH_MISMATCH",
-              message: `Column '${w}' has ${p} values but trace expects ${f}. Showing first ${f}.`
+              message: `Column '${w}' has ${p} values but trace expects ${h}. Showing first ${h}.`
             });
       }), this.warnings.splice(0, this.warnings.length, ...e);
     },
@@ -263,7 +269,7 @@ function M(o, y, h) {
      */
     removeTrace(e) {
       const t = e ?? this.activeTraceIndex;
-      window.confirm(v) && (this.traces.splice(t, 1), this.traces.length === 0 ? this.activeTraceIndex = 0 : this.activeTraceIndex >= this.traces.length && (this.activeTraceIndex = this.traces.length - 1));
+      window.confirm(_) && (this.traces.splice(t, 1), this.traces.length === 0 ? this.activeTraceIndex = 0 : this.activeTraceIndex >= this.traces.length && (this.activeTraceIndex = this.traces.length - 1));
     },
     /**
      * Swap trace at `from` with trace at `to`.
@@ -324,8 +330,8 @@ function M(o, y, h) {
         s[l] !== void 0 && (n[l] = s[l]);
       for (const l of Object.keys(s))
         ["type", "name", "meta"].includes(l) || r.has(l) && (n[l] = s[l]);
-      const f = P[t] ?? {};
-      for (const [l, g] of Object.entries(f))
+      const h = P[t] ?? {};
+      for (const [l, g] of Object.entries(h))
         n[l] = g;
       this.traces[e] = n;
     },
@@ -433,20 +439,20 @@ function M(o, y, h) {
     }
   });
 }
-function j(o, y, h, c, x) {
-  M(o, y, h);
+function j(o, y, f, c, x) {
+  M(o, y, f);
   const e = Alpine.store("chartBuilder");
   if (u = c, m = x, typeof window.Plotly > "u") {
     e._plotlyMissing = !0, c && (c.textContent = y);
     return;
   }
-  T && e._render(), _ && _.disconnect();
+  T && e._render(), v && v.disconnect();
   const t = c == null ? void 0 : c.closest(".chart-builder");
-  t && typeof ResizeObserver < "u" && (_ = new ResizeObserver((i) => {
-    var n, f;
-    const r = (((f = (n = i[0]) == null ? void 0 : n.contentRect) == null ? void 0 : f.width) ?? window.innerWidth) < 1024;
+  t && typeof ResizeObserver < "u" && (v = new ResizeObserver((i) => {
+    var n, h;
+    const r = (((h = (n = i[0]) == null ? void 0 : n.contentRect) == null ? void 0 : h.width) ?? window.innerWidth) < 1024;
     e._tooSmall = r, r && u && typeof window.Plotly < "u" && (window.Plotly.purge(u), T = !1);
-  }), _.observe(t)), c && typeof ResizeObserver < "u" && new ResizeObserver(() => {
+  }), v.observe(t)), c && typeof ResizeObserver < "u" && new ResizeObserver(() => {
     if (e._plotlyMissing || typeof window.Plotly > "u" || e._tooSmall) return;
     const s = c.getBoundingClientRect();
     s.width === 0 || s.height === 0 || (T ? window.Plotly.Plots.resize(c) : (b = !0, e._startEffects(), T = !0, e._render()));

@@ -138,6 +138,12 @@ const LAYOUT_DEFAULTS = {
     margin:     { t: 50, b: 50, l: 60, r: 30 },
     showlegend: false,
     legend:     { orientation: 'v' },
+    hovermode:  'x',
+    hoverlabel: {
+        bgcolor: '#ffffff',
+        bordercolor: '#444444',
+        font: { family: 'Arial', size: 12, color: '#000000' },
+    },
 }
 
 function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {

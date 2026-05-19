@@ -1060,6 +1060,59 @@
                     </select>
                 </div>
             </div>
+
+            {{-- Hover --}}
+            <div class="chart-builder__group">
+                <div class="chart-builder__group-label">
+                    {{ __('plotly-chart-editor::plotly-chart-editor.ui.hovermode') }}
+                </div>
+                <div class="chart-builder__field">
+                    <label class="chart-builder__field-label">
+                        {{ __('plotly-chart-editor::plotly-chart-editor.ui.hovermode') }}
+                    </label>
+                    <select
+                        class="chart-builder__control chart-builder__control--select"
+                        x-model="{{ $store }}.layout.hovermode"
+                    >
+                        <option value="x">X</option>
+                        <option value="y">Y</option>
+                        <option value="closest">Closest</option>
+                        <option value="x unified">X unified</option>
+                        <option value="y unified">Y unified</option>
+                        <option value="false">False</option>
+                    </select>
+                </div>
+                <div class="chart-builder__field">
+                    <label class="chart-builder__field-label">
+                        {{ __('plotly-chart-editor::plotly-chart-editor.ui.hover_label') }}
+                    </label>
+                    <x-plotly-chart-editor::primitives.font
+                        :path="$store . '.layout.hoverlabel.font'"
+                    />
+                </div>
+                <div class="chart-builder__field">
+                    <label class="chart-builder__field-label">
+                        {{ __('plotly-chart-editor::plotly-chart-editor.fields.hover_bgcolor') }}
+                    </label>
+                    <input
+                        type="color"
+                        class="chart-builder__control chart-builder__control--color"
+                        :value="{{ $store }}.layout.hoverlabel.bgcolor || '#ffffff'"
+                        @change="{{ $store }}.layout.hoverlabel.bgcolor = $event.target.value"
+                    >
+                </div>
+                <div class="chart-builder__field">
+                    <label class="chart-builder__field-label">
+                        {{ __('plotly-chart-editor::plotly-chart-editor.fields.hover_bordercolor') }}
+                    </label>
+                    <input
+                        type="color"
+                        class="chart-builder__control chart-builder__control--color"
+                        :value="{{ $store }}.layout.hoverlabel.bordercolor || '#444444'"
+                        @change="{{ $store }}.layout.hoverlabel.bordercolor = $event.target.value"
+                    >
+                </div>
+            </div>
         </x-plotly-chart-editor::fold>
 
     </div>{{-- end sidebar --}}
