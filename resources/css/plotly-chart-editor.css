@@ -77,6 +77,10 @@
     margin-top: 0.75rem;
 }
 
+.chart-builder__layout-groups {
+    margin-top: 0.75rem;
+}
+
 .chart-builder__group-label {
     font-size: 0.7rem;
     font-weight: 600;

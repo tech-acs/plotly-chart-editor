@@ -298,6 +298,7 @@
                             </template>
 
                             {{-- layout_groups: trace-type-specific layout-level attributes --}}
+                            <div class="chart-builder__layout-groups">
                             <template x-for="(group, groupKey) in _profile.layout_groups ?? {}" :key="'layout-'+groupKey">
                                 <div
                                     class="chart-builder__group"
@@ -399,6 +400,7 @@
                                     </template>
                                 </div>
                             </template>
+                            </div>
                         </div>
                     </template>
                 </div>
