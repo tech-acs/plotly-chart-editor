@@ -67,6 +67,14 @@ function mergeDefaults(target, defaults) {
  * "Cannot read properties of undefined" on first render.
  */
 const LAYOUT_DEFAULTS = {
+    // Nested sub-objects that primitives bind into must always exist.
+    // We provide structural defaults only — values that match Plotly's own
+    // defaults so the controls reflect the actual chart state on first render.
+    //
+    // plot_bgcolor / paper_bgcolor are intentionally NOT defaulted here:
+    // Plotly's default is transparent, which browsers render as white. Injecting
+    // '#ffffff' would make the controls show white while the chart uses transparent
+    // — causing a visible mismatch. Let the consumer provide these explicitly.
     title:  { text: '', font: { family: 'Arial', size: 16, color: '#000000' } },
     xaxis:  {
         title: { text: '' },
@@ -81,11 +89,9 @@ const LAYOUT_DEFAULTS = {
         zeroline: true,
         tickformat: '',
     },
-    margin: { t: 50, b: 50, l: 60, r: 30 },
+    margin:     { t: 50, b: 50, l: 60, r: 30 },
     showlegend: true,
-    legend: { orientation: 'v' },
-    plot_bgcolor:  '#ffffff',
-    paper_bgcolor: '#ffffff',
+    legend:     { orientation: 'v' },
 }
 
 function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {

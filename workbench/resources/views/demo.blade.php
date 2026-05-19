@@ -29,8 +29,8 @@
         * { box-sizing: border-box; }
         body { font-family: system-ui, sans-serif; margin: 0; padding: 24px; background: #f1f5f9; }
         h1 { font-size: 1.25rem; font-weight: 600; color: #0f172a; margin-bottom: 1rem; }
-        /* Give the editor a fixed height so both columns fill the viewport */
-        #plotly-editor-root { height: calc(100vh - 100px); }
+        /* Adjust the editor height to account for the page header */
+        #plotly-editor-root { --plotly-editor-height: calc(100vh - 100px); }
     </style>
 </head>
 <body>

@@ -468,7 +468,8 @@
                     <input
                         type="color"
                         class="chart-builder__control chart-builder__control--color"
-                        x-model="{{ $store }}.layout.plot_bgcolor"
+                        :value="{{ $store }}.layout.plot_bgcolor || '#ffffff'"
+                        @change="{{ $store }}.layout.plot_bgcolor = $event.target.value"
                     >
                 </div>
                 <div class="chart-builder__field">
@@ -478,7 +479,8 @@
                     <input
                         type="color"
                         class="chart-builder__control chart-builder__control--color"
-                        x-model="{{ $store }}.layout.paper_bgcolor"
+                        :value="{{ $store }}.layout.paper_bgcolor || '#ffffff'"
+                        @change="{{ $store }}.layout.paper_bgcolor = $event.target.value"
                     >
                 </div>
             </div>

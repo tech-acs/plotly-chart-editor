@@ -1,16 +1,24 @@
 function a(r) {
   return typeof Alpine < "u" && typeof Alpine.raw == "function" ? Alpine.raw(r) : r;
 }
-function h(r) {
+function u(r) {
   return structuredClone(a(r));
 }
-let d = null, p = null, _ = null, g = null, v = !1, m = !1, y = "Delete this trace? This cannot be undone.";
-function w(r, u) {
-  for (const [c, n] of Object.entries(u))
-    r[c] === void 0 || r[c] === null ? r[c] = structuredClone(n) : typeof n == "object" && !Array.isArray(n) && typeof r[c] == "object" && !Array.isArray(r[c]) && w(r[c], n);
+let f = null, p = null, _ = null, g = null, v = !1, m = !1, y = "Delete this trace? This cannot be undone.";
+function w(r, d) {
+  for (const [n, c] of Object.entries(d))
+    r[n] === void 0 || r[n] === null ? r[n] = structuredClone(c) : typeof c == "object" && !Array.isArray(c) && typeof r[n] == "object" && !Array.isArray(r[n]) && w(r[n], c);
   return r;
 }
 const x = {
+  // Nested sub-objects that primitives bind into must always exist.
+  // We provide structural defaults only — values that match Plotly's own
+  // defaults so the controls reflect the actual chart state on first render.
+  //
+  // plot_bgcolor / paper_bgcolor are intentionally NOT defaulted here:
+  // Plotly's default is transparent, which browsers render as white. Injecting
+  // '#ffffff' would make the controls show white while the chart uses transparent
+  // — causing a visible mismatch. Let the consumer provide these explicitly.
   title: { text: "", font: { family: "Arial", size: 16, color: "#000000" } },
   xaxis: {
     title: { text: "" },
@@ -27,20 +35,18 @@ const x = {
   },
   margin: { t: 50, b: 50, l: 60, r: 30 },
   showlegend: !0,
-  legend: { orientation: "v" },
-  plot_bgcolor: "#ffffff",
-  paper_bgcolor: "#ffffff"
+  legend: { orientation: "v" }
 };
-function A(r, u, c) {
-  y = c ?? y;
-  const n = w(r.layout ?? {}, x);
+function A(r, d, n) {
+  y = n ?? y;
+  const c = w(r.layout ?? {}, x);
   !!Alpine.store("chartBuilder") || Alpine.store("chartBuilder", {
     // ── Loaded from Livewire on mount ─────────────────────────────
     dataSources: r.dataSources ?? {},
     schemaProfiles: r.schemaProfiles ?? {},
     // ── Managed by Alpine ─────────────────────────────────────────
     traces: r.traces ?? [],
-    layout: n,
+    layout: c,
     config: r.config ?? { responsive: !0 },
     // ── Sync / UI config ──────────────────────────────────────────
     syncMode: r.syncMode ?? "manual",
@@ -54,7 +60,7 @@ function A(r, u, c) {
     syncing: !1,
     lastSyncAt: null,
     // ── Internal flags ────────────────────────────────────────────
-    _plotlyMissingMessage: u,
+    _plotlyMissingMessage: d,
     _plotlyMissing: !1,
     // ── Conditional visibility helpers (PRD §8) ───────────────────
     /**
@@ -109,16 +115,16 @@ function A(r, u, c) {
       window.Plotly.react(
         p,
         e,
-        h(this.layout),
-        h(this.config)
+        u(this.layout),
+        u(this.config)
       );
     },
     // ── Meta resolution ───────────────────────────────────────────
     resolveMeta(e) {
       var i;
-      const t = h(e), s = ((i = t.meta) == null ? void 0 : i.columnNames) ?? {};
-      for (const [o, f] of Object.entries(s))
-        f && this.dataSources[f] !== void 0 && (t[o] = a(this.dataSources[f]));
+      const t = u(e), s = ((i = t.meta) == null ? void 0 : i.columnNames) ?? {};
+      for (const [o, h] of Object.entries(s))
+        h && this.dataSources[h] !== void 0 && (t[o] = a(this.dataSources[h]));
       return t;
     },
     compileTrace(e) {
@@ -146,7 +152,7 @@ function A(r, u, c) {
      * @param {number} [index]
      */
     duplicateTrace(e) {
-      const t = e ?? this.activeTraceIndex, s = h(a(this.traces)[t]);
+      const t = e ?? this.activeTraceIndex, s = u(a(this.traces)[t]);
       s.name = (s.name ?? `Trace ${t + 1}`) + " (copy)", this.traces.push(s), this.activeTraceIndex = this.traces.length - 1;
     },
     /**
@@ -168,7 +174,7 @@ function A(r, u, c) {
     moveTrace(e, t) {
       const s = this.traces.length;
       if (t < 0 || t >= s) return;
-      const i = h(a(this.traces[e]));
+      const i = u(a(this.traces[e]));
       this.traces.splice(e, 1), this.traces.splice(t, 0, i), this.activeTraceIndex = t;
     },
     /**
@@ -201,9 +207,9 @@ function A(r, u, c) {
           this._applyTraceType(e, t);
           return;
         }
-        if (d)
+        if (f)
           try {
-            const o = await d.getSchemaProfile(t);
+            const o = await f.getSchemaProfile(t);
             if (!o || typeof o != "object" || !o.groups)
               throw new Error(`Invalid profile returned for type "${t}"`);
             this.schemaProfiles[t] = o, this._applyTraceType(e, t);
@@ -213,12 +219,12 @@ function A(r, u, c) {
       }
     },
     _applyTraceType(e, t) {
-      const s = this.schemaProfiles[t], i = h(a(this.traces)[e] ?? {}), o = this._profileFieldKeys(s), f = { type: t };
+      const s = this.schemaProfiles[t], i = u(a(this.traces)[e] ?? {}), o = this._profileFieldKeys(s), h = { type: t };
       for (const l of ["name", "meta"])
-        i[l] !== void 0 && (f[l] = i[l]);
+        i[l] !== void 0 && (h[l] = i[l]);
       for (const l of Object.keys(i))
-        ["type", "name", "meta"].includes(l) || o.has(l) && (f[l] = i[l]);
-      this.traces[e] = f;
+        ["type", "name", "meta"].includes(l) || o.has(l) && (h[l] = i[l]);
+      this.traces[e] = h;
     },
     _profileFieldKeys(e) {
       const t = /* @__PURE__ */ new Set();
@@ -244,26 +250,26 @@ function A(r, u, c) {
       (this.syncMode === "auto" || this.syncMode === "hybrid") && (clearTimeout(g), g = setTimeout(() => this.syncToBackend(), 500));
     },
     syncToBackend() {
-      if (this.syncing || !d) return;
+      if (this.syncing || !f) return;
       this.syncing = !0;
       const e = {
         traces: a(this.traces).map((t) => this.compileTrace(t)),
-        layout: h(this.layout)
+        layout: u(this.layout)
       };
-      d.syncFromAlpine(JSON.stringify(e)).finally(() => {
+      f.syncFromAlpine(JSON.stringify(e)).finally(() => {
         this.syncing = !1, this.dirty = !1, this.lastSyncAt = Date.now();
       });
     },
     setWire(e) {
-      d = e;
+      f = e;
     }
   });
 }
-function b(r, u, c, n, T) {
-  A(r, u, c);
+function b(r, d, n, c, T) {
+  A(r, d, n);
   const e = Alpine.store("chartBuilder");
-  if (p = n, d = T, typeof window.Plotly > "u") {
-    e._plotlyMissing = !0, n && (n.textContent = u);
+  if (p = c, f = T, typeof window.Plotly > "u") {
+    e._plotlyMissing = !0, c && (c.textContent = d);
     return;
   }
   v || (m = !0, e._startEffects(), v = !0), e._render();
