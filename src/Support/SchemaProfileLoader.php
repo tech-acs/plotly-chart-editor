@@ -58,25 +58,6 @@ class SchemaProfileLoader
     }
 
     /**
-     * Filter config profiles to only those whose type (or alias target) is
-     * present in $traceTypes. Returns the list of enabled type names.
-     *
-     * @param  array<int, string>  $traceTypes
-     * @return array<int, string>
-     */
-    public function enabledTypes(array $traceTypes): array
-    {
-        $aliases = $this->config['aliases'] ?? [];
-        $profiles = $this->config['profiles'] ?? [];
-
-        return array_values(array_filter($traceTypes, function (string $type) use ($aliases, $profiles): bool {
-            $resolved = $aliases[$type] ?? $type;
-
-            return isset($profiles[$resolved]);
-        }));
-    }
-
-    /**
      * Walk a profile and translate all 'label' string values through __().
      *
      * @param  array<string, mixed>  $profile

@@ -79,9 +79,7 @@
             "providers": [
                 "Uneca\\PlotlyChartEditor\\PlotlyChartEditorServiceProvider"
             ],
-            "aliases": {
-                "PlotlyChartEditor": "Uneca\\PlotlyChartEditor\\Facades\\PlotlyChartEditor"
-            }
+            "aliases": []
         }
     },
     "minimum-stability": "dev",

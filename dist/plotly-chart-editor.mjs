@@ -5,7 +5,7 @@ function d(n) {
   return JSON.parse(JSON.stringify(f(n)));
 }
 let w = null;
-const P = {
+const M = {
   area: "scatter"
 }, C = {
   area: { mode: "none", fill: "tozeroy", fillcolor: "#1f77b4" }
@@ -87,7 +87,7 @@ const N = {
     font: { family: "Arial", size: 12, color: "#000000" }
   }
 };
-function M(n, g, h) {
+function P(n, g, h) {
   v = h ?? v;
   const c = I(n.layout ?? {}, N);
   !!Alpine.store("chartBuilder") || Alpine.store("chartBuilder", {
@@ -193,13 +193,15 @@ function M(n, g, h) {
     },
     _render() {
       if (this._plotlyMissing || !y) return;
-      const e = f(this.traces).map((t) => this.resolveMeta(t));
+      const e = f(this.traces).map((t) => this.compileTrace(t));
       window.Plotly.react(
         y,
         e,
         d(this.layout),
         d(this.config)
-      );
+      ).catch((t) => {
+        console.error("[plotly-chart-editor] Plotly.react failed:", t);
+      });
     },
     // ── Validation (PRD §11) ──────────────────────────────────────
     /**
@@ -295,7 +297,7 @@ function M(n, g, h) {
     },
     compileTrace(e) {
       const t = this.resolveMeta(e);
-      return t.type = P[t.type] ?? t.type, delete t.meta, t;
+      return t.type = M[t.type] ?? t.type, delete t.meta, t;
     },
     // ── Trace operations (PRD §6) ─────────────────────────────────
     /**
@@ -517,8 +519,10 @@ function M(n, g, h) {
         this.savedAt = Date.now(), clearTimeout(S), S = setTimeout(() => {
           this.savedAt = null;
         }, 2e3);
+      }).catch((t) => {
+        console.error("[plotly-chart-editor] syncToBackend failed:", t), this.dirty = !0;
       }).finally(() => {
-        this.syncing = !1, this.dirty = !1, this.lastSyncAt = Date.now();
+        this.syncing = !1, this.lastSyncAt = Date.now();
       });
     },
     setWire(e) {
@@ -527,7 +531,7 @@ function M(n, g, h) {
   });
 }
 function j(n, g, h, c, A) {
-  M(n, g, h);
+  P(n, g, h);
   const e = Alpine.store("chartBuilder");
   if (y = c, w = A, typeof window.Plotly > "u") {
     e._plotlyMissing = !0, c && (c.textContent = g);
@@ -545,8 +549,8 @@ function j(n, g, h, c, A) {
     s.width === 0 || s.height === 0 || (T ? window.Plotly.Plots.resize(c) : (b = !0, e._startEffects(), T = !0, e._render()));
   }).observe(c);
 }
-typeof window < "u" && (window.initChartBuilder = M, window.bootChartBuilder = j);
+typeof window < "u" && (window.initChartBuilder = P, window.bootChartBuilder = j);
 export {
   j as bootChartBuilder,
-  M as initChartBuilder
+  P as initChartBuilder
 };

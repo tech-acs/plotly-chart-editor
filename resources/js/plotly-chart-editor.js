@@ -318,13 +318,15 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
             _render() {
                 if (this._plotlyMissing || !_canvasEl) return
 
-                const resolved = toRaw(this.traces).map(t => this.resolveMeta(t))
+                const resolved = toRaw(this.traces).map(t => this.compileTrace(t))
                 window.Plotly.react(
                     _canvasEl,
                     resolved,
                     deepClone(this.layout),
                     deepClone(this.config)
-                )
+                ).catch(err => {
+                    console.error('[plotly-chart-editor] Plotly.react failed:', err)
+                })
             },
 
             // ── Validation (PRD §11) ──────────────────────────────────────
@@ -774,9 +776,12 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
                         clearTimeout(_savedTimer)
                         _savedTimer = setTimeout(() => { this.savedAt = null }, 2000)
                     })
+                    .catch(err => {
+                        console.error('[plotly-chart-editor] syncToBackend failed:', err)
+                        this.dirty = true
+                    })
                     .finally(() => {
                         this.syncing    = false
-                        this.dirty      = false
                         this.lastSyncAt = Date.now()
                     })
             },
