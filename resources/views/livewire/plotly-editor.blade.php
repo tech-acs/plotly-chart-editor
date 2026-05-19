@@ -890,13 +890,23 @@
                 </div>
             </div>
 
-            {{-- Tick Font (via primitive) --}}
+            {{-- Tick Font X (via primitive) --}}
             <div class="chart-builder__group">
                 <div class="chart-builder__group-label">
-                    {{ __('plotly-chart-editor::plotly-chart-editor.ui.tick_font') }}
+                    {{ __('plotly-chart-editor::plotly-chart-editor.ui.tick_font_x') }}
                 </div>
                 <x-plotly-chart-editor::primitives.font
                     :path="$store . '.layout.xaxis.tickfont'"
+                />
+            </div>
+
+            {{-- Tick Font Y (via primitive) --}}
+            <div class="chart-builder__group">
+                <div class="chart-builder__group-label">
+                    {{ __('plotly-chart-editor::plotly-chart-editor.ui.tick_font_y') }}
+                </div>
+                <x-plotly-chart-editor::primitives.font
+                    :path="$store . '.layout.yaxis.tickfont'"
                 />
             </div>
         </x-plotly-chart-editor::fold>

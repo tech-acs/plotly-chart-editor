@@ -11,8 +11,8 @@ const C = {
   area: { mode: "none", fill: "tozeroy", fillcolor: "#1f77b4" }
 };
 let u = null, k = null, A = null, T = !1, b = !1, v = "Delete this trace? This cannot be undone.", S = null, O = null, _ = null;
-function I(o, p) {
-  for (const [h, c] of Object.entries(p))
+function I(o, y) {
+  for (const [h, c] of Object.entries(y))
     o[h] === void 0 || o[h] === null ? o[h] = structuredClone(c) : typeof c == "object" && !Array.isArray(c) && typeof o[h] == "object" && !Array.isArray(o[h]) && I(o[h], c);
   return o;
 }
@@ -50,6 +50,7 @@ const N = {
     showgrid: !0,
     zeroline: !0,
     tickformat: "",
+    tickfont: { family: "Arial", size: 12, color: "#000000" },
     autorange: !0,
     showline: !1,
     linecolor: "#444444",
@@ -67,7 +68,7 @@ const N = {
   showlegend: !1,
   legend: { orientation: "v" }
 };
-function M(o, p, h) {
+function M(o, y, h) {
   v = h ?? v;
   const c = I(o.layout ?? {}, N);
   !!Alpine.store("chartBuilder") || Alpine.store("chartBuilder", {
@@ -94,7 +95,7 @@ function M(o, p, h) {
     copiedAt: null,
     // timestamp of last clipboard copy (drives "Copied ✓")
     // ── Internal flags ────────────────────────────────────────────
-    _plotlyMissingMessage: p,
+    _plotlyMissingMessage: y,
     _plotlyMissing: !1,
     _tooSmall: !1,
     // ── Conditional visibility helpers (PRD §8) ───────────────────
@@ -191,18 +192,18 @@ function M(o, p, h) {
       a(this.traces).forEach((t, i) => {
         var g;
         const s = ((g = t.meta) == null ? void 0 : g.columnNames) ?? {}, r = {};
-        for (const [w, y] of Object.entries(s))
-          y && this.dataSources[y] && (r[w] = a(this.dataSources[y]).length);
+        for (const [w, p] of Object.entries(s))
+          p && this.dataSources[p] && (r[w] = a(this.dataSources[p]).length);
         const n = Object.values(r);
         if (n.length < 2) return;
         const f = Math.min(...n), l = Math.max(...n);
         if (f !== l)
-          for (const [w, y] of Object.entries(r))
-            y !== f && e.push({
+          for (const [w, p] of Object.entries(r))
+            p !== f && e.push({
               traceIndex: i,
               field: w,
               code: "LENGTH_MISMATCH",
-              message: `Column '${w}' has ${y} values but trace expects ${f}. Showing first ${f}.`
+              message: `Column '${w}' has ${p} values but trace expects ${f}. Showing first ${f}.`
             });
       }), this.warnings.splice(0, this.warnings.length, ...e);
     },
@@ -429,11 +430,11 @@ function M(o, p, h) {
     }
   });
 }
-function j(o, p, h, c, x) {
-  M(o, p, h);
+function j(o, y, h, c, x) {
+  M(o, y, h);
   const e = Alpine.store("chartBuilder");
   if (u = c, m = x, typeof window.Plotly > "u") {
-    e._plotlyMissing = !0, c && (c.textContent = p);
+    e._plotlyMissing = !0, c && (c.textContent = y);
     return;
   }
   T && e._render(), _ && _.disconnect();

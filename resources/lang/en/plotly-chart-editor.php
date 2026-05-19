@@ -66,6 +66,8 @@ return [
         'tick_angle' => 'Tick angle',
         'tick_format' => 'Tick format',
         'tick_font' => 'Tick font',
+        'tick_font_x' => 'X tick font',
+        'tick_font_y' => 'Y tick font',
         'range' => 'Range',
         'axis_line' => 'Axis line',
         'tick_labels' => 'Tick labels',

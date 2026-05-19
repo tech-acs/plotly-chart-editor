@@ -119,6 +119,7 @@ const LAYOUT_DEFAULTS = {
         showgrid: true,
         zeroline: true,
         tickformat: '',
+        tickfont: { family: 'Arial', size: 12, color: '#000000' },
         autorange: true,
         showline: false,
         linecolor: '#444444',
