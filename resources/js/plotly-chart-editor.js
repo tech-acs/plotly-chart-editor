@@ -394,7 +394,63 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
                     }
                 }
 
+                this._applyTransforms(resolved)
+
                 return resolved
+            },
+
+            /**
+             * Apply filter/sort transforms to the resolved trace data arrays.
+             * Modifies the trace in place.
+             *
+             * @param {object} trace
+             */
+            _applyTransforms(trace) {
+                if (!Array.isArray(trace.transforms) || trace.transforms.length === 0) return
+
+                const dataKeys = Object.keys(trace).filter(k =>
+                    Array.isArray(trace[k]) && k !== 'transforms' && k !== 'meta'
+                )
+                if (dataKeys.length === 0) return
+
+                for (const tr of trace.transforms) {
+                    if (tr.type === 'filter') {
+                        const target = trace[tr.target]
+                        if (!Array.isArray(target)) continue
+
+                        const mask = target.map(v => {
+                            switch (tr.operation) {
+                                case '=':  return v === tr.value
+                                case '!=': return v !== tr.value
+                                case '<':  return v < tr.value
+                                case '<=': return v <= tr.value
+                                case '>':  return v > tr.value
+                                case '>=': return v >= tr.value
+                                default:   return true
+                            }
+                        })
+
+                        for (const key of dataKeys) {
+                            trace[key] = trace[key].filter((_, i) => mask[i])
+                        }
+                    } else if (tr.type === 'sort') {
+                        const target = trace[tr.target]
+                        if (!Array.isArray(target)) continue
+
+                        const length = target.length
+                        const indices = Array.from({ length }, (_, i) => i)
+                        indices.sort((a, b) => {
+                            const aVal = target[a]
+                            const bVal = target[b]
+                            const cmp = aVal < bVal ? -1 : aVal > bVal ? 1 : 0
+                            return tr.order === 'descending' ? -cmp : cmp
+                        })
+
+                        for (const key of dataKeys) {
+                            trace[key] = indices.map(i => trace[key][i])
+                        }
+                    }
+                }
             },
 
             compileTrace(trace) {
@@ -583,7 +639,7 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
              * @param {'filter'|'sort'} type
              */
             addTransform(type) {
-                const trace = toRaw(this.traces)[this.activeTraceIndex]
+                const trace = this.traces[this.activeTraceIndex]
                 if (!trace) return
                 if (!Array.isArray(trace.transforms)) {
                     trace.transforms = []
@@ -593,8 +649,7 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
                     sort:   { type: 'sort',   target: 'y', order: 'ascending' },
                 }
                 trace.transforms.push(scaffolds[type] ?? { type })
-                // Replace the trace to trigger reactivity
-                this.traces[this.activeTraceIndex] = trace
+                this._scheduleRender()
             },
 
             /**
@@ -604,14 +659,13 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
              * @param {number} idx
              */
             removeTransform(idx) {
-                const trace = toRaw(this.traces)[this.activeTraceIndex]
+                const trace = this.traces[this.activeTraceIndex]
                 if (!trace || !Array.isArray(trace.transforms)) return
                 trace.transforms.splice(idx, 1)
                 if (trace.transforms.length === 0) {
                     delete trace.transforms
                 }
-                // Replace the trace to trigger reactivity
-                this.traces[this.activeTraceIndex] = trace
+                this._scheduleRender()
             },
 
             // ── Export (PRD §10) ──────────────────────────────────────────

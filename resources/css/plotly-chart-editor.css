@@ -483,7 +483,31 @@
     border: 1px solid var(--plotly-editor-border);
     border-radius: var(--plotly-editor-radius);
     padding: 0.5rem;
+}
+
+.chart-builder__transform-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.25rem;
+    border-bottom: 1px solid var(--plotly-editor-border);
     margin-bottom: 0.5rem;
+}
+
+.chart-builder__transform-card__header .chart-builder__group-label {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.chart-builder__transform-card__fields {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.chart-builder__active-trace > .chart-builder__group {
+    margin-top: 0.75rem;
 }
 
 /* ── Active trace panel ──────────────────────────────────────────────────── */
