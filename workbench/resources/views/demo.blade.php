@@ -54,7 +54,7 @@
         ]"
         :trace-types="['bar', 'scatter', 'line', 'pie', 'histogram']"
         sync-mode="hybrid"
-        :show-export="true"
+        :show-export="false"
     />
 
     @livewireScripts

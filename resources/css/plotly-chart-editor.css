@@ -73,6 +73,10 @@
     gap: 0.5rem;
 }
 
+.chart-builder__group + .chart-builder__group {
+    margin-top: 0.75rem;
+}
+
 .chart-builder__group-label {
     font-size: 0.7rem;
     font-weight: 600;
@@ -87,14 +91,17 @@
 /* ── Fields ──────────────────────────────────────────────────────────────── */
 .chart-builder__field {
     display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .chart-builder__field-label {
     font-size: 0.75rem;
     color: var(--plotly-editor-text-muted);
     font-weight: 500;
+    flex-shrink: 0;
+    min-width: 4.5rem;
 }
 
 /* ── Controls ────────────────────────────────────────────────────────────── */
@@ -165,7 +172,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 0.5rem 0.75rem;
-    background: var(--plotly-editor-surface);
+    background: var(--plotly-editor-border);
     cursor: pointer;
     user-select: none;
     font-weight: 600;

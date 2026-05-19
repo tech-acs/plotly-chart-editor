@@ -4,10 +4,10 @@ function l(o) {
 function d(o) {
   return structuredClone(l(o));
 }
-let p = null, u = null, x = null, A = null, g = !1, _ = !1, T = "Delete this trace? This cannot be undone.", S = null, O = null, w = null;
-function I(o, f) {
-  for (const [h, c] of Object.entries(f))
-    o[h] === void 0 || o[h] === null ? o[h] = structuredClone(c) : typeof c == "object" && !Array.isArray(c) && typeof o[h] == "object" && !Array.isArray(o[h]) && I(o[h], c);
+let p = null, f = null, x = null, A = null, g = !1, _ = !1, T = "Delete this trace? This cannot be undone.", S = null, O = null, w = null;
+function I(o, u) {
+  for (const [h, a] of Object.entries(u))
+    o[h] === void 0 || o[h] === null ? o[h] = structuredClone(a) : typeof a == "object" && !Array.isArray(a) && typeof o[h] == "object" && !Array.isArray(o[h]) && I(o[h], a);
   return o;
 }
 const M = {
@@ -34,19 +34,19 @@ const M = {
     tickformat: ""
   },
   margin: { t: 50, b: 50, l: 60, r: 30 },
-  showlegend: !0,
+  showlegend: !1,
   legend: { orientation: "v" }
 };
-function k(o, f, h) {
+function k(o, u, h) {
   T = h ?? T;
-  const c = I(o.layout ?? {}, M);
+  const a = I(o.layout ?? {}, M);
   !!Alpine.store("chartBuilder") || Alpine.store("chartBuilder", {
     // ── Loaded from Livewire on mount ─────────────────────────────
     dataSources: o.dataSources ?? {},
     schemaProfiles: o.schemaProfiles ?? {},
     // ── Managed by Alpine ─────────────────────────────────────────
     traces: o.traces ?? [],
-    layout: c,
+    layout: a,
     config: o.config ?? { responsive: !0 },
     // ── Sync / UI config ──────────────────────────────────────────
     syncMode: o.syncMode ?? "manual",
@@ -64,7 +64,7 @@ function k(o, f, h) {
     copiedAt: null,
     // timestamp of last clipboard copy (drives "Copied ✓")
     // ── Internal flags ────────────────────────────────────────────
-    _plotlyMissingMessage: f,
+    _plotlyMissingMessage: u,
     _plotlyMissing: !1,
     _tooSmall: !1,
     // ── Conditional visibility helpers (PRD §8) ───────────────────
@@ -141,10 +141,10 @@ function k(o, f, h) {
       }, 50);
     },
     _render() {
-      if (this._plotlyMissing || !u) return;
+      if (this._plotlyMissing || !f) return;
       const e = l(this.traces).map((t) => this.resolveMeta(t));
       window.Plotly.react(
-        u,
+        f,
         e,
         d(this.layout),
         d(this.config)
@@ -165,14 +165,14 @@ function k(o, f, h) {
           y && this.dataSources[y] && (r[m] = l(this.dataSources[y]).length);
         const n = Object.values(r);
         if (n.length < 2) return;
-        const a = Math.min(...n), C = Math.max(...n);
-        if (a !== C)
+        const c = Math.min(...n), C = Math.max(...n);
+        if (c !== C)
           for (const [m, y] of Object.entries(r))
-            y !== a && e.push({
+            y !== c && e.push({
               traceIndex: i,
               field: m,
               code: "LENGTH_MISMATCH",
-              message: `Column '${m}' has ${y} values but trace expects ${a}. Showing first ${a}.`
+              message: `Column '${m}' has ${y} values but trace expects ${c}. Showing first ${c}.`
             });
       }), this.warnings.splice(0, this.warnings.length, ...e);
     },
@@ -286,10 +286,10 @@ function k(o, f, h) {
     },
     _applyTraceType(e, t) {
       const i = this.schemaProfiles[t], s = d(l(this.traces)[e] ?? {}), r = this._profileFieldKeys(i), n = { type: t };
-      for (const a of ["name", "meta"])
-        s[a] !== void 0 && (n[a] = s[a]);
-      for (const a of Object.keys(s))
-        ["type", "name", "meta"].includes(a) || r.has(a) && (n[a] = s[a]);
+      for (const c of ["name", "meta"])
+        s[c] !== void 0 && (n[c] = s[c]);
+      for (const c of Object.keys(s))
+        ["type", "name", "meta"].includes(c) || r.has(c) && (n[c] = s[c]);
       this.traces[e] = n;
     },
     _profileFieldKeys(e) {
@@ -327,12 +327,12 @@ function k(o, f, h) {
      * @param {'png'|'jpeg'|'svg'|'webp'} format
      */
     async exportImage(e = "png") {
-      if (!(this._plotlyMissing || !u))
+      if (!(this._plotlyMissing || !f))
         try {
-          const t = await window.Plotly.toImage(u, {
+          const t = await window.Plotly.toImage(f, {
             format: e,
-            width: u.offsetWidth || 1200,
-            height: u.offsetHeight || 600
+            width: f.offsetWidth || 1200,
+            height: f.offsetHeight || 600
           });
           this._download(`chart.${e}`, `image/${e}`, t, !0);
         } catch (t) {
@@ -396,24 +396,24 @@ function k(o, f, h) {
     }
   });
 }
-function P(o, f, h, c, v) {
-  k(o, f, h);
+function P(o, u, h, a, v) {
+  k(o, u, h);
   const e = Alpine.store("chartBuilder");
-  if (u = c, p = v, typeof window.Plotly > "u") {
-    e._plotlyMissing = !0, c && (c.textContent = f);
+  if (f = a, p = v, typeof window.Plotly > "u") {
+    e._plotlyMissing = !0, a && (a.textContent = u);
     return;
   }
   g && e._render(), w && w.disconnect();
-  const t = c == null ? void 0 : c.closest(".chart-builder");
+  const t = a == null ? void 0 : a.closest(".chart-builder");
   t && typeof ResizeObserver < "u" && (w = new ResizeObserver((i) => {
-    var n, a;
-    const r = (((a = (n = i[0]) == null ? void 0 : n.contentRect) == null ? void 0 : a.width) ?? window.innerWidth) < 1024;
-    e._tooSmall = r, r && u && typeof window.Plotly < "u" && (window.Plotly.purge(u), g = !1);
-  }), w.observe(t)), c && typeof ResizeObserver < "u" && new ResizeObserver(() => {
+    var n, c;
+    const r = (((c = (n = i[0]) == null ? void 0 : n.contentRect) == null ? void 0 : c.width) ?? window.innerWidth) < 1024;
+    e._tooSmall = r, r && f && typeof window.Plotly < "u" && (window.Plotly.purge(f), g = !1);
+  }), w.observe(t)), a && typeof ResizeObserver < "u" && new ResizeObserver(() => {
     if (e._plotlyMissing || typeof window.Plotly > "u" || e._tooSmall) return;
-    const s = c.getBoundingClientRect();
-    s.width === 0 || s.height === 0 || (g ? window.Plotly.Plots.resize(c) : (_ = !0, e._startEffects(), g = !0, e._render()));
-  }).observe(c);
+    const s = a.getBoundingClientRect();
+    s.width === 0 || s.height === 0 || (g ? window.Plotly.Plots.resize(a) : (_ = !0, e._startEffects(), g = !0, e._render()));
+  }).observe(a);
 }
 typeof window < "u" && (window.initChartBuilder = k, window.bootChartBuilder = P);
 export {

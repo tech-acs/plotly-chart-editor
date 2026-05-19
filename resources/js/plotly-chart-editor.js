@@ -93,7 +93,7 @@ const LAYOUT_DEFAULTS = {
         tickformat: '',
     },
     margin:     { t: 50, b: 50, l: 60, r: 30 },
-    showlegend: true,
+    showlegend: false,
     legend:     { orientation: 'v' },
 }
 
