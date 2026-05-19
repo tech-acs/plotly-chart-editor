@@ -83,6 +83,42 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
             _plotlyMissingMessage: plotlyMissingMessage,
             _plotlyMissing:        false,
 
+            // ── Conditional visibility helpers (PRD §8) ───────────────────
+
+            /**
+             * Alias: the active trace object.
+             * Used in xshow expressions: `trace.mode && trace.mode.includes('lines')`
+             */
+            get trace() {
+                return this.traces[this.activeTraceIndex] ?? {}
+            },
+
+            /**
+             * Alias: the active trace type string.
+             * Used in xshow expressions: `traceType !== 'pie'`
+             */
+            get traceType() {
+                return this.traces[this.activeTraceIndex]?.type ?? ''
+            },
+
+            /**
+             * Whether the given trace type supports marker config.
+             * @param {string} type
+             * @returns {boolean}
+             */
+            hasMarkerSupport(type) {
+                return ['scatter', 'bar', 'histogram', 'pie'].includes(type)
+            },
+
+            /**
+             * Whether the given trace type supports fill config.
+             * @param {string} type
+             * @returns {boolean}
+             */
+            hasFillSupport(type) {
+                return ['scatter'].includes(type)
+            },
+
             // ── Effects ───────────────────────────────────────────────────
 
             _startEffects() {

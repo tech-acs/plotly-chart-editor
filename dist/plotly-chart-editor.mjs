@@ -1,12 +1,12 @@
-function n(s) {
+function a(s) {
   return typeof Alpine < "u" && typeof Alpine.raw == "function" ? Alpine.raw(s) : s;
 }
 function l(s) {
-  return structuredClone(n(s));
+  return structuredClone(a(s));
 }
 let h = null, p = null, T = null, _ = null, g = !1, m = !1, y = "Delete this trace? This cannot be undone.";
-function v(s, d, u) {
-  y = u ?? y, !!Alpine.store("chartBuilder") || Alpine.store("chartBuilder", {
+function v(s, d, f) {
+  y = f ?? y, !!Alpine.store("chartBuilder") || Alpine.store("chartBuilder", {
     // ── Loaded from Livewire on mount ─────────────────────────────
     dataSources: s.dataSources ?? {},
     schemaProfiles: s.schemaProfiles ?? {},
@@ -28,13 +28,45 @@ function v(s, d, u) {
     // ── Internal flags ────────────────────────────────────────────
     _plotlyMissingMessage: d,
     _plotlyMissing: !1,
+    // ── Conditional visibility helpers (PRD §8) ───────────────────
+    /**
+     * Alias: the active trace object.
+     * Used in xshow expressions: `trace.mode && trace.mode.includes('lines')`
+     */
+    get trace() {
+      return this.traces[this.activeTraceIndex] ?? {};
+    },
+    /**
+     * Alias: the active trace type string.
+     * Used in xshow expressions: `traceType !== 'pie'`
+     */
+    get traceType() {
+      var e;
+      return ((e = this.traces[this.activeTraceIndex]) == null ? void 0 : e.type) ?? "";
+    },
+    /**
+     * Whether the given trace type supports marker config.
+     * @param {string} type
+     * @returns {boolean}
+     */
+    hasMarkerSupport(e) {
+      return ["scatter", "bar", "histogram", "pie"].includes(e);
+    },
+    /**
+     * Whether the given trace type supports fill config.
+     * @param {string} type
+     * @returns {boolean}
+     */
+    hasFillSupport(e) {
+      return ["scatter"].includes(e);
+    },
     // ── Effects ───────────────────────────────────────────────────
     _startEffects() {
-      const t = this;
+      const e = this;
       Alpine.effect(() => {
-        JSON.stringify(t.traces), t._scheduleRender();
+        JSON.stringify(e.traces), e._scheduleRender();
       }), Alpine.effect(() => {
-        JSON.stringify(t.layout), t._scheduleRender();
+        JSON.stringify(e.layout), e._scheduleRender();
       });
     },
     // ── Render pipeline ───────────────────────────────────────────
@@ -45,25 +77,25 @@ function v(s, d, u) {
     },
     _render() {
       if (this._plotlyMissing || !p) return;
-      const t = n(this.traces).map((e) => this.resolveMeta(e));
+      const e = a(this.traces).map((t) => this.resolveMeta(t));
       window.Plotly.react(
         p,
-        t,
+        e,
         l(this.layout),
         l(this.config)
       );
     },
     // ── Meta resolution ───────────────────────────────────────────
-    resolveMeta(t) {
-      var r;
-      const e = l(t), i = ((r = e.meta) == null ? void 0 : r.columnNames) ?? {};
-      for (const [c, o] of Object.entries(i))
-        o && this.dataSources[o] !== void 0 && (e[c] = n(this.dataSources[o]));
-      return e;
+    resolveMeta(e) {
+      var i;
+      const t = l(e), r = ((i = t.meta) == null ? void 0 : i.columnNames) ?? {};
+      for (const [c, o] of Object.entries(r))
+        o && this.dataSources[o] !== void 0 && (t[c] = a(this.dataSources[o]));
+      return t;
     },
-    compileTrace(t) {
-      const e = this.resolveMeta(t);
-      return delete e.meta, e;
+    compileTrace(e) {
+      const t = this.resolveMeta(e);
+      return delete t.meta, t;
     },
     // ── Trace operations (PRD §6) ─────────────────────────────────
     /**
@@ -72,10 +104,10 @@ function v(s, d, u) {
      *
      * @param {string} [type]
      */
-    addTrace(t) {
-      const e = t ?? n(this.traceTypes)[0] ?? "bar";
+    addTrace(e) {
+      const t = e ?? a(this.traceTypes)[0] ?? "bar";
       this.traces.push({
-        type: e,
+        type: t,
         name: `Trace ${this.traces.length + 1}`,
         meta: { columnNames: {} }
       }), this.activeTraceIndex = this.traces.length - 1;
@@ -85,9 +117,9 @@ function v(s, d, u) {
      *
      * @param {number} [index]
      */
-    duplicateTrace(t) {
-      const e = t ?? this.activeTraceIndex, i = l(n(this.traces)[e]);
-      i.name = (i.name ?? `Trace ${e + 1}`) + " (copy)", this.traces.push(i), this.activeTraceIndex = this.traces.length - 1;
+    duplicateTrace(e) {
+      const t = e ?? this.activeTraceIndex, r = l(a(this.traces)[t]);
+      r.name = (r.name ?? `Trace ${t + 1}`) + " (copy)", this.traces.push(r), this.activeTraceIndex = this.traces.length - 1;
     },
     /**
      * Remove a trace after native confirm(). Adjusts activeTraceIndex
@@ -95,9 +127,9 @@ function v(s, d, u) {
      *
      * @param {number} [index]
      */
-    removeTrace(t) {
-      const e = t ?? this.activeTraceIndex;
-      window.confirm(y) && (this.traces.splice(e, 1), this.traces.length === 0 ? this.activeTraceIndex = 0 : this.activeTraceIndex >= this.traces.length && (this.activeTraceIndex = this.traces.length - 1));
+    removeTrace(e) {
+      const t = e ?? this.activeTraceIndex;
+      window.confirm(y) && (this.traces.splice(t, 1), this.traces.length === 0 ? this.activeTraceIndex = 0 : this.activeTraceIndex >= this.traces.length && (this.activeTraceIndex = this.traces.length - 1));
     },
     /**
      * Swap trace at `from` with trace at `to`.
@@ -105,25 +137,25 @@ function v(s, d, u) {
      * @param {number} from
      * @param {number} to
      */
-    moveTrace(t, e) {
-      const i = this.traces.length;
-      if (e < 0 || e >= i) return;
-      const r = l(n(this.traces[t]));
-      this.traces.splice(t, 1), this.traces.splice(e, 0, r), this.activeTraceIndex = e;
+    moveTrace(e, t) {
+      const r = this.traces.length;
+      if (t < 0 || t >= r) return;
+      const i = l(a(this.traces[e]));
+      this.traces.splice(e, 1), this.traces.splice(t, 0, i), this.activeTraceIndex = t;
     },
     /**
      * Move the active trace one step up (lower index = rendered first).
      */
-    moveTraceUp(t) {
-      const e = t ?? this.activeTraceIndex;
-      this.moveTrace(e, e - 1);
+    moveTraceUp(e) {
+      const t = e ?? this.activeTraceIndex;
+      this.moveTrace(t, t - 1);
     },
     /**
      * Move the active trace one step down.
      */
-    moveTraceDown(t) {
-      const e = t ?? this.activeTraceIndex;
-      this.moveTrace(e, e + 1);
+    moveTraceDown(e) {
+      const t = e ?? this.activeTraceIndex;
+      this.moveTrace(t, t + 1);
     },
     // ── Trace type switching (PRD §6) ─────────────────────────────
     /**
@@ -134,45 +166,45 @@ function v(s, d, u) {
      * @param {number} index
      * @param {string} newType
      */
-    async setTraceType(t, e) {
-      var r;
-      if (((r = n(this.traces)[t]) == null ? void 0 : r.type) !== e) {
-        if (this.schemaProfiles[e]) {
-          this._applyTraceType(t, e);
+    async setTraceType(e, t) {
+      var i;
+      if (((i = a(this.traces)[e]) == null ? void 0 : i.type) !== t) {
+        if (this.schemaProfiles[t]) {
+          this._applyTraceType(e, t);
           return;
         }
         if (h)
           try {
-            const c = await h.getSchemaProfile(e);
+            const c = await h.getSchemaProfile(t);
             if (!c || typeof c != "object" || !c.groups)
-              throw new Error(`Invalid profile returned for type "${e}"`);
-            this.schemaProfiles[e] = c, this._applyTraceType(t, e);
+              throw new Error(`Invalid profile returned for type "${t}"`);
+            this.schemaProfiles[t] = c, this._applyTraceType(e, t);
           } catch (c) {
-            console.error(`[plotly-chart-editor] Failed to load profile for "${e}":`, c), this._dispatchToast(e);
+            console.error(`[plotly-chart-editor] Failed to load profile for "${t}":`, c), this._dispatchToast(t);
           }
       }
     },
-    _applyTraceType(t, e) {
-      const i = this.schemaProfiles[e], r = l(n(this.traces)[t] ?? {}), c = this._profileFieldKeys(i), o = { type: e };
-      for (const a of ["name", "meta"])
-        r[a] !== void 0 && (o[a] = r[a]);
-      for (const a of Object.keys(r))
-        ["type", "name", "meta"].includes(a) || c.has(a) && (o[a] = r[a]);
-      this.traces[t] = o;
+    _applyTraceType(e, t) {
+      const r = this.schemaProfiles[t], i = l(a(this.traces)[e] ?? {}), c = this._profileFieldKeys(r), o = { type: t };
+      for (const n of ["name", "meta"])
+        i[n] !== void 0 && (o[n] = i[n]);
+      for (const n of Object.keys(i))
+        ["type", "name", "meta"].includes(n) || c.has(n) && (o[n] = i[n]);
+      this.traces[e] = o;
     },
-    _profileFieldKeys(t) {
-      const e = /* @__PURE__ */ new Set();
-      for (const i of Object.values((t == null ? void 0 : t.groups) ?? {}))
-        for (const r of (i == null ? void 0 : i.fields) ?? [])
-          e.add(r.key.split(".")[0]);
-      return e;
+    _profileFieldKeys(e) {
+      const t = /* @__PURE__ */ new Set();
+      for (const r of Object.values((e == null ? void 0 : e.groups) ?? {}))
+        for (const i of (r == null ? void 0 : r.fields) ?? [])
+          t.add(i.key.split(".")[0]);
+      return t;
     },
-    _dispatchToast(t) {
+    _dispatchToast(e) {
       window.dispatchEvent(new CustomEvent("plotly-editor:toast", {
         detail: {
           key: "errors.profile_load_failed",
-          message: `Failed to load profile for ${t}. Please try again.`,
-          type: t
+          message: `Failed to load profile for ${e}. Please try again.`,
+          type: e
         }
       }));
     },
@@ -186,27 +218,27 @@ function v(s, d, u) {
     syncToBackend() {
       if (this.syncing || !h) return;
       this.syncing = !0;
-      const t = {
-        traces: n(this.traces).map((e) => this.compileTrace(e)),
+      const e = {
+        traces: a(this.traces).map((t) => this.compileTrace(t)),
         layout: l(this.layout)
       };
-      h.syncFromAlpine(JSON.stringify(t)).finally(() => {
+      h.syncFromAlpine(JSON.stringify(e)).finally(() => {
         this.syncing = !1, this.dirty = !1, this.lastSyncAt = Date.now();
       });
     },
-    setWire(t) {
-      h = t;
+    setWire(e) {
+      h = e;
     }
   });
 }
-function w(s, d, u, f, t) {
-  v(s, d, u);
-  const e = Alpine.store("chartBuilder");
-  if (p = f, h = t, typeof window.Plotly > "u") {
-    e._plotlyMissing = !0, f && (f.textContent = d);
+function w(s, d, f, u, e) {
+  v(s, d, f);
+  const t = Alpine.store("chartBuilder");
+  if (p = u, h = e, typeof window.Plotly > "u") {
+    t._plotlyMissing = !0, u && (u.textContent = d);
     return;
   }
-  g || (m = !0, e._startEffects(), g = !0), e._render();
+  g || (m = !0, t._startEffects(), g = !0), t._render();
 }
 typeof window < "u" && (window.initChartBuilder = v, window.bootChartBuilder = w);
 export {

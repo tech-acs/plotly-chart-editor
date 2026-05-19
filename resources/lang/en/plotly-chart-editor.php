@@ -46,9 +46,50 @@ return [
         'trace_label' => 'Trace :n',
         'type_label' => 'Type',
         'traces_section' => 'Traces',
+
+        // Fold titles
+        'fold_traces' => 'Traces',
+        'fold_axes' => 'Axes',
+        'fold_canvas' => 'Canvas & Titles',
+
+        // Axes fold
+        'x_axis' => 'X Axis',
+        'y_axis' => 'Y Axis',
+        'axis_title' => 'Title',
+        'axis_range_min' => 'Min',
+        'axis_range_max' => 'Max',
+        'gridlines' => 'Gridlines',
+        'zeroline' => 'Zero line',
+        'tick_angle' => 'Tick angle',
+        'tick_format' => 'Tick format',
+        'tick_font' => 'Tick font',
+
+        // Canvas & Titles fold
+        'chart_title' => 'Chart title',
+        'title_font' => 'Title font',
+        'margins' => 'Margins',
+        'bg_plot' => 'Plot background',
+        'bg_paper' => 'Paper background',
+        'legend' => 'Legend',
+        'show_legend' => 'Show legend',
+        'legend_position' => 'Position',
+        'legend_orient' => 'Orientation',
+    ],
+
+    'viewport' => [
+        'too_small' => 'The chart editor requires a viewport of at least 1024px wide.',
     ],
 
     'fields' => [
+        // font primitive
+        'font_family' => 'Family',
+        'font_size' => 'Size',
+        'font_color' => 'Color',
+        // margin primitive
+        'margin_t' => 'Top',
+        'margin_b' => 'Bottom',
+        'margin_l' => 'Left',
+        'margin_r' => 'Right',
         'x' => 'X',
         'y' => 'Y',
         'labels' => 'Labels',

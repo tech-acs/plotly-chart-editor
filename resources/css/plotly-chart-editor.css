@@ -206,6 +206,12 @@
     gap: 0.35rem;
 }
 
+.margin-primitive__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem;
+}
+
 /* ── Misc ────────────────────────────────────────────────────────────────── */
 .chart-builder__no-profile {
     font-size: 0.75rem;
