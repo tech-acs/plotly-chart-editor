@@ -23,17 +23,14 @@
     --plotly-editor-radius:       6px;
     --plotly-editor-sidebar-w:    380px;
     --plotly-editor-font:         system-ui, sans-serif;
-    /* Height of the editor. Consumers override this to fit their layout.
-       The sidebar scroll depends on this being a concrete value. */
-    --plotly-editor-height:       calc(100vh - 80px);
 }
 
 /* ── Root container (PRD §13.2) ──────────────────────────────────────────── */
 .chart-builder {
     display: grid;
     grid-template-columns: var(--plotly-editor-sidebar-w) 1fr;
-    grid-template-rows: minmax(520px, var(--plotly-editor-height));
-    height: var(--plotly-editor-height);
+    grid-template-rows: 1fr;
+    height: 100%;
     min-height: 520px;
     font-family: var(--plotly-editor-font);
     font-size: 0.875rem;
