@@ -182,6 +182,43 @@ return [
         'transform_order' => 'Order',
         'transform_order_asc' => 'Ascending',
         'transform_order_desc' => 'Descending',
+        // axis types
+        'axis_type_auto' => 'Auto',
+        'axis_type_linear' => 'Linear',
+        'axis_type_log' => 'Log',
+        'axis_type_date' => 'Date',
+        'axis_type_category' => 'Category',
+        'axis_type_multicategory' => 'Multi-category',
+        // mirror
+        'mirror_false' => 'False',
+        'mirror_true' => 'True',
+        'mirror_ticks' => 'Ticks',
+        'mirror_all' => 'All',
+        'mirror_allticks' => 'All + Ticks',
+        // tick position
+        'tick_position_none' => 'None',
+        'tick_position_outside' => 'Outside',
+        'tick_position_inside' => 'Inside',
+        // legend
+        'legend_orient_v' => 'Vertical',
+        'legend_orient_h' => 'Horizontal',
+        'legend_pos_top_right' => 'Top right',
+        'legend_pos_top_left' => 'Top left',
+        'legend_pos_bottom_right' => 'Bottom right',
+        'legend_pos_bottom_left' => 'Bottom left',
+        'legend_pos_top_center' => 'Top center',
+        'legend_pos_bottom_center' => 'Bottom center',
+        'legend_pos_left_center' => 'Left center',
+        'legend_pos_right_center' => 'Right center',
+        // hover modes
+        'hovermode_x' => 'X',
+        'hovermode_y' => 'Y',
+        'hovermode_closest' => 'Closest',
+        'hovermode_x_unified' => 'X unified',
+        'hovermode_y_unified' => 'Y unified',
+        'hovermode_false' => 'False',
+        // misc
+        'select_column' => '— select column —',
     ],
 
 ];

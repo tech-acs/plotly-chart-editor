@@ -26,6 +26,13 @@
     --plotly-editor-success:      #16a34a;
 }
 
+/* ── Viewport-too-small overlay ─────────────────────────────────────────── */
+.chart-builder__too-small-msg {
+    padding: 2rem;
+    text-align: center;
+    color: var(--plotly-editor-text-muted);
+}
+
 /* ── Root container (PRD §13.2) ──────────────────────────────────────────── */
 .chart-builder {
     display: grid;
@@ -67,6 +74,11 @@
 }
 
 /* ── Groups ──────────────────────────────────────────────────────────────── */
+.chart-builder__groups {
+    display: flex;
+    flex-direction: column;
+}
+
 .chart-builder__group {
     display: flex;
     flex-direction: column;

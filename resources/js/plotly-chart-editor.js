@@ -275,6 +275,48 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
                 return ['scatter'].includes(type)
             },
 
+            /**
+             * Evaluate an xshow expression from a schema profile.
+             *
+             * @param {string|null|undefined} expr
+             * @returns {boolean}
+             */
+            evaluateXshow(expr) {
+                if (!expr) return true
+                return (new Function('store','trace','traceType','hasMarkerSupport','hasFillSupport','return ' + expr))(
+                    this,
+                    this.trace,
+                    this.traceType,
+                    this.hasMarkerSupport.bind(this),
+                    this.hasFillSupport.bind(this),
+                )
+            },
+
+            /**
+             * Set the legend position preset and update the 4 position fields.
+             *
+             * @param {string} position
+             */
+            setLegendPosition(position) {
+                const legend = this.layout.legend
+                this.setPath(this.layout, 'legend._position', position)
+                const positions = {
+                    'top-right':     { xanchor: 'right',  yanchor: 'top',    x: 1,   y: 1   },
+                    'top-left':      { xanchor: 'left',   yanchor: 'top',    x: 0,   y: 1   },
+                    'bottom-right':  { xanchor: 'right',  yanchor: 'bottom', x: 1,   y: 0   },
+                    'bottom-left':   { xanchor: 'left',   yanchor: 'bottom', x: 0,   y: 0   },
+                    'top-center':    { xanchor: 'center', yanchor: 'top',    x: 0.5, y: 1   },
+                    'bottom-center': { xanchor: 'center', yanchor: 'bottom', x: 0.5, y: 0   },
+                    'left-center':   { xanchor: 'left',   yanchor: 'middle', x: 0,   y: 0.5 },
+                    'right-center':  { xanchor: 'right',  yanchor: 'middle', x: 1,   y: 0.5 },
+                }
+                const p = positions[position] ?? positions['top-right']
+                legend.xanchor = p.xanchor
+                legend.yanchor = p.yanchor
+                legend.x = p.x
+                legend.y = p.y
+            },
+
             // ── Effects ───────────────────────────────────────────────────
 
             _startEffects() {
@@ -319,10 +361,24 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
                 if (this._plotlyMissing || !_canvasEl) return
 
                 const resolved = toRaw(this.traces).map(t => this.compileTrace(t))
+                const layout = deepClone(this.layout)
+
+                // Stable key derived from trace configuration (type + column
+                // bindings). When only trivial layout properties change (title,
+                // font, color), the key stays the same and Plotly preserves
+                // the viewport / auto-range. When trace data changes, the key
+                // changes and auto-range recalculates for the new data.
+                layout.uirevision = JSON.stringify(
+                    toRaw(this.traces).map(t => ({
+                        type:        t.type,
+                        columnNames: t.meta?.columnNames,
+                    }))
+                )
+
                 window.Plotly.react(
                     _canvasEl,
                     resolved,
-                    deepClone(this.layout),
+                    layout,
                     deepClone(this.config)
                 ).catch(err => {
                     console.error('[plotly-chart-editor] Plotly.react failed:', err)
@@ -672,18 +728,21 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
 
             // ── Export (PRD §10) ──────────────────────────────────────────
 
+            _buildExportPayload() {
+                const data = toRaw(this.traces).map(t => this.compileTrace(t))
+                return JSON.stringify(
+                    { data, layout: deepClone(this.layout), config: deepClone(this.config) },
+                    null,
+                    2
+                )
+            },
+
             /**
              * Download the full chart config as chart.json.
              * meta is stripped — the file is ready for direct use with Plotly.newPlot().
              */
             exportJSON() {
-                const data = toRaw(this.traces).map(t => this.compileTrace(t))
-                const payload = JSON.stringify(
-                    { data, layout: deepClone(this.layout), config: deepClone(this.config) },
-                    null,
-                    2
-                )
-                this._download('chart.json', 'application/json', payload)
+                this._download('chart.json', 'application/json', this._buildExportPayload())
             },
 
             /**
@@ -711,15 +770,8 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
              * Shows a transient "Copied ✓" indicator via copiedAt.
              */
             async copyConfig() {
-                const data = toRaw(this.traces).map(t => this.compileTrace(t))
-                const text = JSON.stringify(
-                    { data, layout: deepClone(this.layout), config: deepClone(this.config) },
-                    null,
-                    2
-                )
-
                 try {
-                    await navigator.clipboard.writeText(text)
+                    await navigator.clipboard.writeText(this._buildExportPayload())
                     this.copiedAt = Date.now()
                     clearTimeout(_copiedTimer)
                     _copiedTimer = setTimeout(() => { this.copiedAt = null }, 2000)

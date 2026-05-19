@@ -1,22 +1,22 @@
-function f(n) {
+function h(n) {
   return typeof Alpine < "u" && typeof Alpine.raw == "function" ? Alpine.raw(n) : n;
 }
-function d(n) {
-  return JSON.parse(JSON.stringify(f(n)));
+function u(n) {
+  return JSON.parse(JSON.stringify(h(n)));
 }
 let w = null;
 const M = {
   area: "scatter"
-}, C = {
+}, N = {
   area: { mode: "none", fill: "tozeroy", fillcolor: "#1f77b4" }
 };
-let y = null, x = null, k = null, T = !1, b = !1, v = "Delete this trace? This cannot be undone.", S = null, O = null, _ = null;
-function I(n, g) {
-  for (const [h, c] of Object.entries(g))
-    n[h] === void 0 || n[h] === null ? n[h] = structuredClone(c) : typeof c == "object" && !Array.isArray(c) && typeof n[h] == "object" && !Array.isArray(n[h]) && I(n[h], c);
+let y = null, A = null, k = null, x = !1, _ = !1, b = "Delete this trace? This cannot be undone.", S = null, O = null, T = null;
+function P(n, g) {
+  for (const [f, c] of Object.entries(g))
+    n[f] === void 0 || n[f] === null ? n[f] = structuredClone(c) : typeof c == "object" && !Array.isArray(c) && typeof n[f] == "object" && !Array.isArray(n[f]) && P(n[f], c);
   return n;
 }
-const N = {
+const C = {
   // Nested sub-objects that primitives bind into must always exist.
   // We provide structural defaults only — values that match Plotly's own
   // defaults so the controls reflect the actual chart state on first render.
@@ -87,9 +87,9 @@ const N = {
     font: { family: "Arial", size: 12, color: "#000000" }
   }
 };
-function P(n, g, h) {
-  v = h ?? v;
-  const c = I(n.layout ?? {}, N);
+function I(n, g, f) {
+  b = f ?? b;
+  const c = P(n.layout ?? {}, C);
   !!Alpine.store("chartBuilder") || Alpine.store("chartBuilder", {
     // ── Loaded from Livewire on mount ─────────────────────────────
     dataSources: n.dataSources ?? {},
@@ -143,7 +143,7 @@ function P(n, g, h) {
      * @returns {*}
      */
     getPath(e, t) {
-      return t.split(".").reduce((r, s) => r == null ? void 0 : r[s], e);
+      return t.split(".").reduce((r, i) => r == null ? void 0 : r[i], e);
     },
     /**
      * Write a value at a dot-separated path on an object,
@@ -154,11 +154,11 @@ function P(n, g, h) {
      * @param {*}      value
      */
     setPath(e, t, r) {
-      const s = t.split(".");
-      let i = e;
-      for (let o = 0; o < s.length - 1; o++)
-        (i[s[o]] == null || typeof i[s[o]] != "object") && (i[s[o]] = {}), i = i[s[o]];
-      i[s[s.length - 1]] = r;
+      const i = t.split(".");
+      let s = e;
+      for (let o = 0; o < i.length - 1; o++)
+        (s[i[o]] == null || typeof s[i[o]] != "object") && (s[i[o]] = {}), s = s[i[o]];
+      s[i[i.length - 1]] = r;
     },
     /**
      * Whether the given trace type supports marker config.
@@ -176,6 +176,41 @@ function P(n, g, h) {
     hasFillSupport(e) {
       return ["scatter"].includes(e);
     },
+    /**
+     * Evaluate an xshow expression from a schema profile.
+     *
+     * @param {string|null|undefined} expr
+     * @returns {boolean}
+     */
+    evaluateXshow(e) {
+      return e ? new Function("store", "trace", "traceType", "hasMarkerSupport", "hasFillSupport", "return " + e)(
+        this,
+        this.trace,
+        this.traceType,
+        this.hasMarkerSupport.bind(this),
+        this.hasFillSupport.bind(this)
+      ) : !0;
+    },
+    /**
+     * Set the legend position preset and update the 4 position fields.
+     *
+     * @param {string} position
+     */
+    setLegendPosition(e) {
+      const t = this.layout.legend;
+      this.setPath(this.layout, "legend._position", e);
+      const r = {
+        "top-right": { xanchor: "right", yanchor: "top", x: 1, y: 1 },
+        "top-left": { xanchor: "left", yanchor: "top", x: 0, y: 1 },
+        "bottom-right": { xanchor: "right", yanchor: "bottom", x: 1, y: 0 },
+        "bottom-left": { xanchor: "left", yanchor: "bottom", x: 0, y: 0 },
+        "top-center": { xanchor: "center", yanchor: "top", x: 0.5, y: 1 },
+        "bottom-center": { xanchor: "center", yanchor: "bottom", x: 0.5, y: 0 },
+        "left-center": { xanchor: "left", yanchor: "middle", x: 0, y: 0.5 },
+        "right-center": { xanchor: "right", yanchor: "middle", x: 1, y: 0.5 }
+      }, i = r[e] ?? r["top-right"];
+      t.xanchor = i.xanchor, t.yanchor = i.yanchor, t.x = i.x, t.y = i.y;
+    },
     // ── Effects ───────────────────────────────────────────────────
     _startEffects() {
       const e = this;
@@ -187,20 +222,28 @@ function P(n, g, h) {
     },
     // ── Render pipeline ───────────────────────────────────────────
     _scheduleRender() {
-      clearTimeout(x), x = setTimeout(() => {
-        this.validate(), this._render(), b ? b = !1 : this.markDirty();
+      clearTimeout(A), A = setTimeout(() => {
+        this.validate(), this._render(), _ ? _ = !1 : this.markDirty();
       }, 50);
     },
     _render() {
       if (this._plotlyMissing || !y) return;
-      const e = f(this.traces).map((t) => this.compileTrace(t));
-      window.Plotly.react(
+      const e = h(this.traces).map((r) => this.compileTrace(r)), t = u(this.layout);
+      t.uirevision = JSON.stringify(
+        h(this.traces).map((r) => {
+          var i;
+          return {
+            type: r.type,
+            columnNames: (i = r.meta) == null ? void 0 : i.columnNames
+          };
+        })
+      ), window.Plotly.react(
         y,
         e,
-        d(this.layout),
-        d(this.config)
-      ).catch((t) => {
-        console.error("[plotly-chart-editor] Plotly.react failed:", t);
+        t,
+        u(this.config)
+      ).catch((r) => {
+        console.error("[plotly-chart-editor] Plotly.react failed:", r);
       });
     },
     // ── Validation (PRD §11) ──────────────────────────────────────
@@ -211,21 +254,21 @@ function P(n, g, h) {
      */
     validate() {
       const e = [];
-      f(this.traces).forEach((t, r) => {
+      h(this.traces).forEach((t, r) => {
         var p;
-        const s = ((p = t.meta) == null ? void 0 : p.columnNames) ?? {}, i = {};
-        for (const [m, u] of Object.entries(s))
-          u && this.dataSources[u] && (i[m] = f(this.dataSources[u]).length);
-        const o = Object.values(i);
+        const i = ((p = t.meta) == null ? void 0 : p.columnNames) ?? {}, s = {};
+        for (const [m, d] of Object.entries(i))
+          d && this.dataSources[d] && (s[m] = h(this.dataSources[d]).length);
+        const o = Object.values(s);
         if (o.length < 2) return;
         const l = Math.min(...o), a = Math.max(...o);
         if (l !== a)
-          for (const [m, u] of Object.entries(i))
-            u !== l && e.push({
+          for (const [m, d] of Object.entries(s))
+            d !== l && e.push({
               traceIndex: r,
               field: m,
               code: "LENGTH_MISMATCH",
-              message: `Column '${m}' has ${u} values but trace expects ${l}. Showing first ${l}.`
+              message: `Column '${m}' has ${d} values but trace expects ${l}. Showing first ${l}.`
             });
       }), this.warnings.splice(0, this.warnings.length, ...e);
     },
@@ -234,16 +277,16 @@ function P(n, g, h) {
      * Used by the inline warning in the column selector.
      */
     warningFor(e, t) {
-      return f(this.warnings).find(
+      return h(this.warnings).find(
         (r) => r.traceIndex === e && r.field === t
       ) ?? null;
     },
     // ── Meta resolution ───────────────────────────────────────────
     resolveMeta(e) {
-      var s;
-      const t = d(e), r = ((s = t.meta) == null ? void 0 : s.columnNames) ?? {};
-      for (const [i, o] of Object.entries(r))
-        o && this.dataSources[o] !== void 0 && (t[i] = f(this.dataSources[o]));
+      var i;
+      const t = u(e), r = ((i = t.meta) == null ? void 0 : i.columnNames) ?? {};
+      for (const [s, o] of Object.entries(r))
+        o && this.dataSources[o] !== void 0 && (t[s] = h(this.dataSources[o]));
       return this._applyTransforms(t), t;
     },
     /**
@@ -260,9 +303,9 @@ function P(n, g, h) {
       if (t.length !== 0) {
         for (const r of e.transforms)
           if (r.type === "filter") {
-            const s = e[r.target];
-            if (!Array.isArray(s)) continue;
-            const i = s.map((o) => {
+            const i = e[r.target];
+            if (!Array.isArray(i)) continue;
+            const s = i.map((o) => {
               switch (r.operation) {
                 case "=":
                   return o === r.value;
@@ -281,14 +324,14 @@ function P(n, g, h) {
               }
             });
             for (const o of t)
-              e[o] = e[o].filter((l, a) => i[a]);
+              e[o] = e[o].filter((l, a) => s[a]);
           } else if (r.type === "sort") {
-            const s = e[r.target];
-            if (!Array.isArray(s)) continue;
-            const i = s.length, o = Array.from({ length: i }, (l, a) => a);
+            const i = e[r.target];
+            if (!Array.isArray(i)) continue;
+            const s = i.length, o = Array.from({ length: s }, (l, a) => a);
             o.sort((l, a) => {
-              const p = s[l], m = s[a], u = p < m ? -1 : p > m ? 1 : 0;
-              return r.order === "descending" ? -u : u;
+              const p = i[l], m = i[a], d = p < m ? -1 : p > m ? 1 : 0;
+              return r.order === "descending" ? -d : d;
             });
             for (const l of t)
               e[l] = o.map((a) => e[l][a]);
@@ -307,7 +350,7 @@ function P(n, g, h) {
      * @param {string} [type]
      */
     addTrace(e) {
-      const t = e ?? f(this.traceTypes)[0] ?? "bar";
+      const t = e ?? h(this.traceTypes)[0] ?? "bar";
       this.traces.push({
         type: t,
         name: `Trace ${this.traces.length + 1}`,
@@ -320,7 +363,7 @@ function P(n, g, h) {
      * @param {number} [index]
      */
     duplicateTrace(e) {
-      const t = e ?? this.activeTraceIndex, r = d(f(this.traces)[t]);
+      const t = e ?? this.activeTraceIndex, r = u(h(this.traces)[t]);
       r.name = (r.name ?? `Trace ${t + 1}`) + " (copy)", this.traces.push(r), this.activeTraceIndex = this.traces.length - 1;
     },
     /**
@@ -331,7 +374,7 @@ function P(n, g, h) {
      */
     removeTrace(e) {
       const t = e ?? this.activeTraceIndex;
-      window.confirm(v) && (this.traces.splice(t, 1), this.traces.length === 0 ? this.activeTraceIndex = 0 : this.activeTraceIndex >= this.traces.length && (this.activeTraceIndex = this.traces.length - 1));
+      window.confirm(b) && (this.traces.splice(t, 1), this.traces.length === 0 ? this.activeTraceIndex = 0 : this.activeTraceIndex >= this.traces.length && (this.activeTraceIndex = this.traces.length - 1));
     },
     /**
      * Swap trace at `from` with trace at `to`.
@@ -342,8 +385,8 @@ function P(n, g, h) {
     moveTrace(e, t) {
       const r = this.traces.length;
       if (t < 0 || t >= r) return;
-      const s = d(f(this.traces[e]));
-      this.traces.splice(e, 1), this.traces.splice(t, 0, s), this.activeTraceIndex = t;
+      const i = u(h(this.traces[e]));
+      this.traces.splice(e, 1), this.traces.splice(t, 0, i), this.activeTraceIndex = t;
     },
     /**
      * Move the active trace one step up (lower index = rendered first).
@@ -369,30 +412,30 @@ function P(n, g, h) {
      * @param {string} newType
      */
     async setTraceType(e, t) {
-      var s;
-      if (((s = f(this.traces)[e]) == null ? void 0 : s.type) !== t) {
+      var i;
+      if (((i = h(this.traces)[e]) == null ? void 0 : i.type) !== t) {
         if (this.schemaProfiles[t]) {
           this._applyTraceType(e, t);
           return;
         }
         if (w)
           try {
-            const i = await w.getSchemaProfile(t);
-            if (!i || typeof i != "object" || !i.groups)
+            const s = await w.getSchemaProfile(t);
+            if (!s || typeof s != "object" || !s.groups)
               throw new Error(`Invalid profile returned for type "${t}"`);
-            this.schemaProfiles[t] = i, this._applyTraceType(e, t);
-          } catch (i) {
-            console.error(`[plotly-chart-editor] Failed to load profile for "${t}":`, i), this._dispatchToast(t);
+            this.schemaProfiles[t] = s, this._applyTraceType(e, t);
+          } catch (s) {
+            console.error(`[plotly-chart-editor] Failed to load profile for "${t}":`, s), this._dispatchToast(t);
           }
       }
     },
     _applyTraceType(e, t) {
-      const r = this.schemaProfiles[t], s = d(f(this.traces)[e] ?? {}), i = this._profileFieldKeys(r), o = { type: t };
+      const r = this.schemaProfiles[t], i = u(h(this.traces)[e] ?? {}), s = this._profileFieldKeys(r), o = { type: t };
       for (const a of ["name", "meta", "transforms"])
-        s[a] !== void 0 && (o[a] = s[a]);
-      for (const a of Object.keys(s))
-        ["type", "name", "meta"].includes(a) || i.has(a) && (o[a] = s[a]);
-      const l = C[t] ?? {};
+        i[a] !== void 0 && (o[a] = i[a]);
+      for (const a of Object.keys(i))
+        ["type", "name", "meta"].includes(a) || s.has(a) && (o[a] = i[a]);
+      const l = N[t] ?? {};
       for (const [a, p] of Object.entries(l))
         o[a] = p;
       this.traces[e] = o;
@@ -400,8 +443,8 @@ function P(n, g, h) {
     _profileFieldKeys(e) {
       const t = /* @__PURE__ */ new Set();
       for (const r of Object.values((e == null ? void 0 : e.groups) ?? {}))
-        for (const s of (r == null ? void 0 : r.fields) ?? [])
-          t.add(s.key.split(".")[0]);
+        for (const i of (r == null ? void 0 : r.fields) ?? [])
+          t.add(i.key.split(".")[0]);
       return t;
     },
     _dispatchToast(e) {
@@ -441,17 +484,20 @@ function P(n, g, h) {
       !t || !Array.isArray(t.transforms) || (t.transforms.splice(e, 1), t.transforms.length === 0 && delete t.transforms, this._scheduleRender());
     },
     // ── Export (PRD §10) ──────────────────────────────────────────
+    _buildExportPayload() {
+      const e = h(this.traces).map((t) => this.compileTrace(t));
+      return JSON.stringify(
+        { data: e, layout: u(this.layout), config: u(this.config) },
+        null,
+        2
+      );
+    },
     /**
      * Download the full chart config as chart.json.
      * meta is stripped — the file is ready for direct use with Plotly.newPlot().
      */
     exportJSON() {
-      const e = f(this.traces).map((r) => this.compileTrace(r)), t = JSON.stringify(
-        { data: e, layout: d(this.layout), config: d(this.config) },
-        null,
-        2
-      );
-      this._download("chart.json", "application/json", t);
+      this._download("chart.json", "application/json", this._buildExportPayload());
     },
     /**
      * Export the current chart canvas as an image.
@@ -476,17 +522,12 @@ function P(n, g, h) {
      * Shows a transient "Copied ✓" indicator via copiedAt.
      */
     async copyConfig() {
-      const e = f(this.traces).map((r) => this.compileTrace(r)), t = JSON.stringify(
-        { data: e, layout: d(this.layout), config: d(this.config) },
-        null,
-        2
-      );
       try {
-        await navigator.clipboard.writeText(t), this.copiedAt = Date.now(), clearTimeout(O), O = setTimeout(() => {
+        await navigator.clipboard.writeText(this._buildExportPayload()), this.copiedAt = Date.now(), clearTimeout(O), O = setTimeout(() => {
           this.copiedAt = null;
         }, 2e3);
-      } catch (r) {
-        console.error("[plotly-chart-editor] copyConfig failed:", r);
+      } catch (e) {
+        console.error("[plotly-chart-editor] copyConfig failed:", e);
       }
     },
     /**
@@ -497,9 +538,9 @@ function P(n, g, h) {
      * @param {string}  content
      * @param {boolean} isDataUrl  When true, content is already a data URL.
      */
-    _download(e, t, r, s = !1) {
-      const i = document.createElement("a");
-      i.href = s ? r : `data:${t};charset=utf-8,${encodeURIComponent(r)}`, i.download = e, i.style.display = "none", document.body.appendChild(i), i.click(), document.body.removeChild(i);
+    _download(e, t, r, i = !1) {
+      const s = document.createElement("a");
+      s.href = i ? r : `data:${t};charset=utf-8,${encodeURIComponent(r)}`, s.download = e, s.style.display = "none", document.body.appendChild(s), s.click(), document.body.removeChild(s);
     },
     // ── Sync state ────────────────────────────────────────────────
     markDirty() {
@@ -512,8 +553,8 @@ function P(n, g, h) {
       if (this.syncing || !w) return;
       this.syncing = !0;
       const e = {
-        traces: f(this.traces).map((t) => this.compileTrace(t)),
-        layout: d(this.layout)
+        traces: h(this.traces).map((t) => this.compileTrace(t)),
+        layout: u(this.layout)
       };
       w.syncFromAlpine(JSON.stringify(e)).then(() => {
         this.savedAt = Date.now(), clearTimeout(S), S = setTimeout(() => {
@@ -530,27 +571,27 @@ function P(n, g, h) {
     }
   });
 }
-function j(n, g, h, c, A) {
-  P(n, g, h);
+function j(n, g, f, c, v) {
+  I(n, g, f);
   const e = Alpine.store("chartBuilder");
-  if (y = c, w = A, typeof window.Plotly > "u") {
+  if (y = c, w = v, typeof window.Plotly > "u") {
     e._plotlyMissing = !0, c && (c.textContent = g);
     return;
   }
-  T && e._render(), _ && _.disconnect();
+  x && e._render(), T && T.disconnect();
   const t = c == null ? void 0 : c.closest(".chart-builder");
-  t && typeof ResizeObserver < "u" && (_ = new ResizeObserver((r) => {
+  t && typeof ResizeObserver < "u" && (T = new ResizeObserver((r) => {
     var o, l;
-    const i = (((l = (o = r[0]) == null ? void 0 : o.contentRect) == null ? void 0 : l.width) ?? window.innerWidth) < 1024;
-    e._tooSmall = i, i && y && typeof window.Plotly < "u" && (window.Plotly.purge(y), T = !1);
-  }), _.observe(t)), c && typeof ResizeObserver < "u" && new ResizeObserver(() => {
+    const s = (((l = (o = r[0]) == null ? void 0 : o.contentRect) == null ? void 0 : l.width) ?? window.innerWidth) < 1024;
+    e._tooSmall = s, s && y && typeof window.Plotly < "u" && (window.Plotly.purge(y), x = !1);
+  }), T.observe(t)), c && typeof ResizeObserver < "u" && new ResizeObserver(() => {
     if (e._plotlyMissing || typeof window.Plotly > "u" || e._tooSmall) return;
-    const s = c.getBoundingClientRect();
-    s.width === 0 || s.height === 0 || (T ? window.Plotly.Plots.resize(c) : (b = !0, e._startEffects(), T = !0, e._render()));
+    const i = c.getBoundingClientRect();
+    i.width === 0 || i.height === 0 || (x ? window.Plotly.Plots.resize(c) : (_ = !0, e._startEffects(), x = !0, e._render()));
   }).observe(c);
 }
-typeof window < "u" && (window.initChartBuilder = P, window.bootChartBuilder = j);
+typeof window < "u" && (window.initChartBuilder = I, window.bootChartBuilder = j);
 export {
   j as bootChartBuilder,
-  P as initChartBuilder
+  I as initChartBuilder
 };
