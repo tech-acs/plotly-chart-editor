@@ -89,14 +89,18 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
                 const self = this
 
                 Alpine.effect(() => {
-                    const t = self.traces
-                    JSON.stringify(toRaw(t))
+                    // Read through the reactive proxy — do NOT call toRaw() here.
+                    // toRaw() strips the proxy, so Alpine can only track the
+                    // top-level reference, not mutations inside the array
+                    // (e.g. push, splice, or property changes on trace objects).
+                    // JSON.stringify walks every property through the proxy,
+                    // registering a dependency on each one.
+                    JSON.stringify(self.traces)
                     self._scheduleRender()
                 })
 
                 Alpine.effect(() => {
-                    const l = self.layout
-                    JSON.stringify(toRaw(l))
+                    JSON.stringify(self.layout)
                     self._scheduleRender()
                 })
             },

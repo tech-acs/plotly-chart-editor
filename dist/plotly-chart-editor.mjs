@@ -1,8 +1,8 @@
-function c(s) {
+function n(s) {
   return typeof Alpine < "u" && typeof Alpine.raw == "function" ? Alpine.raw(s) : s;
 }
 function l(s) {
-  return structuredClone(c(s));
+  return structuredClone(n(s));
 }
 let h = null, p = null, T = null, _ = null, g = !1, m = !1, y = "Delete this trace? This cannot be undone.";
 function v(s, d, u) {
@@ -32,11 +32,9 @@ function v(s, d, u) {
     _startEffects() {
       const t = this;
       Alpine.effect(() => {
-        const e = t.traces;
-        JSON.stringify(c(e)), t._scheduleRender();
+        JSON.stringify(t.traces), t._scheduleRender();
       }), Alpine.effect(() => {
-        const e = t.layout;
-        JSON.stringify(c(e)), t._scheduleRender();
+        JSON.stringify(t.layout), t._scheduleRender();
       });
     },
     // ── Render pipeline ───────────────────────────────────────────
@@ -47,7 +45,7 @@ function v(s, d, u) {
     },
     _render() {
       if (this._plotlyMissing || !p) return;
-      const t = c(this.traces).map((e) => this.resolveMeta(e));
+      const t = n(this.traces).map((e) => this.resolveMeta(e));
       window.Plotly.react(
         p,
         t,
@@ -59,8 +57,8 @@ function v(s, d, u) {
     resolveMeta(t) {
       var r;
       const e = l(t), i = ((r = e.meta) == null ? void 0 : r.columnNames) ?? {};
-      for (const [n, o] of Object.entries(i))
-        o && this.dataSources[o] !== void 0 && (e[n] = c(this.dataSources[o]));
+      for (const [c, o] of Object.entries(i))
+        o && this.dataSources[o] !== void 0 && (e[c] = n(this.dataSources[o]));
       return e;
     },
     compileTrace(t) {
@@ -75,7 +73,7 @@ function v(s, d, u) {
      * @param {string} [type]
      */
     addTrace(t) {
-      const e = t ?? c(this.traceTypes)[0] ?? "bar";
+      const e = t ?? n(this.traceTypes)[0] ?? "bar";
       this.traces.push({
         type: e,
         name: `Trace ${this.traces.length + 1}`,
@@ -88,7 +86,7 @@ function v(s, d, u) {
      * @param {number} [index]
      */
     duplicateTrace(t) {
-      const e = t ?? this.activeTraceIndex, i = l(c(this.traces)[e]);
+      const e = t ?? this.activeTraceIndex, i = l(n(this.traces)[e]);
       i.name = (i.name ?? `Trace ${e + 1}`) + " (copy)", this.traces.push(i), this.activeTraceIndex = this.traces.length - 1;
     },
     /**
@@ -110,7 +108,7 @@ function v(s, d, u) {
     moveTrace(t, e) {
       const i = this.traces.length;
       if (e < 0 || e >= i) return;
-      const r = l(c(this.traces[t]));
+      const r = l(n(this.traces[t]));
       this.traces.splice(t, 1), this.traces.splice(e, 0, r), this.activeTraceIndex = e;
     },
     /**
@@ -138,28 +136,28 @@ function v(s, d, u) {
      */
     async setTraceType(t, e) {
       var r;
-      if (((r = c(this.traces)[t]) == null ? void 0 : r.type) !== e) {
+      if (((r = n(this.traces)[t]) == null ? void 0 : r.type) !== e) {
         if (this.schemaProfiles[e]) {
           this._applyTraceType(t, e);
           return;
         }
         if (h)
           try {
-            const n = await h.getSchemaProfile(e);
-            if (!n || typeof n != "object" || !n.groups)
+            const c = await h.getSchemaProfile(e);
+            if (!c || typeof c != "object" || !c.groups)
               throw new Error(`Invalid profile returned for type "${e}"`);
-            this.schemaProfiles[e] = n, this._applyTraceType(t, e);
-          } catch (n) {
-            console.error(`[plotly-chart-editor] Failed to load profile for "${e}":`, n), this._dispatchToast(e);
+            this.schemaProfiles[e] = c, this._applyTraceType(t, e);
+          } catch (c) {
+            console.error(`[plotly-chart-editor] Failed to load profile for "${e}":`, c), this._dispatchToast(e);
           }
       }
     },
     _applyTraceType(t, e) {
-      const i = this.schemaProfiles[e], r = l(c(this.traces)[t] ?? {}), n = this._profileFieldKeys(i), o = { type: e };
+      const i = this.schemaProfiles[e], r = l(n(this.traces)[t] ?? {}), c = this._profileFieldKeys(i), o = { type: e };
       for (const a of ["name", "meta"])
         r[a] !== void 0 && (o[a] = r[a]);
       for (const a of Object.keys(r))
-        ["type", "name", "meta"].includes(a) || n.has(a) && (o[a] = r[a]);
+        ["type", "name", "meta"].includes(a) || c.has(a) && (o[a] = r[a]);
       this.traces[t] = o;
     },
     _profileFieldKeys(t) {
@@ -189,7 +187,7 @@ function v(s, d, u) {
       if (this.syncing || !h) return;
       this.syncing = !0;
       const t = {
-        traces: c(this.traces).map((e) => this.compileTrace(e)),
+        traces: n(this.traces).map((e) => this.compileTrace(e)),
         layout: l(this.layout)
       };
       h.syncFromAlpine(JSON.stringify(t)).finally(() => {
