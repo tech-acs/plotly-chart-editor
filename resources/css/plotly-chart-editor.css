@@ -28,6 +28,15 @@
     --plotly-editor-height:       calc(100vh - 80px);
 }
 
+/* ── Livewire outer wrapper ──────────────────────────────────────────────── */
+/* Livewire 4 wraps components in an anonymous <div wire:key="..."> with no
+   class or dimensions. display:contents removes it from the layout model so
+   .chart-builder behaves as a direct child of the page container, inheriting
+   full block width and allowing height:100% to resolve correctly. */
+:has(> .chart-builder) {
+    display: contents;
+}
+
 /* ── Root container (PRD §13.2) ──────────────────────────────────────────── */
 .chart-builder {
     /* Flex row mirrors the react-chart-editor approach:
@@ -35,6 +44,7 @@
        reliably for their own overflow-y:auto scrolling. */
     display: flex;
     flex-direction: row;
+    width: 100%;
     height: var(--plotly-editor-height);
     min-height: 520px;
     font-family: var(--plotly-editor-font);
