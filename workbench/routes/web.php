@@ -11,5 +11,15 @@ Route::get('/', function () {
     // Strip the _meta key — it is not a data column
     $dataSources = collect($raw)->except('_meta')->toArray();
 
-    return view('demo', ['dataSources' => $dataSources]);
+    // Cache-bust the package assets on every rebuild during development
+    $pkgRoot = realpath(__DIR__.'/../..');
+    $assetVersion = max(
+        (int) @filemtime($pkgRoot.'/dist/plotly-chart-editor.umd.js'),
+        (int) @filemtime($pkgRoot.'/resources/css/plotly-chart-editor.css')
+    );
+
+    return view('demo', [
+        'dataSources' => $dataSources,
+        'assetVersion' => $assetVersion,
+    ]);
 });

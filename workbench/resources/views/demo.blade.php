@@ -14,14 +14,14 @@
     <script src="https://cdn.plot.ly/plotly-3.5.0.min.js" charset="utf-8"></script>
 
     {{-- Package CSS --}}
-    <link rel="stylesheet" href="/plotly-chart-editor.css">
+    <link rel="stylesheet" href="/plotly-chart-editor.css?v={{ $assetVersion }}">
 
     {{--
         Package UMD bundle — exposes window.initChartBuilder.
         Must load before @livewireScripts (which boots Alpine).
         DO NOT load a second Alpine here — Livewire 4 bundles Alpine internally.
     --}}
-    <script src="/plotly-chart-editor.umd.js"></script>
+    <script src="/plotly-chart-editor.umd.js?v={{ $assetVersion }}"></script>
 
     @livewireStyles
 
