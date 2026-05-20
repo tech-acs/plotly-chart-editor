@@ -157,8 +157,6 @@ return [
         'shape' => 'Shape',
         'text' => 'Text',
         'textposition' => 'Text position',
-        'textangle' => 'Text angle',
-        'constraintext' => 'Constrain text',
         'cliponaxis' => 'Clip on axis',
         'direction' => 'Direction',
         'rotation' => 'Rotation',

@@ -342,20 +342,6 @@ return [
                             'dflt' => '#444444',
                         ],
                         [
-                            'key' => 'textangle',
-                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.textangle',
-                            'type' => 'enumerated',
-                            'values' => ['auto', '0', '45', '-45', '90', '-90'],
-                            'dflt' => 'auto',
-                        ],
-                        [
-                            'key' => 'constraintext',
-                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.constraintext',
-                            'type' => 'enumerated',
-                            'values' => ['inside', 'outside', 'both', 'none'],
-                            'dflt' => 'none',
-                        ],
-                        [
                             'key' => 'cliponaxis',
                             'label' => 'plotly-chart-editor::plotly-chart-editor.fields.cliponaxis',
                             'type' => 'boolean',
