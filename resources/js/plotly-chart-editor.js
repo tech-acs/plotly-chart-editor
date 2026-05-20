@@ -56,6 +56,7 @@ let _deleteConfirmMsg  = 'Delete this trace? This cannot be undone.'
 let _savedTimer        = null    // clears the "Saved ✓" transient message
 let _copiedTimer       = null    // clears the "Copied ✓" transient message
 let _resizeObserver    = null    // ResizeObserver for viewport gate
+let _lastStructuralSig = null    // last structural signature used to detect layer changes
 
 /**
  * Bootstrap the chart builder Alpine store.
@@ -261,6 +262,23 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
             },
 
             /**
+             * Set a column binding on a trace's meta.columnNames.
+             * Using a store method (rather than direct inline assignment) ensures
+             * Alpine's reactive proxy intercepts the mutation and schedules a
+             * re-render — regardless of whether the key previously existed.
+             *
+             * @param {number} traceIndex
+             * @param {string} fieldKey    e.g. 'text', 'x', 'y'
+             * @param {string} columnName  the selected data-source key
+             */
+            setColumnName(traceIndex, fieldKey, columnName) {
+                const trace = this.traces[traceIndex]
+                if (!trace.meta)             trace.meta = { columnNames: {} }
+                if (!trace.meta.columnNames) trace.meta.columnNames = {}
+                trace.meta.columnNames[fieldKey] = columnName
+            },
+
+            /**
              * Whether the given trace type supports marker config.
              * @param {string} type
              * @returns {boolean}
@@ -366,25 +384,39 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
                 const resolved = toRaw(this.traces).map(t => this.compileTrace(t))
                 const layout = deepClone(this.layout)
 
-                // Stable key derived from trace configuration (type + column
-                // bindings). When only trivial layout properties change (title,
-                // font, color), the key stays the same and Plotly preserves
-                // the viewport / auto-range. When trace data changes, the key
-                // changes and auto-range recalculates for the new data.
-                layout.uirevision = JSON.stringify(
+                // Compute a structural signature from type, mode, and column
+                // bindings. When the signature changes it means the set of SVG
+                // layers Plotly needs to render has changed (e.g. a text layer
+                // is being added or removed). In that case we purge the canvas
+                // and use newPlot() so Plotly builds all layers from scratch.
+                // For styling-only changes (color, font, title, etc.) the
+                // signature stays the same and we use react() which is faster
+                // and preserves viewport/zoom.
+                const structuralSig = JSON.stringify(
                     toRaw(this.traces).map(t => ({
                         type:        t.type,
+                        mode:        t.mode,
                         columnNames: t.meta?.columnNames,
                     }))
                 )
 
-                window.Plotly.react(
+                const needsFullRedraw = structuralSig !== _lastStructuralSig
+                _lastStructuralSig = structuralSig
+
+                // uirevision preserves zoom/pan across react() calls.
+                layout.uirevision = structuralSig
+
+                const plotFn = needsFullRedraw
+                    ? (window.Plotly.purge(_canvasEl), window.Plotly.newPlot)
+                    : window.Plotly.react
+
+                plotFn(
                     _canvasEl,
                     resolved,
                     layout,
                     deepClone(this.config)
                 ).catch(err => {
-                    console.error('[plotly-chart-editor] Plotly.react failed:', err)
+                    console.error('[plotly-chart-editor] Plotly render failed:', err)
                 })
             },
 

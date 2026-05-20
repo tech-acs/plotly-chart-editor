@@ -190,7 +190,7 @@
                                                     <select
                                                         class="chart-builder__control chart-builder__control--select"
                                                         :value="{{ $atrace }}.meta?.columnNames?.[field.key]"
-                                                        @change="{{ $atrace }}.meta.columnNames[field.key] = $event.target.value"
+                                                        @change="{{ $store }}.setColumnName({{ $store }}.activeTraceIndex, field.key, $event.target.value)"
                                                     >
                                                         <option value="" :selected="!{{ $atrace }}.meta?.columnNames?.[field.key]">{{ __('plotly-chart-editor::plotly-chart-editor.fields.select_column') }}</option>
                                                         <template x-for="col in Object.keys({{ $store }}.dataSources)" :key="col">
