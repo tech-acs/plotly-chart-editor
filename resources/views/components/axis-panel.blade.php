@@ -1,7 +1,11 @@
 @props(['axisKey', 'store'])
 @php $axisPath = $store . '.layout.' . $axisKey; @endphp
 
+{{-- Title --}}
 <div class="chart-builder__group">
+    <div class="chart-builder__group-label">
+        {{ __('plotly-chart-editor::plotly-chart-editor.ui.axis_title') }}
+    </div>
     <div class="chart-builder__field">
         <label class="chart-builder__field-label">
             {{ __('plotly-chart-editor::plotly-chart-editor.ui.axis_title') }}
@@ -12,63 +16,9 @@
             x-model="{!! $axisPath !!}.title.text"
         >
     </div>
-
-    <div class="chart-builder__field">
-        <label class="chart-builder__field-label">
-            {{ __('plotly-chart-editor::plotly-chart-editor.ui.gridlines') }}
-        </label>
-        <input
-            type="checkbox"
-            class="chart-builder__control chart-builder__control--checkbox"
-            x-model="{!! $axisPath !!}.showgrid"
-        >
-    </div>
-
-    <div class="chart-builder__field">
-        <label class="chart-builder__field-label">
-            {{ __('plotly-chart-editor::plotly-chart-editor.ui.zeroline') }}
-        </label>
-        <input
-            type="checkbox"
-            class="chart-builder__control chart-builder__control--checkbox"
-            x-model="{!! $axisPath !!}.zeroline"
-        >
-    </div>
-
-    @if ($axisKey === 'yaxis')
-        <div class="chart-builder__field">
-            <label class="chart-builder__field-label">
-                {{ __('plotly-chart-editor::plotly-chart-editor.ui.tick_format') }}
-            </label>
-            <input
-                type="text"
-                class="chart-builder__control chart-builder__control--text"
-                x-model="{!! $axisPath !!}.tickformat"
-            >
-        </div>
-    @endif
-
-    <div class="chart-builder__field">
-        <label class="chart-builder__field-label">
-            {{ __('plotly-chart-editor::plotly-chart-editor.ui.tick_angle') }}
-        </label>
-        <input
-            type="number"
-            class="chart-builder__control chart-builder__control--number"
-            min="-90"
-            max="90"
-            x-model.number="{!! $axisPath !!}.tickangle"
-        >
-    </div>
-
-    <div class="chart-builder__field">
-        <label class="chart-builder__field-label">
-            {{ __('plotly-chart-editor::plotly-chart-editor.ui.tick_font') }}
-        </label>
-        <x-plotly-chart-editor::primitives.font
-            :path="$axisPath . '.tickfont'"
-        />
-    </div>
+    <x-plotly-chart-editor::primitives.font
+        :path="$axisPath . '.title.font'"
+    />
 </div>
 
 {{-- Range --}}
@@ -126,10 +76,20 @@
     </div>
 </div>
 
-{{-- Axis line --}}
+{{-- Lines --}}
 <div class="chart-builder__group">
     <div class="chart-builder__group-label">
-        {{ __('plotly-chart-editor::plotly-chart-editor.ui.axis_line') }}
+        {{ __('plotly-chart-editor::plotly-chart-editor.groups.lines') }}
+    </div>
+    <div class="chart-builder__field">
+        <label class="chart-builder__field-label">
+            {{ __('plotly-chart-editor::plotly-chart-editor.ui.gridlines') }}
+        </label>
+        <input
+            type="checkbox"
+            class="chart-builder__control chart-builder__control--checkbox"
+            x-model="{!! $axisPath !!}.showgrid"
+        >
     </div>
     <div class="chart-builder__field">
         <label class="chart-builder__field-label">
@@ -200,6 +160,67 @@
     </div>
     <div class="chart-builder__field">
         <label class="chart-builder__field-label">
+            {{ __('plotly-chart-editor::plotly-chart-editor.fields.automargin') }}
+        </label>
+        <input
+            type="checkbox"
+            class="chart-builder__control chart-builder__control--checkbox"
+            x-model="{!! $axisPath !!}.automargin"
+        >
+    </div>
+    <div class="chart-builder__field">
+        <label class="chart-builder__field-label">
+            {{ __('plotly-chart-editor::plotly-chart-editor.fields.axis_side') }}
+        </label>
+        <select
+            class="chart-builder__control chart-builder__control--select"
+            x-model="{!! $axisPath !!}.side"
+        >
+            @if ($axisKey === 'xaxis')
+                <option value="bottom">{{ __('plotly-chart-editor::plotly-chart-editor.fields.axis_side_bottom') }}</option>
+                <option value="top">{{ __('plotly-chart-editor::plotly-chart-editor.fields.axis_side_top') }}</option>
+            @else
+                <option value="left">{{ __('plotly-chart-editor::plotly-chart-editor.fields.axis_side_left') }}</option>
+                <option value="right">{{ __('plotly-chart-editor::plotly-chart-editor.fields.axis_side_right') }}</option>
+            @endif
+        </select>
+    </div>
+    <div class="chart-builder__field">
+        <label class="chart-builder__field-label">
+            {{ __('plotly-chart-editor::plotly-chart-editor.ui.tick_format') }}
+        </label>
+        <input
+            type="text"
+            class="chart-builder__control chart-builder__control--text"
+            x-model="{!! $axisPath !!}.tickformat"
+        >
+    </div>
+    <div class="chart-builder__field">
+        <label class="chart-builder__field-label">
+            {{ __('plotly-chart-editor::plotly-chart-editor.ui.tick_angle') }}
+        </label>
+        <select
+            class="chart-builder__control chart-builder__control--select"
+            x-model="{!! $axisPath !!}.tickangle"
+        >
+            <option value="auto">{{ __('plotly-chart-editor::plotly-chart-editor.fields.axis_type_auto') }}</option>
+            <option value="0">0</option>
+            <option value="45">45</option>
+            <option value="90">90</option>
+            <option value="135">135</option>
+            <option value="180">180</option>
+        </select>
+    </div>
+    <div class="chart-builder__field">
+        <label class="chart-builder__field-label">
+            {{ __('plotly-chart-editor::plotly-chart-editor.ui.tick_font') }}
+        </label>
+        <x-plotly-chart-editor::primitives.font
+            :path="$axisPath . '.tickfont'"
+        />
+    </div>
+    <div class="chart-builder__field">
+        <label class="chart-builder__field-label">
             {{ __('plotly-chart-editor::plotly-chart-editor.fields.tick_prefix') }}
         </label>
         <input
@@ -220,15 +241,55 @@
             @change="{!! $axisPath !!}.ticksuffix = $event.target.value"
         >
     </div>
+</div>
+
+{{-- Tick markers --}}
+<div class="chart-builder__group">
+    <div class="chart-builder__group-label">
+        {{ __('plotly-chart-editor::plotly-chart-editor.ui.tick_markers') }}
+    </div>
     <div class="chart-builder__field">
         <label class="chart-builder__field-label">
-            {{ __('plotly-chart-editor::plotly-chart-editor.fields.tick_color') }}
+            {{ __('plotly-chart-editor::plotly-chart-editor.fields.ticks') }}
+        </label>
+        <select
+            class="chart-builder__control chart-builder__control--select"
+            :value="{!! $store !!}.getPath({!! $axisPath !!}, 'ticks')"
+            @change="{!! $store !!}.setPath({!! $axisPath !!}, 'ticks', $event.target.value)"
+        >
+            <option value="">{{ __('plotly-chart-editor::plotly-chart-editor.fields.tick_position_none') }}</option>
+            <option value="outside">{{ __('plotly-chart-editor::plotly-chart-editor.fields.tick_position_outside') }}</option>
+            <option value="inside">{{ __('plotly-chart-editor::plotly-chart-editor.fields.tick_position_inside') }}</option>
+        </select>
+    </div>
+    <div class="chart-builder__field">
+        <label class="chart-builder__field-label">
+            {{ __('plotly-chart-editor::plotly-chart-editor.fields.axis_side') }}
+        </label>
+        <select
+            class="chart-builder__control chart-builder__control--select"
+            x-model="{!! $axisPath !!}.side"
+        >
+            @if ($axisKey === 'xaxis')
+                <option value="bottom">{{ __('plotly-chart-editor::plotly-chart-editor.fields.axis_side_bottom') }}</option>
+                <option value="top">{{ __('plotly-chart-editor::plotly-chart-editor.fields.axis_side_top') }}</option>
+            @else
+                <option value="left">{{ __('plotly-chart-editor::plotly-chart-editor.fields.axis_side_left') }}</option>
+                <option value="right">{{ __('plotly-chart-editor::plotly-chart-editor.fields.axis_side_right') }}</option>
+            @endif
+        </select>
+    </div>
+    <div class="chart-builder__field">
+        <label class="chart-builder__field-label">
+            {{ __('plotly-chart-editor::plotly-chart-editor.fields.tick_len') }}
         </label>
         <input
-            type="color"
-            class="chart-builder__control chart-builder__control--color"
-            :value="{!! $axisPath !!}.tickcolor || '#444444'"
-            @change="{!! $axisPath !!}.tickcolor = $event.target.value"
+            type="number"
+            class="chart-builder__control chart-builder__control--number"
+            min="0"
+            max="50"
+            :value="{!! $axisPath !!}.ticklen ?? 5"
+            @change="{!! $axisPath !!}.ticklen = parseFloat($event.target.value)"
         >
     </div>
     <div class="chart-builder__field">
@@ -246,29 +307,13 @@
     </div>
     <div class="chart-builder__field">
         <label class="chart-builder__field-label">
-            {{ __('plotly-chart-editor::plotly-chart-editor.fields.tick_len') }}
+            {{ __('plotly-chart-editor::plotly-chart-editor.fields.tick_color') }}
         </label>
         <input
-            type="number"
-            class="chart-builder__control chart-builder__control--number"
-            min="0"
-            max="50"
-            :value="{!! $axisPath !!}.ticklen ?? 5"
-            @change="{!! $axisPath !!}.ticklen = parseFloat($event.target.value)"
+            type="color"
+            class="chart-builder__control chart-builder__control--color"
+            :value="{!! $axisPath !!}.tickcolor || '#444444'"
+            @change="{!! $axisPath !!}.tickcolor = $event.target.value"
         >
-    </div>
-    <div class="chart-builder__field">
-        <label class="chart-builder__field-label">
-            {{ __('plotly-chart-editor::plotly-chart-editor.fields.ticks') }}
-        </label>
-        <select
-            class="chart-builder__control chart-builder__control--select"
-            :value="{!! $store !!}.getPath({!! $axisPath !!}, 'ticks')"
-            @change="{!! $store !!}.setPath({!! $axisPath !!}, 'ticks', $event.target.value)"
-        >
-            <option value="">{{ __('plotly-chart-editor::plotly-chart-editor.fields.tick_position_none') }}</option>
-            <option value="outside">{{ __('plotly-chart-editor::plotly-chart-editor.fields.tick_position_outside') }}</option>
-            <option value="inside">{{ __('plotly-chart-editor::plotly-chart-editor.fields.tick_position_inside') }}</option>
-        </select>
     </div>
 </div>

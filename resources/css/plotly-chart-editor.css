@@ -144,6 +144,7 @@
 }
 
 .chart-builder__control--color {
+    width: 3.5rem;
     height: 2rem;
     padding: 0.125rem 0.25rem;
     cursor: pointer;

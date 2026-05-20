@@ -97,12 +97,11 @@ const LAYOUT_DEFAULTS = {
     // Plotly's default is transparent, which browsers render as white. Injecting
     // '#ffffff' would make the controls show white while the chart uses transparent
     // — causing a visible mismatch. Let the consumer provide these explicitly.
-    title:  { text: '', font: { family: 'Arial', size: 16, color: '#000000' } },
+    title:  { text: '', font: { family: 'Arial', size: 16, color: '#000000' }, x: 0.5 },
     xaxis:  {
-        title: { text: '' },
+        title: { text: '', font: { family: 'Arial', size: 14, color: '#000000' } },
         showgrid: true,
-        zeroline: true,
-        tickangle: 0,
+        tickangle: 'auto',
         tickfont: { family: 'Arial', size: 12, color: '#000000' },
         type: '-',
         autorange: true,
@@ -113,15 +112,17 @@ const LAYOUT_DEFAULTS = {
         showticklabels: true,
         tickprefix: '',
         ticksuffix: '',
+        automargin: false,
+        side: 'bottom',
         tickcolor: '#444444',
         tickwidth: 1,
         ticklen: 5,
         ticks: 'outside',
     },
     yaxis:  {
-        title: { text: '' },
+        title: { text: '', font: { family: 'Arial', size: 14, color: '#000000' } },
         showgrid: true,
-        zeroline: true,
+        tickangle: 'auto',
         tickformat: '',
         tickfont: { family: 'Arial', size: 12, color: '#000000' },
         type: '-',
@@ -133,6 +134,8 @@ const LAYOUT_DEFAULTS = {
         showticklabels: true,
         tickprefix: '',
         ticksuffix: '',
+        automargin: false,
+        side: 'left',
         tickcolor: '#444444',
         tickwidth: 1,
         ticklen: 5,
@@ -528,11 +531,23 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
              */
             addTrace(type) {
                 const traceType = type ?? toRaw(this.traceTypes)[0] ?? 'bar'
-                this.traces.push({
+                const trace = {
                     type: traceType,
                     name: `Trace ${this.traces.length + 1}`,
                     meta: { columnNames: {} },
-                })
+                }
+                // Apply profile defaults so fields like mode, color etc. are preset
+                const profile = this.schemaProfiles[traceType]
+                if (profile) {
+                    for (const group of Object.values(profile.groups)) {
+                        for (const field of group.fields) {
+                            if (field.dflt !== undefined) {
+                                this.setPath(trace, field.key, field.dflt)
+                            }
+                        }
+                    }
+                }
+                this.traces.push(trace)
                 this.activeTraceIndex = this.traces.length - 1
             },
 
@@ -661,6 +676,17 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
                 const defaults = _typeDefaults[newType] ?? {}
                 for (const [k, v] of Object.entries(defaults)) {
                     pruned[k] = v
+                }
+
+                // Apply profile field defaults for keys still undefined
+                if (profile) {
+                    for (const group of Object.values(profile.groups)) {
+                        for (const field of group.fields) {
+                            if (field.dflt !== undefined && this.getPath(pruned, field.key) === undefined) {
+                                this.setPath(pruned, field.key, field.dflt)
+                            }
+                        }
+                    }
                 }
 
                 this.traces[index] = pruned

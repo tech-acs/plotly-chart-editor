@@ -145,6 +145,19 @@
                     </select>
                 </div>
 
+                {{-- Trace name (groupless, always visible) --}}
+                <div class="chart-builder__field">
+                    <label class="chart-builder__field-label">
+                        {{ __('plotly-chart-editor::plotly-chart-editor.fields.name') }}
+                    </label>
+                    <input
+                        type="text"
+                        class="chart-builder__control chart-builder__control--text"
+                        :value="{{ $atrace }}.name ?? ''"
+                        @change="{{ $atrace }}.name = $event.target.value"
+                    >
+                </div>
+
                 {{-- Schema-driven groups from active-trace profile --}}
                 <div
                     x-data="{
