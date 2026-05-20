@@ -385,13 +385,11 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
                 const layout = deepClone(this.layout)
 
                 // Compute a structural signature from type, mode, and column
-                // bindings. When the signature changes it means the set of SVG
-                // layers Plotly needs to render has changed (e.g. a text layer
-                // is being added or removed). In that case we purge the canvas
-                // and use newPlot() so Plotly builds all layers from scratch.
-                // For styling-only changes (color, font, title, etc.) the
-                // signature stays the same and we use react() which is faster
-                // and preserves viewport/zoom.
+                // bindings. When the signature changes (e.g. trace type or
+                // column swap) we purge the canvas and use newPlot() so Plotly
+                // builds all SVG layers from scratch. For styling-only changes
+                // (color, font, title, etc.) the signature stays the same and
+                // we use react() which is faster and preserves viewport/zoom.
                 const structuralSig = JSON.stringify(
                     toRaw(this.traces).map(t => ({
                         type:        t.type,
@@ -475,82 +473,17 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
                 ) ?? null
             },
 
-            // ── Meta resolution ───────────────────────────────────────────
-
-            resolveMeta(trace) {
-                const resolved = deepClone(trace)
-                const columnNames = resolved.meta?.columnNames ?? {}
-
+            compileTrace(storeTrace) {
+                const trace = deepClone(storeTrace)
+                const columnNames = trace.meta?.columnNames ?? {}
                 for (const [axis, columnName] of Object.entries(columnNames)) {
                     if (columnName && this.dataSources[columnName] !== undefined) {
-                        resolved[axis] = toRaw(this.dataSources[columnName])
+                        trace[axis] = toRaw(this.dataSources[columnName])
                     }
                 }
-
-                this._applyTransforms(resolved)
-
-                return resolved
-            },
-
-            /**
-             * Apply filter/sort transforms to the resolved trace data arrays.
-             * Modifies the trace in place.
-             *
-             * @param {object} trace
-             */
-            _applyTransforms(trace) {
-                if (!Array.isArray(trace.transforms) || trace.transforms.length === 0) return
-
-                const dataKeys = Object.keys(trace).filter(k =>
-                    Array.isArray(trace[k]) && k !== 'transforms' && k !== 'meta'
-                )
-                if (dataKeys.length === 0) return
-
-                for (const tr of trace.transforms) {
-                    if (tr.type === 'filter') {
-                        const target = trace[tr.target]
-                        if (!Array.isArray(target)) continue
-
-                        const mask = target.map(v => {
-                            switch (tr.operation) {
-                                case '=':  return v === tr.value
-                                case '!=': return v !== tr.value
-                                case '<':  return v < tr.value
-                                case '<=': return v <= tr.value
-                                case '>':  return v > tr.value
-                                case '>=': return v >= tr.value
-                                default:   return true
-                            }
-                        })
-
-                        for (const key of dataKeys) {
-                            trace[key] = trace[key].filter((_, i) => mask[i])
-                        }
-                    } else if (tr.type === 'sort') {
-                        const target = trace[tr.target]
-                        if (!Array.isArray(target)) continue
-
-                        const length = target.length
-                        const indices = Array.from({ length }, (_, i) => i)
-                        indices.sort((a, b) => {
-                            const aVal = target[a]
-                            const bVal = target[b]
-                            const cmp = aVal < bVal ? -1 : aVal > bVal ? 1 : 0
-                            return tr.order === 'descending' ? -cmp : cmp
-                        })
-
-                        for (const key of dataKeys) {
-                            trace[key] = indices.map(i => trace[key][i])
-                        }
-                    }
-                }
-            },
-
-            compileTrace(trace) {
-                const compiled = this.resolveMeta(trace)
-                compiled.type = _plotlyTypeMap[compiled.type] ?? compiled.type
-                delete compiled.meta
-                return compiled
+                trace.type = _plotlyTypeMap[trace.type] ?? trace.type
+                delete trace.meta
+                return trace
             },
 
             // ── Trace operations (PRD §6) ─────────────────────────────────
@@ -695,7 +628,7 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
 
                 const pruned = { type: newType }
 
-                for (const k of ['name', 'meta', 'transforms']) {
+                for (const k of ['name', 'meta']) {
                     if (oldTrace[k] !== undefined) pruned[k] = oldTrace[k]
                 }
 
@@ -746,43 +679,7 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
                 }))
             },
 
-            // ── Transforms ────────────────────────────────────────────────
 
-            /**
-             * Add a transform to the active trace.
-             * Creates the transforms array if it doesn't exist.
-             *
-             * @param {'filter'|'sort'} type
-             */
-            addTransform(type) {
-                const trace = this.traces[this.activeTraceIndex]
-                if (!trace) return
-                if (!Array.isArray(trace.transforms)) {
-                    trace.transforms = []
-                }
-                const scaffolds = {
-                    filter: { type: 'filter', target: 'y', operation: '>', value: 0 },
-                    sort:   { type: 'sort',   target: 'y', order: 'ascending' },
-                }
-                trace.transforms.push(scaffolds[type] ?? { type })
-                this._scheduleRender()
-            },
-
-            /**
-             * Remove a transform from the active trace by index.
-             * Deletes the transforms key if the array becomes empty.
-             *
-             * @param {number} idx
-             */
-            removeTransform(idx) {
-                const trace = this.traces[this.activeTraceIndex]
-                if (!trace || !Array.isArray(trace.transforms)) return
-                trace.transforms.splice(idx, 1)
-                if (trace.transforms.length === 0) {
-                    delete trace.transforms
-                }
-                this._scheduleRender()
-            },
 
             // ── Export (PRD §10) ──────────────────────────────────────────
 

@@ -91,11 +91,6 @@ return [
         'hovermode' => 'Hover mode',
         'hover_label' => 'Hover label',
 
-        // Transforms
-        'transforms' => 'Transforms',
-        'transform_add' => '+ Add transform',
-        'transform_filter' => 'Filter',
-        'transform_sort' => 'Sort',
     ],
 
     'viewport' => [
@@ -205,12 +200,6 @@ return [
         'bg_color' => 'BG color',
         'border_color' => 'Border color',
         'border_width' => 'Border width',
-        'transform_target' => 'Target',
-        'transform_op' => 'Op',
-        'transform_value' => 'Value',
-        'transform_order' => 'Order',
-        'transform_order_asc' => 'Ascending',
-        'transform_order_desc' => 'Descending',
         'h_position' => 'Horizontal position',
         // axis types
         'axis_type_auto' => 'Auto',
