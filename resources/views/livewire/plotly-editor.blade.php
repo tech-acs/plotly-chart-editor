@@ -57,20 +57,20 @@
                         type="button"
                         class="chart-builder__btn chart-builder__btn--icon"
                         title="{{ __('plotly-chart-editor::plotly-chart-editor.ui.add_trace') }}"
-                        x-on:click="{{ $store }}.addTrace()"
+                        @click="{{ $store }}.addTrace()"
                     >+</button>
                     <button
                         type="button"
                         class="chart-builder__btn chart-builder__btn--icon"
                         title="{{ __('plotly-chart-editor::plotly-chart-editor.ui.duplicate_trace') }}"
-                        x-on:click="{{ $store }}.duplicateTrace()"
+                        @click="{{ $store }}.duplicateTrace()"
                         x-bind:disabled="{{ $store }}.traces.length === 0"
                     >⧉</button>
                     <button
                         type="button"
                         class="chart-builder__btn chart-builder__btn--icon chart-builder__btn--danger"
                         title="{{ __('plotly-chart-editor::plotly-chart-editor.ui.delete_trace') }}"
-                        x-on:click="{{ $store }}.removeTrace()"
+                        @click="{{ $store }}.removeTrace()"
                         x-bind:disabled="{{ $store }}.traces.length === 0"
                     >×</button>
                 </div>
@@ -85,7 +85,7 @@
                     <div
                         class="chart-builder__trace-row"
                         x-bind:class="{ 'chart-builder__trace-row--active': {{ $store }}.activeTraceIndex === index }"
-                        x-on:click="{{ $store }}.activeTraceIndex = index"
+                        @click="{{ $store }}.activeTraceIndex = index"
                     >
                         <span
                             class="chart-builder__trace-name"
@@ -96,14 +96,14 @@
                                 type="button"
                                 class="chart-builder__btn chart-builder__btn--xs"
                                 title="{{ __('plotly-chart-editor::plotly-chart-editor.ui.move_up') }}"
-                                x-on:click.stop="{{ $store }}.moveTraceUp(index)"
+                                @click.stop="{{ $store }}.moveTraceUp(index)"
                                 x-bind:disabled="index === 0"
                             >↑</button>
                             <button
                                 type="button"
                                 class="chart-builder__btn chart-builder__btn--xs"
                                 title="{{ __('plotly-chart-editor::plotly-chart-editor.ui.move_down') }}"
-                                x-on:click.stop="{{ $store }}.moveTraceDown(index)"
+                                @click.stop="{{ $store }}.moveTraceDown(index)"
                                 x-bind:disabled="index === {{ $store }}.traces.length - 1"
                             >↓</button>
                         </div>
@@ -822,12 +822,12 @@
             class="chart-builder__export-wrap"
             x-show="{{ $store }}.showExport"
             x-data="{ open: false }"
-            x-on:click.outside="open = false"
+            @click.outside="open = false"
         >
             <button
                 type="button"
                 class="chart-builder__btn"
-                x-on:click="open = !open"
+                @click="open = !open"
                 :aria-expanded="open"
             >{{ __('plotly-chart-editor::plotly-chart-editor.export.button') }} ▾</button>
 
@@ -843,25 +843,25 @@
                 <button
                     type="button"
                     class="chart-builder__export-item"
-                    x-on:click="{{ $store }}.exportJSON(); open = false"
+                    @click="{{ $store }}.exportJSON(); open = false"
                 >{{ __('plotly-chart-editor::plotly-chart-editor.export.json') }}</button>
 
                 <button
                     type="button"
                     class="chart-builder__export-item"
-                    x-on:click="{{ $store }}.exportImage('png'); open = false"
+                    @click="{{ $store }}.exportImage('png'); open = false"
                 >{{ __('plotly-chart-editor::plotly-chart-editor.export.png') }}</button>
 
                 <button
                     type="button"
                     class="chart-builder__export-item"
-                    x-on:click="{{ $store }}.exportImage('svg'); open = false"
+                    @click="{{ $store }}.exportImage('svg'); open = false"
                 >{{ __('plotly-chart-editor::plotly-chart-editor.export.svg') }}</button>
 
                 <button
                     type="button"
                     class="chart-builder__export-item"
-                    x-on:click="{{ $store }}.copyConfig(); open = false"
+                    @click="{{ $store }}.copyConfig(); open = false"
                 >{{ __('plotly-chart-editor::plotly-chart-editor.export.copy') }}</button>
 
             </div>
@@ -873,7 +873,7 @@
             class="chart-builder__btn chart-builder__btn--save"
             x-show="{{ $store }}.syncMode !== 'auto'"
             x-bind:disabled="{{ $store }}.syncing || !{{ $store }}.dirty"
-            x-on:click="{{ $store }}.syncToBackend()"
+            @click="{{ $store }}.syncToBackend()"
             x-text="{{ $store }}.syncing
                 ? @js(__('plotly-chart-editor::plotly-chart-editor.sync.saving'))
                 : @js(__('plotly-chart-editor::plotly-chart-editor.sync.save_button'))"

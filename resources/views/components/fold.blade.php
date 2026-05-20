@@ -10,7 +10,7 @@
 >
     <div
         class="chart-builder__fold-header"
-        x-on:click="open = !open"
+        @click="open = !open"
         role="button"
         :aria-expanded="open"
     >
