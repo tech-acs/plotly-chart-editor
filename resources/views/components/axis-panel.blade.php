@@ -264,23 +264,6 @@
     </div>
     <div class="chart-builder__field">
         <label class="chart-builder__field-label">
-            {{ __('plotly-chart-editor::plotly-chart-editor.fields.axis_side') }}
-        </label>
-        <select
-            class="chart-builder__control chart-builder__control--select"
-            x-model="{!! $axisPath !!}.side"
-        >
-            @if ($axisKey === 'xaxis')
-                <option value="bottom">{{ __('plotly-chart-editor::plotly-chart-editor.fields.axis_side_bottom') }}</option>
-                <option value="top">{{ __('plotly-chart-editor::plotly-chart-editor.fields.axis_side_top') }}</option>
-            @else
-                <option value="left">{{ __('plotly-chart-editor::plotly-chart-editor.fields.axis_side_left') }}</option>
-                <option value="right">{{ __('plotly-chart-editor::plotly-chart-editor.fields.axis_side_right') }}</option>
-            @endif
-        </select>
-    </div>
-    <div class="chart-builder__field">
-        <label class="chart-builder__field-label">
             {{ __('plotly-chart-editor::plotly-chart-editor.fields.tick_len') }}
         </label>
         <input
