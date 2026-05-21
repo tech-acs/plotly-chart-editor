@@ -284,7 +284,7 @@
                                                 <input
                                                     type="checkbox"
                                                     class="chart-builder__control chart-builder__control--checkbox"
-                                                    :checked="{{ $store }}.getPath({{ $atrace }}, field.key)"
+                                                    :checked="{{ $store }}.getPath({{ $atrace }}, field.key) ?? field.dflt ?? false"
                                                     @change="{{ $store }}.setPath({{ $atrace }}, field.key, $event.target.checked)"
                                                 >
                                             </template>
@@ -372,7 +372,7 @@
                                                 <input
                                                     type="checkbox"
                                                     class="chart-builder__control chart-builder__control--checkbox"
-                                                    :checked="{{ $store }}.getPath({{ $store }}.layout, field.key)"
+                                                    :checked="{{ $store }}.getPath({{ $store }}.layout, field.key) ?? field.dflt ?? false"
                                                     @change="{{ $store }}.setPath({{ $store }}.layout, field.key, $event.target.checked)"
                                                 >
                                             </template>
