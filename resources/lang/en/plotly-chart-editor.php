@@ -88,8 +88,6 @@ return [
         'bg_paper' => 'Paper background',
         'legend' => 'Legend',
         'show_legend' => 'Show legend',
-        'legend_position_x' => 'Horizontal position',
-        'legend_position_y' => 'Vertical position',
         'legend_orient' => 'Orientation',
         'legend_title' => 'Legend title',
         'legend_title_font' => 'Title font',
@@ -206,6 +204,7 @@ return [
         'bg_color' => 'BG color',
         'border_color' => 'Border color',
         'border_width' => 'Border width',
+        'position' => 'Position',
         'h_position' => 'Horizontal position',
         // axis types
         'axis_type_auto' => 'Auto',
@@ -227,6 +226,9 @@ return [
         // legend
         'legend_orient_v' => 'Vertical',
         'legend_orient_h' => 'Horizontal',
+        'legend_h_positioning' => 'Horizontal positioning',
+        'legend_v_positioning' => 'Vertical positioning',
+        'legend_anchor' => 'Anchor',
         'legend_anchor_auto' => 'Auto',
         'legend_anchor_left' => 'Left',
         'legend_anchor_center' => 'Center',

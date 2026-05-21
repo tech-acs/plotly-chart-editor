@@ -146,8 +146,8 @@ const LAYOUT_DEFAULTS = {
     showlegend: true,
     legend: {
         orientation: 'v',
-        xanchor: 'right',
-        yanchor: 'top',
+        xanchor: 'auto',
+        yanchor: 'auto',
         x: 1,
         y: 1,
         bgcolor: '',
@@ -168,7 +168,13 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
     _deleteConfirmMsg = deleteConfirmMessage ?? _deleteConfirmMsg
 
     // Ensure layout sub-objects always exist before the store is registered.
-    const layout = mergeDefaults(payload.layout ?? {}, LAYOUT_DEFAULTS)
+    // PHP serialises [] as a JSON array; named properties added by mergeDefaults
+    // are lost when deepClone() runs JSON.stringify on an array. Force a plain object.
+    const rawLayout = payload.layout ?? {}
+    const layout = mergeDefaults(
+        Array.isArray(rawLayout) ? {} : rawLayout,
+        LAYOUT_DEFAULTS
+    )
 
     // Register the store only on first call.
     // IMPORTANT: Alpine.store(name, value) returns void, not the store.
