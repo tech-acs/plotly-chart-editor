@@ -18,6 +18,8 @@ Route::get('/', function () {
         (int) @filemtime($pkgRoot.'/resources/css/plotly-chart-editor.css')
     );
 
+    App::setLocale('es');
+
     return view('demo', [
         'dataSources' => $dataSources,
         'assetVersion' => $assetVersion,

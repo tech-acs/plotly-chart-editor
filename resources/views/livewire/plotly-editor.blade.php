@@ -10,7 +10,7 @@
         'dataSources'    => $dataSources,
         'traces'         => $data,
         'layout'         => $layout,
-        'config'         => $config,
+        'config'         => array_merge(['locale' => app()->getLocale()], $config),
         'traceTypes'     => $traceTypes,
         'syncMode'       => $syncMode,
         'showExport'     => $showExport,
