@@ -313,31 +313,6 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
                 )
             },
 
-            /**
-             * Set the legend position preset and update the 4 position fields.
-             *
-             * @param {string} position
-             */
-            setLegendPosition(position) {
-                const legend = this.layout.legend
-                this.setPath(this.layout, 'legend._position', position)
-                const positions = {
-                    'top-right':     { xanchor: 'right',  yanchor: 'top',    x: 1,   y: 1   },
-                    'top-left':      { xanchor: 'left',   yanchor: 'top',    x: 0,   y: 1   },
-                    'bottom-right':  { xanchor: 'right',  yanchor: 'bottom', x: 1,   y: 0   },
-                    'bottom-left':   { xanchor: 'left',   yanchor: 'bottom', x: 0,   y: 0   },
-                    'top-center':    { xanchor: 'center', yanchor: 'top',    x: 0.5, y: 1   },
-                    'bottom-center': { xanchor: 'center', yanchor: 'bottom', x: 0.5, y: 0   },
-                    'left-center':   { xanchor: 'left',   yanchor: 'middle', x: 0,   y: 0.5 },
-                    'right-center':  { xanchor: 'right',  yanchor: 'middle', x: 1,   y: 0.5 },
-                }
-                const p = positions[position] ?? positions['top-right']
-                legend.xanchor = p.xanchor
-                legend.yanchor = p.yanchor
-                legend.x = p.x
-                legend.y = p.y
-            },
-
             // ── Effects ───────────────────────────────────────────────────
 
             _startEffects() {

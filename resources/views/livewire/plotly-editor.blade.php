@@ -522,22 +522,64 @@
 
                 <div x-show="{{ $store }}.layout.showlegend" class="chart-builder__field">
                     <label class="chart-builder__field-label">
-                        {{ __('plotly-chart-editor::plotly-chart-editor.ui.legend_position') }}
+                        {{ __('plotly-chart-editor::plotly-chart-editor.ui.legend_position_x') }}
                     </label>
                     <select
                         class="chart-builder__control chart-builder__control--select"
-                        :value="{{ $store }}.getPath({{ $store }}.layout, 'legend._position') || 'top-right'"
-                        @change="{{ $store }}.setLegendPosition($event.target.value)"
+                        :value="{{ $store }}.layout.legend.xanchor || 'auto'"
+                        @change="{{ $store }}.layout.legend.xanchor = $event.target.value"
                     >
-                        <option value="top-right">{{ __('plotly-chart-editor::plotly-chart-editor.fields.legend_pos_top_right') }}</option>
-                        <option value="top-left">{{ __('plotly-chart-editor::plotly-chart-editor.fields.legend_pos_top_left') }}</option>
-                        <option value="bottom-right">{{ __('plotly-chart-editor::plotly-chart-editor.fields.legend_pos_bottom_right') }}</option>
-                        <option value="bottom-left">{{ __('plotly-chart-editor::plotly-chart-editor.fields.legend_pos_bottom_left') }}</option>
-                        <option value="top-center">{{ __('plotly-chart-editor::plotly-chart-editor.fields.legend_pos_top_center') }}</option>
-                        <option value="bottom-center">{{ __('plotly-chart-editor::plotly-chart-editor.fields.legend_pos_bottom_center') }}</option>
-                        <option value="left-center">{{ __('plotly-chart-editor::plotly-chart-editor.fields.legend_pos_left_center') }}</option>
-                        <option value="right-center">{{ __('plotly-chart-editor::plotly-chart-editor.fields.legend_pos_right_center') }}</option>
+                        <option value="auto">{{ __('plotly-chart-editor::plotly-chart-editor.ui.legend_anchor_auto') }}</option>
+                        <option value="left">{{ __('plotly-chart-editor::plotly-chart-editor.ui.legend_anchor_left') }}</option>
+                        <option value="center">{{ __('plotly-chart-editor::plotly-chart-editor.ui.legend_anchor_center') }}</option>
+                        <option value="right">{{ __('plotly-chart-editor::plotly-chart-editor.ui.legend_anchor_right') }}</option>
                     </select>
+                    <div class="chart-builder__control-row" style="margin-top:0.25rem">
+                        <input
+                            type="range"
+                            class="chart-builder__control chart-builder__control--range"
+                            min="0"
+                            max="1"
+                            step="0.01"
+                            :value="{{ $store }}.layout.legend.x ?? 1"
+                            @change="{{ $store }}.layout.legend.x = parseFloat($event.target.value)"
+                        >
+                        <span
+                            class="chart-builder__control-value"
+                            x-text="Math.round(({{ $store }}.layout.legend.x ?? 1) * 100) + '%'"
+                        ></span>
+                    </div>
+                </div>
+
+                <div x-show="{{ $store }}.layout.showlegend" class="chart-builder__field">
+                    <label class="chart-builder__field-label">
+                        {{ __('plotly-chart-editor::plotly-chart-editor.ui.legend_position_y') }}
+                    </label>
+                    <select
+                        class="chart-builder__control chart-builder__control--select"
+                        :value="{{ $store }}.layout.legend.yanchor || 'auto'"
+                        @change="{{ $store }}.layout.legend.yanchor = $event.target.value"
+                    >
+                        <option value="auto">{{ __('plotly-chart-editor::plotly-chart-editor.ui.legend_anchor_auto') }}</option>
+                        <option value="top">{{ __('plotly-chart-editor::plotly-chart-editor.ui.legend_anchor_top') }}</option>
+                        <option value="middle">{{ __('plotly-chart-editor::plotly-chart-editor.ui.legend_anchor_middle') }}</option>
+                        <option value="bottom">{{ __('plotly-chart-editor::plotly-chart-editor.ui.legend_anchor_bottom') }}</option>
+                    </select>
+                    <div class="chart-builder__control-row" style="margin-top:0.25rem">
+                        <input
+                            type="range"
+                            class="chart-builder__control chart-builder__control--range"
+                            min="0"
+                            max="1"
+                            step="0.01"
+                            :value="{{ $store }}.layout.legend.y ?? 1"
+                            @change="{{ $store }}.layout.legend.y = parseFloat($event.target.value)"
+                        >
+                        <span
+                            class="chart-builder__control-value"
+                            x-text="Math.round(({{ $store }}.layout.legend.y ?? 1) * 100) + '%'"
+                        ></span>
+                    </div>
                 </div>
 
                 <div x-show="{{ $store }}.layout.showlegend" class="chart-builder__field">

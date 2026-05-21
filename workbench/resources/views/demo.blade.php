@@ -45,12 +45,12 @@
                 'meta'   => ['columnNames' => ['x' => 'Country', 'y' => 'Population']],
                 'marker' => ['color' => '#1f77b4'],
             ],
-            [
+            /*[
                 'type'       => 'box',
                 'name'       => 'Life expectancy',
                 'meta'       => ['columnNames' => ['y' => 'LifeExpectancy']],
                 'fillcolor'  => '#2ca02c',
-            ],
+            ],*/
         ]"
         :layout="[
             'title'  => ['text' => 'African Countries — Population'],
