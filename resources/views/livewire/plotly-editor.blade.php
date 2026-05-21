@@ -118,9 +118,9 @@
             </div>
 
             {{-- ── Active-trace panel ──────────────────────────────────── --}}
+            <template x-if="{{ $store }}.traces.length > 0">
             <div
                 class="chart-builder__active-trace"
-                x-show="{{ $store }}.traces.length > 0"
             >
                 {{-- Type selector --}}
                 <div class="chart-builder__field">
@@ -387,6 +387,7 @@
 
 
             </div>
+            </template>
         </x-plotly-chart-editor::fold>
 
         {{-- ══════════════════════════════════════════════════════
