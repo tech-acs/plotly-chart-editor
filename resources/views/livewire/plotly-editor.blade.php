@@ -1,6 +1,6 @@
 @php
     $store    = "Alpine.store('chartBuilder')";
-    $atrace   = "{$store}.traces[{$store}.activeTraceIndex]";   // active trace object
+    $atrace   = "({$store}.traces[{$store}.activeTraceIndex] ?? {})"; // active trace object (safe empty fallback)
 @endphp
 
 <div
