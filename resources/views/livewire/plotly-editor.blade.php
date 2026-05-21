@@ -529,10 +529,10 @@
                         :value="{{ $store }}.layout.legend.xanchor || 'auto'"
                         @change="{{ $store }}.layout.legend.xanchor = $event.target.value"
                     >
-                        <option value="auto">{{ __('plotly-chart-editor::plotly-chart-editor.ui.legend_anchor_auto') }}</option>
-                        <option value="left">{{ __('plotly-chart-editor::plotly-chart-editor.ui.legend_anchor_left') }}</option>
-                        <option value="center">{{ __('plotly-chart-editor::plotly-chart-editor.ui.legend_anchor_center') }}</option>
-                        <option value="right">{{ __('plotly-chart-editor::plotly-chart-editor.ui.legend_anchor_right') }}</option>
+                        <option value="auto">{{ __('plotly-chart-editor::plotly-chart-editor.fields.legend_anchor_auto') }}</option>
+                        <option value="left">{{ __('plotly-chart-editor::plotly-chart-editor.fields.legend_anchor_left') }}</option>
+                        <option value="center">{{ __('plotly-chart-editor::plotly-chart-editor.fields.legend_anchor_center') }}</option>
+                        <option value="right">{{ __('plotly-chart-editor::plotly-chart-editor.fields.legend_anchor_right') }}</option>
                     </select>
                     <div class="chart-builder__control-row" style="margin-top:0.25rem">
                         <input
@@ -560,10 +560,10 @@
                         :value="{{ $store }}.layout.legend.yanchor || 'auto'"
                         @change="{{ $store }}.layout.legend.yanchor = $event.target.value"
                     >
-                        <option value="auto">{{ __('plotly-chart-editor::plotly-chart-editor.ui.legend_anchor_auto') }}</option>
-                        <option value="top">{{ __('plotly-chart-editor::plotly-chart-editor.ui.legend_anchor_top') }}</option>
-                        <option value="middle">{{ __('plotly-chart-editor::plotly-chart-editor.ui.legend_anchor_middle') }}</option>
-                        <option value="bottom">{{ __('plotly-chart-editor::plotly-chart-editor.ui.legend_anchor_bottom') }}</option>
+                        <option value="auto">{{ __('plotly-chart-editor::plotly-chart-editor.fields.legend_anchor_auto') }}</option>
+                        <option value="top">{{ __('plotly-chart-editor::plotly-chart-editor.fields.legend_anchor_top') }}</option>
+                        <option value="middle">{{ __('plotly-chart-editor::plotly-chart-editor.fields.legend_anchor_middle') }}</option>
+                        <option value="bottom">{{ __('plotly-chart-editor::plotly-chart-editor.fields.legend_anchor_bottom') }}</option>
                     </select>
                     <div class="chart-builder__control-row" style="margin-top:0.25rem">
                         <input
