@@ -621,6 +621,11 @@ return [
                             'label' => 'plotly-chart-editor::plotly-chart-editor.fields.x',
                             'type' => 'column',
                         ],
+                        [
+                            'key' => 'y',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.y',
+                            'type' => 'column',
+                        ],
                     ],
                 ],
                 'Bins' => [
