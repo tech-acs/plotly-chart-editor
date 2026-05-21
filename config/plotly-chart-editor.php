@@ -62,22 +62,6 @@ return [
                         ],
                     ],
                 ],
-                'Legend' => [
-                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.legend',
-                    'fields' => [
-                        [
-                            'key' => 'showlegend',
-                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.showlegend',
-                            'type' => 'boolean',
-                            'dflt' => true,
-                        ],
-                        [
-                            'key' => 'legendgroup',
-                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.legendgroup',
-                            'type' => 'text',
-                        ],
-                    ],
-                ],
                 'Bars' => [
                     'label' => 'plotly-chart-editor::plotly-chart-editor.groups.bars',
                     'fields' => [
@@ -108,6 +92,27 @@ return [
                             'min' => 0,
                             'max' => 1,
                             'dflt' => 1,
+                        ],
+                    ],
+                ],
+                'BarPosition' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.bar_position',
+                    'fields' => [
+                        [
+                            'key' => 'base',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.base',
+                            'type' => 'number',
+                        ],
+                        [
+                            'key' => 'offset',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.offset',
+                            'type' => 'number',
+                        ],
+                        [
+                            'key' => 'width',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.width',
+                            'type' => 'number',
+                            'min' => 0,
                         ],
                     ],
                 ],
@@ -150,24 +155,19 @@ return [
                         ],
                     ],
                 ],
-                'BarPosition' => [
-                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.bar_position',
+                'Legend' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.legend',
                     'fields' => [
                         [
-                            'key' => 'base',
-                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.base',
-                            'type' => 'number',
+                            'key' => 'showlegend',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.showlegend',
+                            'type' => 'boolean',
+                            'dflt' => true,
                         ],
                         [
-                            'key' => 'offset',
-                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.offset',
-                            'type' => 'number',
-                        ],
-                        [
-                            'key' => 'width',
-                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.width',
-                            'type' => 'number',
-                            'min' => 0,
+                            'key' => 'legendgroup',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.legendgroup',
+                            'type' => 'text',
                         ],
                     ],
                 ],
@@ -233,6 +233,50 @@ return [
                             'type' => 'enumerated',
                             'values' => ['none', 'lines', 'markers', 'text', 'lines+markers', 'lines+text', 'markers+text', 'lines+markers+text'],
                             'dflt' => 'lines+markers',
+                        ],
+                    ],
+                ],
+                'Text' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.text',
+                    'fields' => [
+                        [
+                            'key' => 'text',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.text',
+                            'type' => 'column',
+                        ],
+                        [
+                            'key' => 'textposition',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.textposition',
+                            'type' => 'enumerated',
+                            'values' => ['top left', 'top center', 'top right', 'middle left', 'middle center', 'middle right', 'bottom left', 'bottom center', 'bottom right'],
+                            'dflt' => 'middle center',
+                        ],
+                        [
+                            'key' => 'textfont.family',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.font_family',
+                            'type' => 'enumerated',
+                            'values' => ['Arial', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'system-ui'],
+                            'dflt' => 'Arial',
+                        ],
+                        [
+                            'key' => 'textfont.size',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.font_size',
+                            'type' => 'number',
+                            'min' => 8,
+                            'max' => 48,
+                            'dflt' => 12,
+                        ],
+                        [
+                            'key' => 'textfont.color',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.font_color',
+                            'type' => 'color',
+                            'dflt' => '#444444',
+                        ],
+                        [
+                            'key' => 'cliponaxis',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.cliponaxis',
+                            'type' => 'boolean',
+                            'dflt' => true,
                         ],
                     ],
                 ],
@@ -302,66 +346,6 @@ return [
                             'min' => 0,
                             'max' => 1,
                             'dflt' => 1,
-                        ],
-                    ],
-                ],
-                'Text' => [
-                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.text',
-                    'fields' => [
-                        [
-                            'key' => 'text',
-                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.text',
-                            'type' => 'column',
-                        ],
-                        [
-                            'key' => 'textposition',
-                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.textposition',
-                            'type' => 'enumerated',
-                            'values' => ['top left', 'top center', 'top right', 'middle left', 'middle center', 'middle right', 'bottom left', 'bottom center', 'bottom right'],
-                            'dflt' => 'middle center',
-                        ],
-                        [
-                            'key' => 'textfont.family',
-                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.font_family',
-                            'type' => 'enumerated',
-                            'values' => ['Arial', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'system-ui'],
-                            'dflt' => 'Arial',
-                        ],
-                        [
-                            'key' => 'textfont.size',
-                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.font_size',
-                            'type' => 'number',
-                            'min' => 8,
-                            'max' => 48,
-                            'dflt' => 12,
-                        ],
-                        [
-                            'key' => 'textfont.color',
-                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.font_color',
-                            'type' => 'color',
-                            'dflt' => '#444444',
-                        ],
-                        [
-                            'key' => 'cliponaxis',
-                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.cliponaxis',
-                            'type' => 'boolean',
-                            'dflt' => true,
-                        ],
-                    ],
-                ],
-                'Legend' => [
-                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.legend',
-                    'fields' => [
-                        [
-                            'key' => 'showlegend',
-                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.showlegend',
-                            'type' => 'boolean',
-                            'dflt' => true,
-                        ],
-                        [
-                            'key' => 'legendgroup',
-                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.legendgroup',
-                            'type' => 'text',
                         ],
                     ],
                 ],
@@ -440,6 +424,22 @@ return [
                         ],
                     ],
                 ],
+                'Legend' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.legend',
+                    'fields' => [
+                        [
+                            'key' => 'showlegend',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.showlegend',
+                            'type' => 'boolean',
+                            'dflt' => true,
+                        ],
+                        [
+                            'key' => 'legendgroup',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.legendgroup',
+                            'type' => 'text',
+                        ],
+                    ],
+                ],
             ],
         ],
 
@@ -458,22 +458,6 @@ return [
                             'key' => 'values',
                             'label' => 'plotly-chart-editor::plotly-chart-editor.fields.values',
                             'type' => 'column',
-                        ],
-                    ],
-                ],
-                'Legend' => [
-                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.legend',
-                    'fields' => [
-                        [
-                            'key' => 'showlegend',
-                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.showlegend',
-                            'type' => 'boolean',
-                            'dflt' => true,
-                        ],
-                        [
-                            'key' => 'legendgroup',
-                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.legendgroup',
-                            'type' => 'text',
                         ],
                     ],
                 ],
@@ -594,6 +578,22 @@ return [
                         ],
                     ],
                 ],
+                'Legend' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.legend',
+                    'fields' => [
+                        [
+                            'key' => 'showlegend',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.showlegend',
+                            'type' => 'boolean',
+                            'dflt' => true,
+                        ],
+                        [
+                            'key' => 'legendgroup',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.legendgroup',
+                            'type' => 'text',
+                        ],
+                    ],
+                ],
             ],
             'layout_groups' => [
                 'PieLayout' => [
@@ -620,22 +620,6 @@ return [
                             'key' => 'x',
                             'label' => 'plotly-chart-editor::plotly-chart-editor.fields.x',
                             'type' => 'column',
-                        ],
-                    ],
-                ],
-                'Legend' => [
-                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.legend',
-                    'fields' => [
-                        [
-                            'key' => 'showlegend',
-                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.showlegend',
-                            'type' => 'boolean',
-                            'dflt' => true,
-                        ],
-                        [
-                            'key' => 'legendgroup',
-                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.legendgroup',
-                            'type' => 'text',
                         ],
                     ],
                 ],
@@ -758,6 +742,22 @@ return [
                         ],
                     ],
                 ],
+                'Legend' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.legend',
+                    'fields' => [
+                        [
+                            'key' => 'showlegend',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.showlegend',
+                            'type' => 'boolean',
+                            'dflt' => true,
+                        ],
+                        [
+                            'key' => 'legendgroup',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.legendgroup',
+                            'type' => 'text',
+                        ],
+                    ],
+                ],
             ],
             'layout_groups' => [
                 'HistogramLayout' => [
@@ -792,6 +792,282 @@ return [
                             'min' => 0,
                             'max' => 1,
                             'dflt' => 0,
+                        ],
+                    ],
+                ],
+            ],
+        ],
+
+        // ── box ────────────────────────────────────────────────────────────────
+        'box' => [
+            'groups' => [
+                'Data' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.data',
+                    'fields' => [
+                        [
+                            'key' => 'y',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.y',
+                            'type' => 'column',
+                        ],
+                        [
+                            'key' => 'x',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.x',
+                            'type' => 'column',
+                        ],
+                        [
+                            'key' => 'orientation',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.orientation',
+                            'type' => 'enumerated',
+                            'values' => ['v', 'h'],
+                            'dflt' => 'v',
+                        ],
+                    ],
+                ],
+                'Appearance' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.appearance',
+                    'fields' => [
+                        [
+                            'key' => 'fillcolor',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.fillcolor',
+                            'type' => 'color',
+                            'dflt' => '#1f77b4',
+                        ],
+                        [
+                            'key' => 'line.color',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.line_color',
+                            'type' => 'color',
+                            'dflt' => '#444444',
+                        ],
+                        [
+                            'key' => 'line.width',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.line_width',
+                            'type' => 'number',
+                            'min' => 0,
+                            'max' => 20,
+                            'dflt' => 1,
+                        ],
+                        [
+                            'key' => 'opacity',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.opacity',
+                            'type' => 'range',
+                            'min' => 0,
+                            'max' => 1,
+                            'dflt' => 1,
+                        ],
+                    ],
+                ],
+                'Box' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.box',
+                    'fields' => [
+                        [
+                            'key' => 'boxmean',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.boxmean',
+                            'type' => 'enumerated',
+                            'values' => [false, true, 'sd'],
+                            'dflt' => false,
+                        ],
+                        [
+                            'key' => 'boxpoints',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.boxpoints',
+                            'type' => 'enumerated',
+                            'values' => ['outliers', 'all', 'suspectedoutliers', false],
+                            'dflt' => 'outliers',
+                        ],
+                        [
+                            'key' => 'notched',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.notched',
+                            'type' => 'boolean',
+                            'dflt' => false,
+                        ],
+                        [
+                            'key' => 'notchwidth',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.notchwidth',
+                            'type' => 'range',
+                            'min' => 0,
+                            'max' => 0.5,
+                            'dflt' => 0,
+                        ],
+                        [
+                            'key' => 'whiskerwidth',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.whiskerwidth',
+                            'type' => 'range',
+                            'min' => 0,
+                            'max' => 1,
+                            'dflt' => 0.5,
+                        ],
+                        [
+                            'key' => 'quartilemethod',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.quartilemethod',
+                            'type' => 'enumerated',
+                            'values' => ['linear', 'exclusive', 'inclusive'],
+                            'dflt' => 'linear',
+                        ],
+                        [
+                            'key' => 'sizemode',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.sizemode',
+                            'type' => 'enumerated',
+                            'values' => ['quartiles', 'sd'],
+                            'dflt' => 'quartiles',
+                        ],
+                        [
+                            'key' => 'sdmultiple',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.sdmultiple',
+                            'type' => 'number',
+                            'min' => 0,
+                            'dflt' => 1,
+                        ],
+                    ],
+                ],
+                'Markers' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.markers',
+                    'fields' => [
+                        [
+                            'key' => 'marker.color',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.color',
+                            'type' => 'color',
+                            'dflt' => '#1f77b4',
+                        ],
+                        [
+                            'key' => 'marker.size',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.size',
+                            'type' => 'number',
+                            'min' => 1,
+                            'max' => 50,
+                            'dflt' => 6,
+                        ],
+                        [
+                            'key' => 'marker.symbol',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.symbol',
+                            'type' => 'enumerated',
+                            'values' => ['circle', 'square', 'diamond', 'cross', 'x', 'triangle-up'],
+                            'dflt' => 'circle',
+                        ],
+                        [
+                            'key' => 'marker.opacity',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.opacity',
+                            'type' => 'range',
+                            'min' => 0,
+                            'max' => 1,
+                            'dflt' => 1,
+                        ],
+                        [
+                            'key' => 'marker.line.color',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.line_color',
+                            'type' => 'color',
+                            'dflt' => '#444444',
+                        ],
+                        [
+                            'key' => 'marker.line.width',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.line_width',
+                            'type' => 'number',
+                            'min' => 0,
+                            'max' => 20,
+                            'dflt' => 0,
+                        ],
+                    ],
+                ],
+                'Points' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.points',
+                    'fields' => [
+                        [
+                            'key' => 'jitter',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.jitter',
+                            'type' => 'range',
+                            'min' => 0,
+                            'max' => 1,
+                            'dflt' => 0,
+                        ],
+                        [
+                            'key' => 'pointpos',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.pointpos',
+                            'type' => 'range',
+                            'min' => -2,
+                            'max' => 2,
+                            'dflt' => 0,
+                        ],
+                        [
+                            'key' => 'showwhiskers',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.showwhiskers',
+                            'type' => 'boolean',
+                            'dflt' => true,
+                        ],
+                    ],
+                ],
+                'Hover' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.hover',
+                    'fields' => [
+                        [
+                            'key' => 'hoverinfo',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.hoverinfo',
+                            'type' => 'enumerated',
+                            'values' => ['all', 'x', 'y', 'x+y', 'text', 'name', 'skip', 'none'],
+                            'dflt' => 'all',
+                        ],
+                        [
+                            'key' => 'hovertemplate',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.hovertemplate',
+                            'type' => 'text',
+                        ],
+                        [
+                            'key' => 'hoverlabel.bgcolor',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.hover_bgcolor',
+                            'type' => 'color',
+                            'dflt' => '#ffffff',
+                        ],
+                        [
+                            'key' => 'hoverlabel.bordercolor',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.hover_bordercolor',
+                            'type' => 'color',
+                            'dflt' => '#444444',
+                        ],
+                        [
+                            'key' => 'valueformat',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.valueformat',
+                            'type' => 'text',
+                        ],
+                        [
+                            'key' => 'valuesuffix',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.valuesuffix',
+                            'type' => 'text',
+                        ],
+                    ],
+                ],
+                'Legend' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.legend',
+                    'fields' => [
+                        [
+                            'key' => 'showlegend',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.showlegend',
+                            'type' => 'boolean',
+                            'dflt' => true,
+                        ],
+                        [
+                            'key' => 'legendgroup',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.legendgroup',
+                            'type' => 'text',
+                        ],
+                    ],
+                ],
+            ],
+            'layout_groups' => [
+                'BoxLayout' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.box_layout',
+                    'fields' => [
+                        [
+                            'key' => 'boxgap',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.boxgap',
+                            'type' => 'range',
+                            'min' => 0,
+                            'max' => 1,
+                            'dflt' => 0.3,
+                        ],
+                        [
+                            'key' => 'boxgroupgap',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.boxgroupgap',
+                            'type' => 'range',
+                            'min' => 0,
+                            'max' => 1,
+                            'dflt' => 0.3,
                         ],
                     ],
                 ],

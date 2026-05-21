@@ -143,7 +143,7 @@ const LAYOUT_DEFAULTS = {
         ticks: 'outside',
     },
     margin:     { t: 50, b: 50, l: 60, r: 30 },
-    showlegend: false,
+    showlegend: true,
     legend: {
         orientation: 'v',
         xanchor: 'right',

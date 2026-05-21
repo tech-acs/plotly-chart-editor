@@ -70,7 +70,7 @@ const j = {
     ticks: "outside"
   },
   margin: { t: 50, b: 50, l: 60, r: 30 },
-  showlegend: !1,
+  showlegend: !0,
   legend: {
     orientation: "v",
     xanchor: "right",

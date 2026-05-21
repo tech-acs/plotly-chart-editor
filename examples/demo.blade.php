@@ -45,6 +45,12 @@
                     'meta' => ['columnNames' => ['x' => 'Country', 'y' => 'Population']],
                     'marker' => ['color' => '#1f77b4'],
                 ],
+                [
+                    'type' => 'box',
+                    'name' => 'Life expectancy',
+                    'meta' => ['columnNames' => ['y' => 'LifeExpectancy']],
+                    'fillcolor' => '#2ca02c',
+                ],
             ]"
             :layout="[
                 'title' => ['text' => 'African Countries by Population'],
@@ -52,7 +58,7 @@
                 'yaxis' => ['title' => ['text' => 'Population (millions)']],
                 'margin' => ['t' => 60, 'b' => 80, 'l' => 70, 'r' => 30],
             ]"
-            :trace-types="['bar', 'line', 'scatter', 'pie', 'histogram']"
+            :trace-types="['bar', 'line', 'scatter', 'pie', 'histogram', 'box']"
             :sync-mode="'hybrid'"
             :preload-schema="true"
             :show-export="true"

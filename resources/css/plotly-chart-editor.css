@@ -98,9 +98,9 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--plotly-editor-text-muted);
+    color: var(--plotly-editor-text);
     padding-bottom: 0.25rem;
-    border-bottom: 1px solid var(--plotly-editor-border);
+    border-bottom: 1px solid color-mix(in srgb, var(--plotly-editor-text-muted) 50%, var(--plotly-editor-border) 50%);
     margin-bottom: 0.25rem;
 }
 
@@ -228,7 +228,7 @@
     cursor: pointer;
     user-select: none;
     font-weight: 600;
-    font-size: 0.8125rem;
+    font-size: 0.9rem;
 }
 
 .chart-builder__fold-body {
@@ -440,7 +440,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--plotly-editor-text-muted);
+    color: var(--plotly-editor-text);
 }
 
 .chart-builder__section-actions {

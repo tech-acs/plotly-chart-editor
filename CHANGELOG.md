@@ -26,7 +26,7 @@ Initial public release.
 - Native `confirm()` delete confirmation.
 
 **Folds UI**
-- Three collapsible accordion folds: Traces, Axes, Canvas & Titles.
+- Three collapsible accordion folds: Traces, Axes, Canvas, Title & Legend.
 - `<x-plotly-chart-editor::fold>` anonymous Blade component.
 - Four reusable primitive components: `font`, `line`, `marker`, `margin`.
 - `getPath()` / `setPath()` store helpers for dot-notation field keys (`marker.color` etc.).

@@ -431,27 +431,20 @@
             :title="__('plotly-chart-editor::plotly-chart-editor.ui.fold_canvas')"
             :open="false"
         >
-            {{-- Chart title --}}
+            {{-- Title --}}
             <div class="chart-builder__group">
                 <div class="chart-builder__group-label">
                     {{ __('plotly-chart-editor::plotly-chart-editor.ui.chart_title') }}
                 </div>
                 <div class="chart-builder__field">
                     <label class="chart-builder__field-label">
-                        {{ __('plotly-chart-editor::plotly-chart-editor.ui.chart_title') }}
+                        {{ __('plotly-chart-editor::plotly-chart-editor.ui.title') }}
                     </label>
                     <input
                         type="text"
                         class="chart-builder__control chart-builder__control--text"
                         x-model="{{ $store }}.layout.title.text"
                     >
-                </div>
-            </div>
-
-            {{-- Title font --}}
-            <div class="chart-builder__group">
-                <div class="chart-builder__group-label">
-                    {{ __('plotly-chart-editor::plotly-chart-editor.ui.title_font') }}
                 </div>
                 <x-plotly-chart-editor::primitives.font
                     :path="$store . '.layout.title.font'"

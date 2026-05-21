@@ -39,6 +39,10 @@ return [
         'bar_position' => 'Bar Position',
         'text' => 'Text',
         'cumulative' => 'Cumulative',
+        'appearance' => 'Appearance',
+        'box' => 'Box',
+        'points' => 'Points',
+        'box_layout' => 'Box Layout',
     ],
 
     'confirmations' => [
@@ -56,9 +60,9 @@ return [
         'traces_section' => 'Traces',
 
         // Fold titles
-        'fold_traces' => 'Traces',
+        'fold_traces' => 'Traces (Series)',
         'fold_axes' => 'Axes',
-        'fold_canvas' => 'Canvas & Titles',
+        'fold_canvas' => 'Canvas, Title & Legend',
 
         // Axes fold
         'x_axis' => 'X Axis',
@@ -75,8 +79,9 @@ return [
         'tick_labels' => 'Tick labels',
         'tick_markers' => 'Tick markers',
 
-        // Canvas & Titles fold
+        // Canvas, Title & Legend fold
         'chart_title' => 'Chart title',
+        'title' => 'Title',
         'title_font' => 'Title font',
         'margins' => 'Margins',
         'bg_plot' => 'Plot background',
@@ -119,7 +124,7 @@ return [
 
     'fields' => [
         // font primitive
-        'font_family' => 'Family',
+        'font_family' => 'Font Family',
         'font_size' => 'Size',
         'font_color' => 'Color',
         // margin primitive
@@ -238,6 +243,19 @@ return [
         'hovermode_false' => 'False',
         // misc
         'select_column' => '— select column —',
+        'boxmean' => 'Box mean',
+        'boxpoints' => 'Box points',
+        'notched' => 'Notched',
+        'notchwidth' => 'Notch width',
+        'whiskerwidth' => 'Whisker width',
+        'quartilemethod' => 'Quartile method',
+        'sizemode' => 'Size mode',
+        'sdmultiple' => 'Std dev multiple',
+        'jitter' => 'Jitter',
+        'pointpos' => 'Point position',
+        'showwhiskers' => 'Show whiskers',
+        'boxgap' => 'Box gap',
+        'boxgroupgap' => 'Box group gap',
     ],
 
 ];
