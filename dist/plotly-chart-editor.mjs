@@ -334,7 +334,7 @@ function R(a, w, p, g, d, A) {
               traceIndex: i,
               field: u,
               code: "LENGTH_MISMATCH",
-              message: O.replace(":field", u).replace(":colLen", String(_)).replace(":expectedLen", String(l)).replace(":shown", String(l))
+              message: O.replace(":field", u).replace(":columnLen", String(_)).replace(":expectedLen", String(l)).replace(":shown", String(l))
             });
       }), this.warnings.splice(0, this.warnings.length, ...e);
     },

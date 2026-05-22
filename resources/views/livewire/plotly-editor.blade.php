@@ -207,8 +207,8 @@
                                                     {{-- Inline column-length mismatch warning --}}
                                                     <div
                                                         class="chart-builder__warning chart-builder__warning--inline"
-                                                        x-show="{{ $store }}.warningFor({{ $store }}.activeTraceIndex, field.key) !== null"
-                                                        x-text="{{ $store }}.warningFor({{ $store }}.activeTraceIndex, field.key)?.message ?? ''"
+                                                        x-show="{{ $store }}.warnings.some(w => w.traceIndex === {{ $store }}.activeTraceIndex && w.field === field.key)"
+                                                        x-text="({{ $store }}.warnings.find(w => w.traceIndex === {{ $store }}.activeTraceIndex && w.field === field.key)?.message) ?? ''"
                                                     ></div>
                                                 </div>
                                             </template>

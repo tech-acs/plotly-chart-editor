@@ -81,6 +81,7 @@
         ]"
         sync-mode="hybrid"
         :show-export="false"
+        show-export="true"
     />
 
     @livewireScripts

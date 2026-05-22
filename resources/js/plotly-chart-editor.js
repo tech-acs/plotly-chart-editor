@@ -502,7 +502,7 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
                                     code:    'LENGTH_MISMATCH',
                                     message: _lengthMismatchMsg
                                         .replace(':field', field)
-                                        .replace(':colLen', String(colLen))
+                                        .replace(':columnLen', String(colLen))
                                         .replace(':expectedLen', String(expectedLen))
                                         .replace(':shown', String(expectedLen)),
                                 })
