@@ -4,6 +4,7 @@
 @endphp
 
 <div
+    x-cloak
     id="plotly-editor-root"
     class="chart-builder"
     data-chart-builder-payload="{{ json_encode([
