@@ -74,7 +74,6 @@
     <script>
         document.addEventListener('livewire:init', () => {
             Livewire.on('chart-synced', (event) => {
-                console.log('Chart synced:', event.data, event.layout);
                 // Persist to your backend here.
             });
         });

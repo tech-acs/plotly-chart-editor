@@ -54,6 +54,8 @@ let _booted = false
 let _suppressNextDirty = false   // blocks the first markDirty() after initial render
 let _deleteConfirmMsg  = 'Delete this trace? This cannot be undone.'
 let _deleteAnnotationConfirmMsg = 'Delete this annotation? This cannot be undone.'
+let _lengthMismatchMsg      = "Column ':field' has :colLen values but trace expects :expectedLen. Showing first :shown."
+let _profileLoadFailedMsg   = 'Failed to load profile for :type. Please try again.'
 let _savedTimer        = null    // clears the "Saved ✓" transient message
 let _copiedTimer       = null    // clears the "Copied ✓" transient message
 let _resizeObserver    = null    // ResizeObserver for viewport gate
@@ -224,9 +226,11 @@ const _ANNOTATION_SCAFFOLDS = {
     },
 }
 
-function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, deleteAnnotationConfirmMessage) {
+function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, deleteAnnotationConfirmMessage, lengthMismatchMsg, profileLoadFailedMsg) {
     _deleteConfirmMsg = deleteConfirmMessage ?? _deleteConfirmMsg
     _deleteAnnotationConfirmMsg = deleteAnnotationConfirmMessage ?? _deleteAnnotationConfirmMsg
+    _lengthMismatchMsg = lengthMismatchMsg ?? _lengthMismatchMsg
+    _profileLoadFailedMsg = profileLoadFailedMsg ?? _profileLoadFailedMsg
 
     // Ensure layout sub-objects always exist before the store is registered.
     // PHP serialises [] as a JSON array; named properties added by mergeDefaults
@@ -496,7 +500,11 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
                                     traceIndex,
                                     field,
                                     code:    'LENGTH_MISMATCH',
-                                    message: `Column '${field}' has ${colLen} values but trace expects ${expectedLen}. Showing first ${expectedLen}.`,
+                                    message: _lengthMismatchMsg
+                                        .replace(':field', field)
+                                        .replace(':colLen', String(colLen))
+                                        .replace(':expectedLen', String(expectedLen))
+                                        .replace(':shown', String(expectedLen)),
                                 })
                             }
                         }
@@ -820,7 +828,7 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
                 window.dispatchEvent(new CustomEvent('plotly-editor:toast', {
                     detail: {
                         key:     'errors.profile_load_failed',
-                        message: `Failed to load profile for ${type}. Please try again.`,
+                        message: _profileLoadFailedMsg.replace(':type', type),
                         type,
                     },
                 }))
@@ -966,10 +974,10 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
  * @param {HTMLElement} canvasEl
  * @param {object}      wire
  */
-function bootChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, deleteAnnotationConfirmMessage, canvasEl, wire) {
+function bootChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, deleteAnnotationConfirmMessage, canvasEl, wire, lengthMismatchMsg, profileLoadFailedMsg) {
     // Register the store (side effect) — do NOT use its return value,
     // Vite minification makes it unreliable (see initChartBuilder comment).
-    initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, deleteAnnotationConfirmMessage)
+    initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, deleteAnnotationConfirmMessage, lengthMismatchMsg, profileLoadFailedMsg)
 
     // Retrieve the store directly — always returns the registered object.
     const store = Alpine.store('chartBuilder')

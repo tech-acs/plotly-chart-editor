@@ -615,16 +615,6 @@ return [
                             'type' => 'color',
                             'dflt' => '#444444',
                         ],
-                        [
-                            'key' => 'valueformat',
-                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.valueformat',
-                            'type' => 'text',
-                        ],
-                        [
-                            'key' => 'valuesuffix',
-                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.valuesuffix',
-                            'type' => 'text',
-                        ],
                     ],
                 ],
                 'Legend' => [
@@ -1269,22 +1259,6 @@ return [
                             'label' => 'plotly-chart-editor::plotly-chart-editor.fields.hover_bordercolor',
                             'type' => 'color',
                             'dflt' => '#444444',
-                        ],
-                    ],
-                ],
-                'Legend' => [
-                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.legend',
-                    'fields' => [
-                        [
-                            'key' => 'showlegend',
-                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.showlegend',
-                            'type' => 'boolean',
-                            'dflt' => true,
-                        ],
-                        [
-                            'key' => 'legendgroup',
-                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.legendgroup',
-                            'type' => 'text',
                         ],
                     ],
                 ],

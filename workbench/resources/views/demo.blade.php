@@ -88,7 +88,6 @@
     <script>
         document.addEventListener('livewire:init', () => {
             Livewire.on('chart-synced', (event) => {
-                console.log('[chart-synced]', event);
             });
         });
     </script>

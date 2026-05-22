@@ -1,6 +1,6 @@
 # Plotly Chart Editor
 
-A reusable Laravel package providing a reactive visual chart builder Livewire component that produces valid Plotly.js configurations.
+A reactive chart builder for Laravel. This Livewire component gives your users a sidebar-driven editor to configure Plotly.js charts. It supports English, French, Portuguese, and Spanish.
 
 - **Composer:** `uneca/plotly-chart-editor`
 - **License:** MIT
@@ -109,14 +109,120 @@ All columns should be the same length. Length mismatches produce a non-blocking 
 |---|---|---|
 | `chart-synced` | `{ data: array, layout: array }` | After every successful sync to Livewire. |
 
-Listen in your Livewire component:
+---
+
+## Persisting charts
+
+The `chart-synced` event fires on every successful sync. Use it to save the chart state to your database.
+
+### Example migration
 
 ```php
-#[On('chart-synced')]
-public function onChartSynced(array $data, array $layout): void
+Schema::create('charts', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('user_id')->constrained();
+    $table->string('title')->nullable();
+    $table->json('traces');        // array of Plotly trace objects
+    $table->json('layout');        // Plotly layout object
+    $table->timestamps();
+});
+```
+
+### Saving
+
+Listen for the event in your Livewire component, then persist:
+
+```php
+use App\Models\Chart;
+use Livewire\Attributes\On;
+
+class ChartEditor extends \Livewire\Component
 {
-    // persist $data and $layout to your database
+    public Chart $chart;
+
+    #[On('chart-synced')]
+    public function saveChart(array $data, array $layout): void
+    {
+        $this->chart->update([
+            'traces' => $data,
+            'layout' => $layout,
+        ]);
+    }
 }
+```
+
+### Loading an existing chart
+
+Pass the stored `traces` and `layout` back as props:
+
+```blade
+<livewire:plotly-editor
+    :data-sources="$rawDataset"
+    :data="$chart->traces"
+    :layout="$chart->layout"
+/>
+```
+
+### Full save/load example with `sync-mode="manual"`
+
+Your page component loads the chart, passes it to the editor, and listens for saves:
+
+```php
+use App\Models\Chart;
+use Livewire\Attributes\On;
+
+class EditChart extends \Livewire\Component
+{
+    public Chart $chart;
+    public array $rawDataset;
+
+    public function mount(Chart $chart): void
+    {
+        $this->chart = $chart;
+        // Load your data sources however you normally do
+        $this->rawDataset = [
+            'Country'    => ['Ghana', 'Kenya', 'Nigeria'],
+            'Population' => [34, 55, 223],
+            'GDP'        => [72, 95, 446],
+        ];
+    }
+
+    #[On('chart-synced')]
+    public function onChartSynced(array $data, array $layout): void
+    {
+        $this->chart->update([
+            'traces' => $data,
+            'layout' => $layout,
+        ]);
+
+        session()->flash('saved', 'Chart updated.');
+    }
+
+    public function render()
+    {
+        return view('livewire.edit-chart', [
+            'chart' => $this->chart,
+        ]);
+    }
+}
+```
+
+```blade
+{{-- resources/views/livewire/edit-chart.blade.php --}}
+<div>
+    <h1>{{ $chart->title }}</h1>
+
+    @if (session('saved'))
+        <p class="text-green-600">{{ session('saved') }}</p>
+    @endif
+
+    <livewire:plotly-editor
+        :data-sources="$rawDataset"
+        :data="$chart->traces"
+        :layout="$chart->layout"
+        :sync-mode="'manual'"
+    />
+</div>
 ```
 
 ---

@@ -23,8 +23,10 @@
             var missingMsg = @js(__('plotly-chart-editor::plotly-chart-editor.errors.plotly_missing'));
             var deleteMsg  = @js(__('plotly-chart-editor::plotly-chart-editor.confirmations.delete_trace'));
             var deleteAnnMsg = @js(__('plotly-chart-editor::plotly-chart-editor.confirmations.delete_annotation'));
+            var lengthMismatchMsg = @js(__('plotly-chart-editor::plotly-chart-editor.warnings.length_mismatch'));
+            var profileLoadFailedMsg = @js(__('plotly-chart-editor::plotly-chart-editor.errors.profile_load_failed'));
             var canvas     = $el.querySelector('[data-plotly-canvas]');
-            window.bootChartBuilder(payload, missingMsg, deleteMsg, deleteAnnMsg, canvas, $wire);
+            window.bootChartBuilder(payload, missingMsg, deleteMsg, deleteAnnMsg, canvas, $wire, lengthMismatchMsg, profileLoadFailedMsg);
         })();
     "
 >
@@ -90,7 +92,7 @@
                     >
                         <span
                             class="chart-builder__trace-name"
-                            x-text="trace.name || ('Trace ' + (index + 1))"
+                            x-text="trace.name || `{{ __('plotly-chart-editor::plotly-chart-editor.trace_label', ['n' => '${index + 1}']) }}`"
                         ></span>
                         <div class="chart-builder__trace-actions">
                             <button
@@ -945,15 +947,14 @@
                                     <div class="chart-builder__field" x-show="ann.showarrow">
                                         <label class="chart-builder__field-label">{{ __('plotly-chart-editor::plotly-chart-editor.annotations.annotation_arrowhead') }}</label>
                                         <select class="chart-builder__control chart-builder__control--select" x-model="ann.arrowhead">
-                                            <option value="0">0</option>
-                                            <option value="1">1</option>
-                                            <option value="2">2</option>
-                                            <option value="3">3</option>
-                                            <option value="4">4</option>
-                                            <option value="5">5</option>
-                                            <option value="6">6</option>
-                                            <option value="7">7</option>
-                                            <option value="8">8</option>
+                                            <option value="0">{{ __('plotly-chart-editor::plotly-chart-editor.annotations.annotation_arrowhead_0') }}</option>
+                                            <option value="1">{{ __('plotly-chart-editor::plotly-chart-editor.annotations.annotation_arrowhead_1') }}</option>
+                                            <option value="2">{{ __('plotly-chart-editor::plotly-chart-editor.annotations.annotation_arrowhead_2') }}</option>
+                                            <option value="3">{{ __('plotly-chart-editor::plotly-chart-editor.annotations.annotation_arrowhead_3') }}</option>
+                                            <option value="4">{{ __('plotly-chart-editor::plotly-chart-editor.annotations.annotation_arrowhead_4') }}</option>
+                                            <option value="5">{{ __('plotly-chart-editor::plotly-chart-editor.annotations.annotation_arrowhead_5') }}</option>
+                                            <option value="6">{{ __('plotly-chart-editor::plotly-chart-editor.annotations.annotation_arrowhead_6') }}</option>
+                                            <option value="7">{{ __('plotly-chart-editor::plotly-chart-editor.annotations.annotation_arrowhead_7') }}</option>
                                         </select>
                                     </div>
                                     <div class="chart-builder__field" x-show="ann.showarrow">
@@ -1281,11 +1282,15 @@
         class="chart-builder__footer"
         x-show="!{{ $store }}._tooSmall"
     >
+        @php
+            $warnSingular = preg_replace('/^\d+\s+/', '', trans_choice('plotly-chart-editor::plotly-chart-editor.warnings.badge', 1));
+            $warnPlural   = preg_replace('/^\d+\s+/', '', trans_choice('plotly-chart-editor::plotly-chart-editor.warnings.badge', 2));
+        @endphp
         {{-- Warning badge --}}
         <div
             class="chart-builder__warning"
             x-show="{{ $store }}.warnings.length > 0"
-            x-text="'⚠ ' + {{ $store }}.warnings.length + ({{ $store }}.warnings.length === 1 ? ' warning' : ' warnings')"
+            x-text="'⚠ ' + {{ $store }}.warnings.length + ' ' + ({{ $store }}.warnings.length === 1 ? '{{ $warnSingular }}' : '{{ $warnPlural }}')"
         ></div>
 
         {{-- Dirty indicator --}}
