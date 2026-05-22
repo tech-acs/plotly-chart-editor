@@ -11,6 +11,33 @@ Route::get('/', function () {
     // Strip the _meta key — it is not a data column
     $dataSources = collect($raw)->except('_meta')->toArray();
 
+    // Hierarchical columns for the sunburst trace demo.
+    // Labels and parents define a continent → country hierarchy.
+    $dataSources['SunburstLabel'] = [
+        'World', 'Africa', 'Europe', 'Asia', 'Americas', 'Oceania',
+        'Nigeria', 'Egypt', 'Kenya', 'Morocco',
+        'Germany', 'France', 'UK',
+        'China', 'India', 'Japan',
+        'USA', 'Brazil', 'Canada',
+        'Australia',
+    ];
+    $dataSources['SunburstParent'] = [
+        '', 'World', 'World', 'World', 'World', 'World',
+        'Africa', 'Africa', 'Africa', 'Africa',
+        'Europe', 'Europe', 'Europe',
+        'Asia', 'Asia', 'Asia',
+        'Americas', 'Americas', 'Americas',
+        'Oceania',
+    ];
+    $dataSources['SunburstValue'] = [
+        8000, 1400, 750, 4700, 1100, 45,
+        223, 112, 55, 37,
+        83, 65, 67,
+        1400, 1400, 125,
+        340, 215, 40,
+        26,
+    ];
+
     // Cache-bust the package assets on every rebuild during development
     $pkgRoot = realpath(__DIR__.'/../..');
     $assetVersion = max(
@@ -18,7 +45,7 @@ Route::get('/', function () {
         (int) @filemtime($pkgRoot.'/resources/css/plotly-chart-editor.css')
     );
 
-    App::setLocale('es');
+    // App::setLocale('fr');
 
     return view('demo', [
         'dataSources' => $dataSources,

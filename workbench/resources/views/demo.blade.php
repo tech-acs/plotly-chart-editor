@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,6 +11,21 @@
         Livewire 4 boots Alpine on DOMContentLoaded, so a blocking <script>
         in <head> is the safest way to ensure window.Plotly exists first.
     --}}
+    {{--
+        MathJax v3 — required by Plotly.js for LaTeX rendering in titles,
+        axis labels, hover templates, etc. Must load before Plotly so the
+        TeX engine is available at render time. Without it, text like
+        $y = \sin(x)$ displays literally.
+    --}}
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' },
+            options: { enableMenu: false },
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.min.js"></script>
+
     <script src="https://cdn.plot.ly/plotly-3.5.0.min.js" charset="utf-8"></script>
 
     {{-- Package CSS --}}
@@ -32,6 +47,17 @@
         /* Give the editor a fixed height so both columns fill the viewport */
         #plotly-editor-root { height: calc(100vh - 100px); }
     </style>
+
+    {{--
+        Load Plotly locale before Alpine boots.
+        The locale file is served by the workbench's local route
+        (/plotly-locale/{code}.js) from node_modules/plotly.js-locales,
+        wrapped as a standalone script that auto-registers with Plotly.
+    --}}
+    @php $localeCode = app()->getLocale(); @endphp
+    @if ($localeCode && $localeCode !== 'en')
+    <script src="/plotly-locale/{{ explode('_', $localeCode)[0] }}.js"></script>
+    @endif
 </head>
 <body>
     <h1>Plotly Chart Editor — Workbench Demo</h1>
@@ -39,19 +65,14 @@
     <livewire:plotly-editor
         :data-sources="$dataSources"
         :data="[
-            [
-                'type'   => 'bar',
-                'name'   => 'Population (millions)',
-                'meta'   => ['columnNames' => ['x' => 'Country', 'y' => 'Population']],
-                'marker' => ['color' => '#1f77b4'],
-            ],
-            /*[
-                'type'       => 'box',
-                'name'       => 'Life expectancy',
-                'meta'       => ['columnNames' => ['y' => 'LifeExpectancy']],
-                'fillcolor'  => '#2ca02c',
-            ],*/
-        ]"
+                [
+                    'type'   => 'bar',
+                    'name'   => 'Population (millions)',
+                    'meta'   => ['columnNames' => ['x' => 'Country', 'y' => 'Population']],
+                    'marker' => ['color' => '#1f77b4'],
+                    'yhoverformat' => '.2f',
+                ],
+            ]"
         :layout="[
             'title'  => ['text' => 'African Countries — Population'],
             'xaxis'  => ['title' => ['text' => 'Country']],

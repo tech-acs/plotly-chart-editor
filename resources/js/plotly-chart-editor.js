@@ -53,6 +53,7 @@ let _autoSyncTimer = null
 let _booted = false
 let _suppressNextDirty = false   // blocks the first markDirty() after initial render
 let _deleteConfirmMsg  = 'Delete this trace? This cannot be undone.'
+let _deleteAnnotationConfirmMsg = 'Delete this annotation? This cannot be undone.'
 let _savedTimer        = null    // clears the "Saved ✓" transient message
 let _copiedTimer       = null    // clears the "Copied ✓" transient message
 let _resizeObserver    = null    // ResizeObserver for viewport gate
@@ -98,7 +99,7 @@ const LAYOUT_DEFAULTS = {
     // Plotly's default is transparent, which browsers render as white. Injecting
     // '#ffffff' would make the controls show white while the chart uses transparent
     // — causing a visible mismatch. Let the consumer provide these explicitly.
-    title:  { text: '', font: { family: 'Arial', size: 16, color: '#000000' }, x: 0.5 },
+    title:  { text: '', font: { family: 'Arial', size: 16, color: '#000000' }, x: 0.5, automargin: false },
     xaxis:  {
         title: { text: '', font: { family: 'Arial', size: 14, color: '#000000' } },
         showgrid: true,
@@ -142,7 +143,7 @@ const LAYOUT_DEFAULTS = {
         ticklen: 5,
         ticks: 'outside',
     },
-    margin:     { t: 50, b: 50, l: 60, r: 30 },
+    margin:     { t: 50, b: 50, l: 60, r: 30, pad: 0 },
     showlegend: true,
     legend: {
         orientation: 'v',
@@ -156,16 +157,76 @@ const LAYOUT_DEFAULTS = {
         font: { family: 'Arial', size: 12, color: '#000000' },
         title: { text: '', font: { family: 'Arial', size: 12, color: '#000000' } },
     },
+    _annotations: [],
+    font:       { family: 'Arial', size: 12, color: '#444444' },
+    uniformtext: { mode: false, minsize: 0 },
+    separators: '.,',
+    colorway: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'],
+    dragmode:   'zoom',
     hovermode:  'x',
     hoverlabel: {
         bgcolor: '#ffffff',
         bordercolor: '#444444',
         font: { family: 'Arial', size: 12, color: '#000000' },
+        align: 'auto',
     },
 }
 
-function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
+/**
+ * Scaffold defaults for annotation types. Matches Plotly's native defaults.
+ */
+const _ANNOTATION_SCAFFOLDS = {
+    text: {
+        _plotlyType: 'text',
+        text: 'new text',
+        font: { family: 'Arial', size: 14, color: '#000000' },
+        textangle: 0,
+        align: 'center',
+        valign: 'middle',
+        showarrow: true,
+        arrowcolor: '#444444',
+        arrowhead: 1,
+        arrowwidth: 1,
+        arrowsize: 1,
+        ax: -50,
+        ay: -50,
+        x: 0.5,
+        y: 0.5,
+        xref: 'paper',
+        yref: 'paper',
+        xanchor: 'auto',
+        yanchor: 'auto',
+        bgcolor: '',
+        bordercolor: '#444444',
+        borderwidth: 1,
+        borderpad: 1,
+        opacity: 1,
+    },
+    shape: {
+        _plotlyType: 'shape',
+        type: 'rect',
+        x0: 0.1, y0: 0.1, x1: 0.5, y1: 0.5,
+        xref: 'paper', yref: 'paper',
+        line: { color: '#444444', width: 2, dash: 'solid' },
+        fillcolor: '#1f77b4',
+        layer: 'above',
+        opacity: 0.7,
+    },
+    image: {
+        _plotlyType: 'image',
+        source: '',
+        x: 0.5, y: 0.5, sizex: 0.2, sizey: 0.2,
+        xref: 'paper', yref: 'paper',
+        xanchor: 'left', yanchor: 'top',
+        sizing: 'contain',
+        layer: 'above',
+        opacity: 1,
+    },
+}
+
+function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, deleteAnnotationConfirmMessage) {
     _deleteConfirmMsg = deleteConfirmMessage ?? _deleteConfirmMsg
+    _deleteAnnotationConfirmMsg = deleteAnnotationConfirmMessage ?? _deleteAnnotationConfirmMsg
 
     // Ensure layout sub-objects always exist before the store is registered.
     // PHP serialises [] as a JSON array; named properties added by mergeDefaults
@@ -216,6 +277,7 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
             _plotlyMissingMessage: plotlyMissingMessage,
             _plotlyMissing:        false,
             _tooSmall:             false,
+
 
             // ── Conditional visibility helpers (PRD §8) ───────────────────
 
@@ -290,7 +352,7 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
              * @returns {boolean}
              */
             hasMarkerSupport(type) {
-                return ['scatter', 'bar', 'histogram', 'pie'].includes(type)
+                return ['scatter', 'bar', 'histogram', 'pie', 'sunburst'].includes(type)
             },
 
             /**
@@ -364,6 +426,7 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
 
                 const resolved = toRaw(this.traces).map(t => this.compileTrace(t))
                 const layout = deepClone(this.layout)
+                this._compileAnnotations(layout)
 
                 // Compute a structural signature from type, mode, and column
                 // bindings. When the signature changes (e.g. trace type or
@@ -458,9 +521,18 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
                 const trace = deepClone(storeTrace)
                 const columnNames = trace.meta?.columnNames ?? {}
                 for (const [axis, columnName] of Object.entries(columnNames)) {
-                    if (columnName && this.dataSources[columnName] !== undefined) {
-                        trace[axis] = toRaw(this.dataSources[columnName])
+                    if (!columnName || this.dataSources[columnName] === undefined) continue
+                    // Skip column resolution when the corresponding *_from_column flag is false
+                    if (axis === 'marker.size' && trace.marker?.size_from_column === false) continue
+                    const keys = axis.split('.')
+                    let cur = trace
+                    for (let i = 0; i < keys.length - 1; i++) {
+                        if (cur[keys[i]] == null || typeof cur[keys[i]] !== 'object') {
+                            cur[keys[i]] = {}
+                        }
+                        cur = cur[keys[i]]
                     }
+                    cur[keys[keys.length - 1]] = toRaw(this.dataSources[columnName])
                 }
                 trace.type = _plotlyTypeMap[trace.type] ?? trace.type
                 delete trace.meta
@@ -563,6 +635,100 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
             moveTraceDown(index) {
                 const i = index ?? this.activeTraceIndex
                 this.moveTrace(i, i + 1)
+            },
+
+            // ── Annotation operations ─────────────────────────────────────
+
+            /**
+             * Push a new annotation of the given type onto layout._annotations.
+             * @param {'text'|'shape'|'image'} type
+             */
+            addAnnotation(type) {
+                const scaffold = _ANNOTATION_SCAFFOLDS[type]
+                if (!scaffold) return
+                if (!this.layout._annotations) {
+                    this.layout._annotations = []
+                }
+                this.layout._annotations.push(deepClone(scaffold))
+                this._scheduleRender()
+            },
+
+            /**
+             * Remove an annotation at the given index after confirm.
+             * @param {number} idx
+             */
+            removeAnnotation(idx) {
+                const ann = this.layout._annotations
+                if (!ann || idx < 0 || idx >= ann.length) return
+                ann.splice(idx, 1)
+                this._scheduleRender()
+            },
+
+            /**
+             * Move an annotation from one index to another.
+             * @param {number} from
+             * @param {number} to
+             */
+            moveAnnotation(from, to) {
+                const ann = this.layout._annotations
+                if (!ann || from < 0 || from >= ann.length) return
+                if (to < 0 || to >= ann.length) return
+                if (from === to) return
+                const moved = deepClone(toRaw(ann[from]))
+                ann.splice(from, 1)
+                ann.splice(to, 0, moved)
+            },
+
+            /**
+             * Move annotation at idx one position up.
+             * @param {number} idx
+             */
+            moveAnnotationUp(idx) {
+                this.moveAnnotation(idx, idx - 1)
+            },
+
+            /**
+             * Move annotation at idx one position down.
+             * @param {number} idx
+             */
+            moveAnnotationDown(idx) {
+                this.moveAnnotation(idx, idx + 1)
+            },
+
+            /**
+             * Given a deep-cloned layout, compile _annotations into Plotly-native
+             * layout.annotations / layout.shapes / layout.images and strip _plotlyType.
+             * Called by _render() and syncToBackend().
+             * @param {object} layout
+             */
+            _compileAnnotations(layout) {
+                const ann = layout._annotations
+                if (!ann || !Array.isArray(ann) || ann.length === 0) {
+                    layout.annotations = []
+                    layout.shapes = []
+                    layout.images = []
+                    delete layout._annotations
+                    return
+                }
+                const texts = []
+                const shapes = []
+                const images = []
+                for (const item of ann) {
+                    const raw = toRaw(item)
+                    const clone = deepClone(raw)
+                    delete clone._plotlyType
+                    if (raw._plotlyType === 'text') {
+                        texts.push(clone)
+                    } else if (raw._plotlyType === 'shape') {
+                        shapes.push(clone)
+                    } else if (raw._plotlyType === 'image') {
+                        images.push(clone)
+                    }
+                }
+                layout.annotations = texts
+                layout.shapes = shapes
+                layout.images = images
+                delete layout._annotations
             },
 
             // ── Trace type switching (PRD §6) ─────────────────────────────
@@ -753,9 +919,12 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
 
                 this.syncing = true
 
+                const clonedLayout = deepClone(this.layout)
+                this._compileAnnotations(clonedLayout)
+
                 const wirePayload = {
                     traces: toRaw(this.traces).map(t => this.compileTrace(t)),
-                    layout: deepClone(this.layout),
+                    layout: clonedLayout,
                 }
 
                 _wire.syncFromAlpine(JSON.stringify(wirePayload))
@@ -793,13 +962,14 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage) {
  * @param {object}      payload
  * @param {string}      plotlyMissingMessage
  * @param {string}      deleteConfirmMessage
+ * @param {string}      deleteAnnotationConfirmMessage
  * @param {HTMLElement} canvasEl
  * @param {object}      wire
  */
-function bootChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, canvasEl, wire) {
+function bootChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, deleteAnnotationConfirmMessage, canvasEl, wire) {
     // Register the store (side effect) — do NOT use its return value,
     // Vite minification makes it unreliable (see initChartBuilder comment).
-    initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage)
+    initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, deleteAnnotationConfirmMessage)
 
     // Retrieve the store directly — always returns the registered object.
     const store = Alpine.store('chartBuilder')

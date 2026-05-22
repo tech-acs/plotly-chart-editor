@@ -50,4 +50,14 @@
             >
         </div>
     </div>
+    <div class="chart-builder__field" style="margin-top:0.4rem">
+        <label class="chart-builder__field-label">{{ __('plotly-chart-editor::plotly-chart-editor.fields.margin_pad') }}</label>
+        <input
+            type="number"
+            class="chart-builder__control chart-builder__control--number"
+            min="0"
+            max="100"
+            x-model.number="{!! $path !!}.pad"
+        >
+    </div>
 </div>

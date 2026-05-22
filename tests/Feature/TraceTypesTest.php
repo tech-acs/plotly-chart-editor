@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Livewire\Livewire;
 use Uneca\PlotlyChartEditor\Livewire\PlotlyEditor;
 
-it('renders all 7 default trace types in the type dropdown', function (): void {
+it('renders all 8 default trace types in the type dropdown', function (): void {
     $html = Livewire::test(PlotlyEditor::class, [
         'dataSources' => ['x' => [1, 2, 3]],
     ])->html();
@@ -17,5 +17,6 @@ it('renders all 7 default trace types in the type dropdown', function (): void {
         ->toContain('&quot;histogram&quot;')
         ->toContain('&quot;line&quot;')
         ->toContain('&quot;area&quot;')
-        ->toContain('&quot;box&quot;');
+        ->toContain('&quot;box&quot;')
+        ->toContain('&quot;sunburst&quot;');
 });

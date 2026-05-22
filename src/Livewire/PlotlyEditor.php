@@ -24,7 +24,7 @@ class PlotlyEditor extends Component
     public array $config = ['responsive' => true];
 
     /** @var array<int, string> Enabled trace types; first is the default for new traces. */
-    public array $traceTypes = ['bar', 'scatter', 'pie', 'histogram', 'line', 'area', 'box'];
+    public array $traceTypes = ['bar', 'scatter', 'pie', 'histogram', 'line', 'area', 'box', 'sunburst'];
 
     /** @var string One of: manual, auto, hybrid. */
     public string $syncMode = 'manual';
@@ -52,7 +52,7 @@ class PlotlyEditor extends Component
         array $data = [],
         array $layout = [],
         array $config = ['responsive' => true],
-        array $traceTypes = ['bar', 'scatter', 'pie', 'histogram', 'line', 'area', 'box'],
+        array $traceTypes = ['bar', 'scatter', 'pie', 'histogram', 'line', 'area', 'box', 'sunburst'],
         string $syncMode = 'manual',
         bool $preloadSchema = true,
         bool $showExport = true,

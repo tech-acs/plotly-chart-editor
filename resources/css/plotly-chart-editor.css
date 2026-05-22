@@ -496,6 +496,59 @@
     margin-top: 0.75rem;
 }
 
+/* ── Annotation cards (Fold 4) ────────────────────────────────────────────── */
+.chart-builder__annotation-card {
+    border: 1px solid var(--plotly-editor-border);
+    border-radius: var(--plotly-editor-radius);
+    padding: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.chart-builder__annotation-card:first-child {
+    margin-top: 0;
+}
+
+.chart-builder__annotation-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.25rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.chart-builder__annotation-card--open .chart-builder__annotation-card__header {
+    border-bottom: 1px solid var(--plotly-editor-border);
+    margin-bottom: 0.5rem;
+}
+
+.chart-builder__annotation-card__arrow {
+    font-size: 0.7rem;
+    color: var(--plotly-editor-text-muted);
+    flex-shrink: 0;
+    min-width: 1rem;
+}
+
+.chart-builder__annotation-card__title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--plotly-editor-text);
+    flex: 1;
+    margin: 0 0.25rem;
+}
+
+.chart-builder__annotation-card__actions {
+    display: flex;
+    gap: 0.25rem;
+    flex-shrink: 0;
+}
+
+.chart-builder__annotation-card__fields {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
 /* ── Active trace panel ──────────────────────────────────────────────────── */
 .chart-builder__active-trace {
     display: flex;

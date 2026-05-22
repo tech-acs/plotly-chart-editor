@@ -46,5 +46,30 @@ class WorkbenchServiceProvider extends ServiceProvider
 
             return response()->file($path, ['Content-Type' => 'text/css']);
         });
+
+        // Serve Plotly locale files from node_modules (installed by the host app).
+        // These are CommonJS modules; we wrap them in an IIFE that provides
+        // a mock module.exports and auto-registers the locale with Plotly.
+        Route::get('/plotly-locale/{code}.js', function ($code) use ($packageRoot) {
+            $path = $packageRoot.'/node_modules/plotly.js-locales/'.$code.'.js';
+
+            if (! file_exists($path)) {
+                abort(404);
+            }
+
+            $content = file_get_contents($path);
+
+            $js = "(function() {
+    var module = { exports: {} };
+    {$content}
+
+    if (module.exports && typeof window !== 'undefined' && window.Plotly) {
+        window.Plotly.register(module.exports);
+    }
+})();
+";
+
+            return response($js, 200, ['Content-Type' => 'application/javascript']);
+        });
     }
 }
