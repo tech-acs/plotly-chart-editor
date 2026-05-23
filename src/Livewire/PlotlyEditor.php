@@ -117,15 +117,9 @@ class PlotlyEditor extends Component
             );
         }
 
-        // Strip the internal meta key that Alpine uses for column bindings.
-        // It must never be stored server-side or forwarded to consumers.
-        $traces = array_map(function (array $trace): array {
-            unset($trace['meta']);
-
-            return $trace;
-        }, $state['traces']);
-
-        $this->data = $traces;
+        // meta.columnNames is kept in the stored traces so they can be
+        // re-bound to dataSources when the editor mounts again.
+        $this->data = $state['traces'];
         $this->layout = $state['layout'];
 
         $this->dispatch('chart-synced', data: $this->data, layout: $this->layout);
@@ -144,6 +138,7 @@ class PlotlyEditor extends Component
 
         return array_map(function (array $trace) use ($aliases): array {
             $trace['type'] = $aliases[$trace['type']] ?? $trace['type'];
+            unset($trace['meta']);
 
             return $trace;
         }, $this->data);

@@ -932,7 +932,25 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
                 this._compileAnnotations(clonedLayout)
 
                 const wirePayload = {
-                    traces: toRaw(this.traces).map(t => this.compileTrace(t)),
+                    traces: toRaw(this.traces).map(t => {
+                        const clone = deepClone(t)
+                        clone.type = _plotlyTypeMap[clone.type] ?? clone.type
+                        // Strip data at column-bound paths so the payload only
+                        // carries column references (via meta.columnNames), not
+                        // the actual data arrays. The host app stores these
+                        // references and hydrates them at render time.
+                        const columnNames = clone.meta?.columnNames ?? {}
+                        for (const axis of Object.keys(columnNames)) {
+                            const keys = axis.split('.')
+                            let cur = clone
+                            for (let i = 0; i < keys.length - 1; i++) {
+                                if (cur[keys[i]] == null || typeof cur[keys[i]] !== 'object') break
+                                cur = cur[keys[i]]
+                            }
+                            delete cur[keys[keys.length - 1]]
+                        }
+                        return clone
+                    }),
                     layout: clonedLayout,
                 }
 

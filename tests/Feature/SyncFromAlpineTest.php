@@ -60,7 +60,7 @@ it('throws when traces key is missing', function (): void {
         ->toThrow(InvalidArgumentException::class);
 });
 
-it('strips meta from incoming traces', function (): void {
+it('preserves meta.columnNames from incoming traces', function (): void {
     $component = Livewire::test(PlotlyEditor::class, [
         'dataSources' => ['Country' => ['Ghana'], 'Pop' => [34]],
     ]);
@@ -80,7 +80,10 @@ it('strips meta from incoming traces', function (): void {
 
     $component->call('syncFromAlpine', $payload);
 
-    expect($component->get('data')[0])->not->toHaveKey('meta');
+    expect($component->get('data')[0])
+        ->toHaveKey('meta')
+        ->and($component->get('data')[0]['meta'])
+        ->toHaveKey('columnNames');
 });
 
 it('dispatches the native ChartSynced event after a successful sync', function (): void {
