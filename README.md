@@ -72,7 +72,7 @@ Full control:
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `dataSources` | `array` | **required** | Key-value pool of columns. Immutable after mount. |
-| `data` | `array` | `[]` | Pre-populated traces (each with optional `meta.columnNames`). |
+| `data` | `array` | `[]` | Pre-populated traces (each with optional `meta.columnNames` for column-referenced bindings). |
 | `layout` | `array` | `[]` | Initial Plotly layout config. |
 | `config` | `array` | `['responsive' => true]` | Plotly config flags. |
 | `traceTypes` | `array` | `['bar']` | Enabled trace types; first is the default for new traces. |
@@ -98,7 +98,7 @@ All columns should be the same length. Length mismatches produce a non-blocking 
 | Mode | Behaviour | Save button |
 |---|---|---|
 | `manual` | Syncs only when the user clicks Save. | Visible |
-| `auto` | Debounced (~500ms) sync after each mutation. Shows "Saved ✓" on success. | Hidden |
+| `auto` | Debounced (~500ms) sync after each mutation. Shows "Synced ✓" on success. | Hidden |
 | `hybrid` | Auto-sync AND a Save button for forced immediate sync. | Visible |
 
 ---
@@ -111,6 +111,8 @@ All columns should be the same length. Length mismatches produce a non-blocking 
 | `ChartSynced` (native) | `$data` + `$layout` | Same moment, as a Laravel event class. |
 | `plotly-chart-editor:synced` | `{ traces, layout }` | Same moment, as a browser CustomEvent. |
 | `plotly-chart-editor:sync-failed` | `{ error }` | On sync failure, as a browser CustomEvent. |
+
+> **Payload notes:** Traces in event payloads carry `meta.columnNames` (column references) but **not the resolved data arrays**. The actual data lives in `dataSources` on the server. To render a chart outside the editor, hydrate the traces by resolving `meta.columnNames` against your dataset — or use `getCompiledTraces()` to get Plotly-native traces with type aliases resolved and `meta` stripped. See "Loading an existing chart" below.
 
 ---
 
@@ -313,7 +315,9 @@ Read chart state directly from `Alpine.store('chartBuilder')` at any time.
 
 ### Loading an existing chart
 
-Pass stored `traces` and `layout` back to the editor:
+The editor syncs traces in **reference form** — each trace carries `meta.columnNames` (e.g. `{'x': 'Country', 'y': 'Population'}`) instead of raw data arrays. The actual column data lives in `dataSources`.
+
+Pass stored traces and layout back to the editor:
 
 ```blade
 <livewire:plotly-editor
@@ -323,15 +327,20 @@ Pass stored `traces` and `layout` back to the editor:
 />
 ```
 
+The editor's Alpine store resolves `meta.columnNames` against `dataSources` at render time via `compileTrace()`, so the chart renders with the correct data.
+
+For read-only display (outside the editor), resolve the bindings yourself or use `getCompiledTraces()`:
+
 ---
 
 ### Utility: `getCompiledTraces()`
 
-When serving stored traces to Plotly directly (outside the editor), some type aliases need resolving (`area` → `scatter`, `line` → `scatter`). Call this method on the component:
+When serving stored traces to Plotly directly (outside the editor), some type aliases need resolving (`area` → `scatter`, `line` → `scatter`) and `meta` should be stripped. Call this method on the component:
 
 ```php
 $compiled = $component->getCompiledTraces();
-// e.g. ['type' => 'area', ...] → ['type' => 'scatter', ...]
+// e.g. ['type' => 'area', 'meta' => [...], ...] → ['type' => 'scatter', ...]
+// meta is removed, only Plotly-native fields remain.
 ```
 
 ---
