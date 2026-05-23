@@ -358,7 +358,7 @@ function L(a, w, p, g, u, A) {
           (l[n[f]] == null || typeof l[n[f]] != "object") && (l[n[f]] = {}), l = l[n[f]];
         l[n[n.length - 1]] = d(this.dataSources[c]);
       }
-      return t.type = z[t.type] ?? t.type, delete t.meta, t;
+      return t.type = z[t.type] ?? t.type, t;
     },
     // ── Trace operations (PRD §6) ─────────────────────────────────
     /**

@@ -543,7 +543,6 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
                     cur[keys[keys.length - 1]] = toRaw(this.dataSources[columnName])
                 }
                 trace.type = _plotlyTypeMap[trace.type] ?? trace.type
-                delete trace.meta
                 return trace
             },
 

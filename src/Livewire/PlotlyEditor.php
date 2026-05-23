@@ -138,7 +138,6 @@ class PlotlyEditor extends Component
 
         return array_map(function (array $trace) use ($aliases): array {
             $trace['type'] = $aliases[$trace['type']] ?? $trace['type'];
-            unset($trace['meta']);
 
             return $trace;
         }, $this->data);

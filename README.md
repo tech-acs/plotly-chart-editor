@@ -335,12 +335,11 @@ For read-only display (outside the editor), resolve the bindings yourself or use
 
 ### Utility: `getCompiledTraces()`
 
-When serving stored traces to Plotly directly (outside the editor), some type aliases need resolving (`area` → `scatter`, `line` → `scatter`) and `meta` should be stripped. Call this method on the component:
+When serving stored traces to Plotly directly (outside the editor), some type aliases need resolving (`area` → `scatter`, `line` → `scatter`). Call this method on the component:
 
 ```php
 $compiled = $component->getCompiledTraces();
-// e.g. ['type' => 'area', 'meta' => [...], ...] → ['type' => 'scatter', ...]
-// meta is removed, only Plotly-native fields remain.
+// e.g. ['type' => 'area', ...] → ['type' => 'scatter', ...]
 ```
 
 ---
