@@ -68,7 +68,7 @@ class PlotlyChartEditorServiceProvider extends PackageServiceProvider
 
         // Blade directives for explicit asset placement
         Blade::directive('plotlyChartEditorStyles', function () {
-            $link = '<link rel="stylesheet" href="'.url('/vendor/plotly-chart-editor/plotly-chart-editor.css').'">';
+            $link = '<link rel="stylesheet" href="/vendor/plotly-chart-editor/plotly-chart-editor.css">';
             // Auto-flex: when .chart-builder lives inside a [wire:id] wrapper
             // (e.g. nested inside another Livewire component), make the wrapper
             // a column flex container and give .chart-builder flex-1 to fill
@@ -84,7 +84,7 @@ class PlotlyChartEditorServiceProvider extends PackageServiceProvider
         });
 
         Blade::directive('plotlyChartEditorScripts', function () {
-            return '<script src="'.url('/vendor/plotly-chart-editor/plotly-chart-editor.js').'" defer></script>';
+            return '<script src="/vendor/plotly-chart-editor/plotly-chart-editor.js" defer></script>';
         });
 
         // Public assets — optional vendor:publish for production

@@ -241,6 +241,26 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
         LAYOUT_DEFAULTS
     )
 
+    // Convert Plotly-native annotations/shapes/images to internal _annotations
+    if (layout.annotations && Array.isArray(layout.annotations)) {
+        layout._annotations = layout._annotations.concat(
+            layout.annotations.map(a => ({ ...a, _plotlyType: 'text' }))
+        )
+        delete layout.annotations
+    }
+    if (layout.shapes && Array.isArray(layout.shapes)) {
+        layout._annotations = layout._annotations.concat(
+            layout.shapes.map(s => ({ ...s, _plotlyType: 'shape' }))
+        )
+        delete layout.shapes
+    }
+    if (layout.images && Array.isArray(layout.images)) {
+        layout._annotations = layout._annotations.concat(
+            layout.images.map(i => ({ ...i, _plotlyType: 'image' }))
+        )
+        delete layout.images
+    }
+
     // Register the store only on first call.
     // IMPORTANT: Alpine.store(name, value) returns void, not the store.
     // We must call Alpine.store(name) separately after registration.
