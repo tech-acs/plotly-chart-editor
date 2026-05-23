@@ -75,7 +75,7 @@ let _lastStructuralSig = null    // last structural signature used to detect lay
  */
 function mergeDefaults(target, defaults) {
     for (const [key, val] of Object.entries(defaults)) {
-        if (target[key] === undefined || target[key] === null) {
+        if (target[key] === undefined || target[key] === null || typeof target[key] !== typeof val) {
             target[key] = structuredClone(val)
         } else if (
             typeof val === 'object' && !Array.isArray(val) &&

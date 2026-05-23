@@ -12,8 +12,8 @@ const z = {
 };
 let m = null, C = null, M = null, A = !1, P = !1, S = "Delete this trace? This cannot be undone.", O = "Column ':field' has :colLen values but trace expects :expectedLen. Showing first :shown.", N = "Failed to load profile for :type. Please try again.", I = null, j = null, v = null, F = null;
 function R(a, _) {
-  for (const [y, w] of Object.entries(_))
-    a[y] === void 0 || a[y] === null ? a[y] = structuredClone(w) : typeof w == "object" && !Array.isArray(w) && typeof a[y] == "object" && !Array.isArray(a[y]) && R(a[y], w);
+  for (const [y, g] of Object.entries(_))
+    a[y] === void 0 || a[y] === null || typeof a[y] != typeof g ? a[y] = structuredClone(g) : typeof g == "object" && !Array.isArray(g) && typeof a[y] == "object" && !Array.isArray(a[y]) && R(a[y], g);
   return a;
 }
 const B = {
@@ -153,7 +153,7 @@ const B = {
     opacity: 1
   }
 };
-function L(a, _, y, w, p, k) {
+function L(a, _, y, g, p, k) {
   S = y ?? S, O = p ?? O, N = k ?? N;
   const x = a.layout ?? {}, c = R(
     Array.isArray(x) ? {} : x,
@@ -655,23 +655,23 @@ function L(a, _, y, w, p, k) {
     }
   });
 }
-function J(a, _, y, w, p, k, x, c) {
-  L(a, _, y, w, x, c);
-  const g = Alpine.store("chartBuilder");
+function J(a, _, y, g, p, k, x, c) {
+  L(a, _, y, g, x, c);
+  const w = Alpine.store("chartBuilder");
   if (m = p, T = k, typeof window.Plotly > "u") {
-    g._plotlyMissing = !0, p && (p.textContent = _);
+    w._plotlyMissing = !0, p && (p.textContent = _);
     return;
   }
-  A && g._render(), v && v.disconnect();
+  A && w._render(), v && v.disconnect();
   const e = p == null ? void 0 : p.closest(".chart-builder");
   e && typeof ResizeObserver < "u" && (v = new ResizeObserver((t) => {
     var s, n;
     const i = (((n = (s = t[0]) == null ? void 0 : s.contentRect) == null ? void 0 : n.width) ?? window.innerWidth) < 1024;
-    g._tooSmall = i, i && m && typeof window.Plotly < "u" && (window.Plotly.purge(m), A = !1);
+    w._tooSmall = i, i && m && typeof window.Plotly < "u" && (window.Plotly.purge(m), A = !1);
   }), v.observe(e)), p && typeof ResizeObserver < "u" && new ResizeObserver(() => {
-    if (g._plotlyMissing || typeof window.Plotly > "u" || g._tooSmall) return;
+    if (w._plotlyMissing || typeof window.Plotly > "u" || w._tooSmall) return;
     const o = p.getBoundingClientRect();
-    o.width === 0 || o.height === 0 || (A ? window.Plotly.Plots.resize(p) : (P = !0, g._startEffects(), A = !0, g._render()));
+    o.width === 0 || o.height === 0 || (A ? window.Plotly.Plots.resize(p) : (P = !0, w._startEffects(), A = !0, w._render()));
   }).observe(p);
 }
 typeof window < "u" && (window.initChartBuilder = L, window.bootChartBuilder = J);
