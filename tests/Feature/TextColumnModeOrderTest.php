@@ -103,8 +103,9 @@ it('accepts a scatter trace with markers+text mode and resolved text array via s
 });
 
 it('stores text data without meta when syncFromAlpine payload includes both mode and text', function (): void {
-    // Confirms meta is stripped and text is preserved — the server-side half
-    // of the "mode first, text column second" ordering scenario.
+    // When the incoming trace has no meta key, the stored trace also has none.
+    // This verifies that syncFromAlpine passes through the trace object
+    // without injecting or removing meta.
     $component = Livewire::test(PlotlyEditor::class, [
         'dataSources' => ['Country' => ['Nigeria', 'Ghana']],
     ]);
@@ -116,7 +117,6 @@ it('stores text data without meta when syncFromAlpine payload includes both mode
                 'name' => 'T',
                 'mode' => 'lines+markers+text',
                 'text' => ['Nigeria', 'Ghana'],
-                // meta is intentionally absent — compileTrace() deletes it before sync
             ],
         ],
         'layout' => [],

@@ -47,7 +47,7 @@ Initial public release.
 - Footer aggregate badge: "⚠ N warnings".
 
 **Export**
-- `exportJSON()` — downloads `chart.json` with meta stripped, ready for `Plotly.newPlot()`.
+- `exportJSON()` — downloads `chart.json` (includes `meta` with column bindings), ready for `Plotly.newPlot()`.
 - `exportImage('png'|'svg')` — uses `Plotly.toImage()` and triggers download.
 - `copyConfig()` — copies JSON to clipboard; shows transient "Copied ✓".
 - Export dropdown visible when `showExport=true` (default).
