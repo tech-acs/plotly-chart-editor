@@ -107,13 +107,17 @@ All columns should be the same length. Length mismatches produce a non-blocking 
 
 | Event | Payload | When |
 |---|---|---|
-| `chart-synced` | `{ data: array, layout: array }` | After every successful sync to Livewire. |
+| `chart-synced` | `{ data: array, layout: array }` | After every successful sync (Livewire dispatch). |
+| `ChartSynced` (native) | `$data` + `$layout` | Same moment, as a Laravel event class. |
+| `plotly-chart-editor:synced` | `{ traces, layout }` | Same moment, as a browser CustomEvent. |
+| `plotly-chart-editor:sync-failed` | `{ error }` | On sync failure, as a browser CustomEvent. |
 
 ---
 
 ## Persisting charts
 
-The `chart-synced` event fires on every successful sync. Use it to save the chart state to your database.
+You have several options to save chart data from the editor to your backend.  
+Choose the one that fits your app's architecture.
 
 ### Example migration
 
@@ -128,44 +132,11 @@ Schema::create('charts', function (Blueprint $table) {
 });
 ```
 
-### Saving
+---
 
-Listen for the event in your Livewire component, then persist:
+### Option A — Host Livewire component (wrapping)
 
-```php
-use App\Models\Chart;
-use Livewire\Attributes\On;
-
-class ChartEditor extends \Livewire\Component
-{
-    public Chart $chart;
-
-    #[On('chart-synced')]
-    public function saveChart(array $data, array $layout): void
-    {
-        $this->chart->update([
-            'traces' => $data,
-            'layout' => $layout,
-        ]);
-    }
-}
-```
-
-### Loading an existing chart
-
-Pass the stored `traces` and `layout` back as props:
-
-```blade
-<livewire:plotly-editor
-    :data-sources="$rawDataset"
-    :data="$chart->traces"
-    :layout="$chart->layout"
-/>
-```
-
-### Full save/load example with `sync-mode="manual"`
-
-Your page component loads the chart, passes it to the editor, and listens for saves:
+Wrap `<livewire:plotly-editor>` in your own Livewire component. The Livewire `chart-synced` event bubbles up to parents, so `#[On]` works directly.
 
 ```php
 use App\Models\Chart;
@@ -179,7 +150,6 @@ class EditChart extends \Livewire\Component
     public function mount(Chart $chart): void
     {
         $this->chart = $chart;
-        // Load your data sources however you normally do
         $this->rawDataset = [
             'Country'    => ['Ghana', 'Kenya', 'Nigeria'],
             'Population' => [34, 55, 223],
@@ -194,15 +164,11 @@ class EditChart extends \Livewire\Component
             'traces' => $data,
             'layout' => $layout,
         ]);
-
-        session()->flash('saved', 'Chart updated.');
     }
 
     public function render()
     {
-        return view('livewire.edit-chart', [
-            'chart' => $this->chart,
-        ]);
+        return view('livewire.edit-chart');
     }
 }
 ```
@@ -211,18 +177,175 @@ class EditChart extends \Livewire\Component
 {{-- resources/views/livewire/edit-chart.blade.php --}}
 <div>
     <h1>{{ $chart->title }}</h1>
-
-    @if (session('saved'))
-        <p class="text-green-600">{{ session('saved') }}</p>
-    @endif
-
     <livewire:plotly-editor
         :data-sources="$rawDataset"
         :data="$chart->traces"
         :layout="$chart->layout"
-        :sync-mode="'manual'"
+        :sync-mode="'hybrid'"
     />
 </div>
+```
+
+**Pros:** Clean PHP-only integration, easy to re-render other page parts.  
+**Cons:** Requires a Livewire component just to wrap the editor.
+
+---
+
+### Option B — JS bridge to a sibling Livewire component
+
+No wrapping needed. Listen with `Livewire.on()` and forward to any component on the page.
+
+```blade
+<livewire:plotly-editor :data-sources="$data" />
+<livewire:save-button />  {{-- or any component --}}
+
+<script>
+Livewire.on('chart-synced', (event) => {
+    Livewire.dispatchTo('save-button', 'chart-synced', event);
+});
+</script>
+```
+
+**Pros:** No wrapping — components stay independent.  
+**Cons:** Requires a small JS snippet.
+
+---
+
+### Option C — Plain JS + HTTP request
+
+No Livewire component at all. The editor lives in a regular Blade view; save via `fetch`.
+
+```blade
+{{-- Not inside a Livewire component — a plain Blade view --}}
+@extends('layouts.app')
+
+@section('content')
+<livewire:plotly-editor :data-sources="$countries" sync-mode="hybrid" />
+@endsection
+
+@push('scripts')
+<script>
+Livewire.on('chart-synced', ({ data, layout }) => {
+    fetch('/charts/{{ $chart->id }}/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+        body: JSON.stringify({ traces: data, layout }),
+    });
+});
+</script>
+@endpush
+```
+
+**Pros:** Zero Livewire boilerplate in the host.  
+**Cons:** You handle CSRF, validation, and routing yourself.
+
+---
+
+### Option D — Native Laravel event listener (new)
+
+The `ChartSynced` event class is dispatched alongside `chart-synced`. Register a listener.
+
+```php
+// App\Providers\EventServiceProvider.php
+protected $listen = [
+    \Uneca\PlotlyChartEditor\Events\ChartSynced::class => [
+        \App\Listeners\SaveChart::class,
+    ],
+];
+```
+
+```php
+// App\Listeners\SaveChart.php
+class SaveChart
+{
+    public function handle(\Uneca\PlotlyChartEditor\Events\ChartSynced $event): void
+    {
+        // $event->data, $event->layout
+        // Save to database, trigger a job, etc.
+    }
+}
+```
+
+**Pros:** Decoupled from Livewire entirely. Can be queued.  
+**Cons:** Requires registering a listener (one-time setup).
+
+---
+
+### Option E — JS CustomEvent (new)
+
+The package dispatches `plotly-chart-editor:synced` on `window`. Listen from any JS framework.
+
+```js
+window.addEventListener('plotly-chart-editor:synced', (e) => {
+    const { traces, layout } = e.detail;
+    // Send to backend, update a store, etc.
+});
+window.addEventListener('plotly-chart-editor:sync-failed', (e) => {
+    console.error('Chart sync failed:', e.detail.error);
+});
+```
+
+**Pros:** Framework-agnostic. Works with React, Vue, vanilla JS.  
+**Cons:** Manual HTTP wiring.
+
+---
+
+### Option F — Alpine store direct read
+
+Read chart state directly from `Alpine.store('chartBuilder')` at any time.
+
+```blade
+<livewire:plotly-editor :data-sources="$data" />
+<button x-data @click="fetch('/save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        traces: Alpine.store('chartBuilder').traces,
+        layout: Alpine.store('chartBuilder').layout,
+    }),
+})">Save</button>
+```
+
+**Pros:** Full control, no event wiring.  
+**Cons:** You must handle dirty-state tracking yourself.
+
+---
+
+### Loading an existing chart
+
+Pass stored `traces` and `layout` back to the editor:
+
+```blade
+<livewire:plotly-editor
+    :data-sources="$rawDataset"
+    :data="$chart->traces"
+    :layout="$chart->layout"
+/>
+```
+
+---
+
+### Utility: `getCompiledTraces()`
+
+When serving stored traces to Plotly directly (outside the editor), some type aliases need resolving (`area` → `scatter`, `line` → `scatter`). Call this method on the component:
+
+```php
+$compiled = $component->getCompiledTraces();
+// e.g. ['type' => 'area', ...] → ['type' => 'scatter', ...]
+```
+
+---
+
+### Validation: `ValidChartConfig` rule
+
+Validate incoming chart payloads in your controllers:
+
+```php
+use Uneca\PlotlyChartEditor\Rules\ValidChartConfig;
+
+$request->validate([
+    'chart' => ['required', new ValidChartConfig],
+]);
 ```
 
 ---

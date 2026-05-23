@@ -7,6 +7,7 @@ namespace Uneca\PlotlyChartEditor\Livewire;
 use Illuminate\View\View;
 use InvalidArgumentException;
 use Livewire\Component;
+use Uneca\PlotlyChartEditor\Events\ChartSynced;
 use Uneca\PlotlyChartEditor\Support\SchemaProfileLoader;
 
 class PlotlyEditor extends Component
@@ -128,6 +129,24 @@ class PlotlyEditor extends Component
         $this->layout = $state['layout'];
 
         $this->dispatch('chart-synced', data: $this->data, layout: $this->layout);
+        ChartSynced::dispatch(data: $this->data, layout: $this->layout);
+    }
+
+    /**
+     * Return traces with type aliases resolved (e.g. 'area' → 'scatter').
+     * Useful for host controllers that need Plotly-native type names.
+     *
+     * @return array<int, array<mixed>>
+     */
+    public function getCompiledTraces(): array
+    {
+        $aliases = config('plotly-chart-editor.aliases', []);
+
+        return array_map(function (array $trace) use ($aliases): array {
+            $trace['type'] = $aliases[$trace['type']] ?? $trace['type'];
+
+            return $trace;
+        }, $this->data);
     }
 
     public function render(): View

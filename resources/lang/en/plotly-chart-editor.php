@@ -16,6 +16,10 @@ return [
 
     'validation' => [
         'data_sources_required' => 'The dataSources property is required and must not be empty.',
+        'chart_config_array' => 'Chart config must be an array.',
+        'chart_config_traces' => 'Chart config must contain a "traces" array.',
+        'trace_type_required' => 'Trace at index :index is missing a "type".',
+        'chart_config_layout' => 'Chart config must contain a "layout" array.',
     ],
 
     'errors' => [
@@ -124,7 +128,7 @@ return [
 
     'sync' => [
         'save_button' => 'Save',
-        'saved' => 'Saved ✓',
+        'saved' => 'Synced ✓',
         'saving' => 'Saving…',
     ],
 

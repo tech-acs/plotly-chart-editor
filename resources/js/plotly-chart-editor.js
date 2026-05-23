@@ -274,7 +274,7 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
             dirty:      false,
             syncing:    false,
             lastSyncAt: null,
-            savedAt:    null,   // timestamp of last successful sync (drives "Saved ✓")
+            savedAt:    null,   // timestamp of last successful sync (drives "Synced ✓")
             copiedAt:   null,   // timestamp of last clipboard copy (drives "Copied ✓")
 
             // ── Internal flags ────────────────────────────────────────────
@@ -685,6 +685,7 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
                 const moved = deepClone(toRaw(ann[from]))
                 ann.splice(from, 1)
                 ann.splice(to, 0, moved)
+                this._scheduleRender()
             },
 
             /**
@@ -937,13 +938,20 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
 
                 _wire.syncFromAlpine(JSON.stringify(wirePayload))
                     .then(() => {
+                        this.dirty = false
                         this.savedAt = Date.now()
                         clearTimeout(_savedTimer)
                         _savedTimer = setTimeout(() => { this.savedAt = null }, 2000)
+                        window.dispatchEvent(new CustomEvent('plotly-chart-editor:synced', {
+                            detail: { traces: wirePayload.traces, layout: clonedLayout }
+                        }))
                     })
                     .catch(err => {
                         console.error('[plotly-chart-editor] syncToBackend failed:', err)
                         this.dirty = true
+                        window.dispatchEvent(new CustomEvent('plotly-chart-editor:sync-failed', {
+                            detail: { error: err.message ?? String(err) }
+                        }))
                     })
                     .finally(() => {
                         this.syncing    = false

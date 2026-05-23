@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Facades\Event;
 use Livewire\Livewire;
+use Uneca\PlotlyChartEditor\Events\ChartSynced;
 use Uneca\PlotlyChartEditor\Livewire\PlotlyEditor;
 
 it('updates data and layout from a valid payload', function (): void {
@@ -79,4 +81,25 @@ it('strips meta from incoming traces', function (): void {
     $component->call('syncFromAlpine', $payload);
 
     expect($component->get('data')[0])->not->toHaveKey('meta');
+});
+
+it('dispatches the native ChartSynced event after a successful sync', function (): void {
+    Event::fake([ChartSynced::class]);
+
+    $component = Livewire::test(PlotlyEditor::class, [
+        'dataSources' => ['X' => [1, 2]],
+    ]);
+
+    $payload = json_encode([
+        'traces' => [['type' => 'scatter', 'name' => 'T1']],
+        'layout' => ['title' => ['text' => 'Test']],
+    ]);
+
+    $component->call('syncFromAlpine', $payload);
+
+    Event::assertDispatched(ChartSynced::class, function (ChartSynced $event): bool {
+        return count($event->data) === 1
+            && $event->data[0]['name'] === 'T1'
+            && $event->layout['title']['text'] === 'Test';
+    });
 });

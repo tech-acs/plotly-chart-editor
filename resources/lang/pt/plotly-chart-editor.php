@@ -114,7 +114,7 @@ return [
 
     'sync' => [
         'save_button' => 'Salvar',
-        'saved' => 'Salvo ✓',
+        'saved' => 'Sincronizado ✓',
         'saving' => 'Salvando…',
     ],
 

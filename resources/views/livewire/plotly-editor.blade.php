@@ -1301,7 +1301,7 @@
             title="{{ __('plotly-chart-editor::plotly-chart-editor.sync.save_button') }}"
         >●</span>
 
-        {{-- "Saved ✓" transient message (auto mode) --}}
+        {{-- "Synced ✓" transient message (auto mode) --}}
         <span
             class="chart-builder__saved-msg"
             x-show="{{ $store }}.savedAt !== null"
