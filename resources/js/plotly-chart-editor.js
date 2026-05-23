@@ -849,7 +849,6 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
 
             /**
              * Download the full chart config as chart.json.
-             * meta is stripped — the file is ready for direct use with Plotly.newPlot().
              */
             exportJSON() {
                 this._download('chart.json', 'application/json', this._buildExportPayload())
