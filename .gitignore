@@ -24,6 +24,12 @@ _ide_helper_models.php
 /.fleet
 /.vscode
 
+# CodeGraph
+/.codegraph
+
+# Workbench
+/workbench/storage
+
 # Misc
 phpunit.xml
 phpstan.neon
