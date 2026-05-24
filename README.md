@@ -4,15 +4,39 @@ A reactive chart builder for Laravel. This Livewire component gives your users a
 
 - **Composer:** `uneca/plotly-chart-editor`
 - **License:** MIT
-- **Stack:** PHP 8.4 · Laravel 13 · Livewire 4 · Alpine 3 · Tailwind v4 · Plotly.js 3.x (peer dep)
+- **Stack:** PHP 8.4 · Laravel 13 · Livewire ^3.0 \|\| ^4.0 · Alpine 3 · Plotly.js 3.x (peer dep)
 
 ---
+
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Quick start](#quick-start)
+- [Layout](#layout)
+- [Props](#props)
+- [Sync modes](#sync-modes)
+- [Events](#events)
+- [Persisting charts](#persisting-charts)
+  - [Example migration](#example-migration)
+  - [Option A — Host Livewire component](#option-a--host-livewire-component-wrapping)
+  - [Option B — JS bridge](#option-b--js-bridge-to-a-sibling-livewire-component)
+  - [Option C — Plain JS + HTTP](#option-c--plain-js--http-request)
+  - [Option D — Native Laravel event](#option-d--native-laravel-event-listener)
+  - [Option E — JS CustomEvent](#option-e--js-customevent)
+  - [Option F — Alpine store](#option-f--alpine-store-direct-read)
+  - [Loading an existing chart](#loading-an-existing-chart)
+  - [Utility: getCompiledTraces](#utility-getcompiledtraces)
+  - [Validation](#validation-validchartconfig-rule)
+- [Publishing assets](#publishing-assets)
+- [Theming](#theming)
+- [Adding a new trace type profile](#adding-a-new-trace-type-profile)
+- [Development](#development)
+- [License](#license)
 
 ## Requirements
 
 - PHP 8.4+
 - Laravel 13.x
-- Livewire 4.x
+- Livewire 3.x or 4.x
 - Plotly.js exposed as `window.Plotly` in your app bundle (peer dependency — not shipped by this package)
 
 ---
@@ -23,23 +47,29 @@ A reactive chart builder for Laravel. This Livewire component gives your users a
 composer require uneca/plotly-chart-editor
 ```
 
-Add these Blade directives to your layout's `<head>` **after** Plotly.js is loaded:
+Load Plotly.js before the package directives (choose one):
+
+**CDN:**
+
+```html
+<script src="https://cdn.plot.ly/plotly-3.5.0.min.js"></script>
+```
+
+**or npm:**
+
+```bash
+npm install plotly.js-dist-min@^3.0.0
+```
+
+```js
+// resources/js/app.js
+import Plotly from 'plotly.js-dist-min';
+window.Plotly = Plotly;
+```
+
+Then add these Blade directives to your layout's `<head>` after Plotly.js:
 
 ```blade
-{{-- Plotly.js (required, choose one) --}}
-
-{{-- CDN --}}
-<script src="https://cdn.plot.ly/plotly-3.5.0.min.js"></script>
-
-{{-- OR via npm --}}
-{{-- npm install plotly.js-dist-min@^3.0.0 --}}
-{{-- resources/js/app.js:
-     import Plotly from 'plotly.js-dist-min';
-     window.Plotly = Plotly;
---}}
-{{-- @vite('resources/js/app.js') --}}
-
-{{-- Package assets --}}
 @plotlyChartEditorStyles
 @plotlyChartEditorScripts
 
@@ -242,11 +272,11 @@ No wrapping needed. Listen with `Livewire.on()` and forward to any component on 
 <script>
 Livewire.on('chart-synced', (event) => {
     Livewire.dispatchTo('save-button', 'chart-synced', event);
+    // Livewire v3: Livewire.emitTo('save-button', 'chart-synced', event);
 });
-</script>
 ```
 
-**Pros:** No wrapping — components stay independent.  
+**Pros:** No wrapping — components stay independent.
 **Cons:** Requires a small JS snippet.
 
 ---
@@ -367,7 +397,7 @@ Pass stored traces and layout back to the editor:
 
 The editor's Alpine store resolves `meta.columnNames` against `dataSources` at render time via `compileTrace()`, so the chart renders with the correct data.
 
-For read-only display (outside the editor), resolve the bindings yourself or use `getCompiledTraces()`:
+For read-only display (outside the editor), resolve the bindings yourself or use `getCompiledTraces()` (see below).
 
 ---
 

@@ -1,13 +1,4 @@
 /**
- * plotly-chart-editor.js
- *
- * Registers Alpine.store('chartBuilder', ...) with the shape defined in PRD §4.
- * Livewire 4 bundles Alpine internally — do NOT load a second Alpine instance.
- *
- * Plotly.js is a peer dependency — this file expects window.Plotly to exist.
- */
-
-/**
  * Unwrap an Alpine reactive proxy to a plain object so structuredClone() works.
  * Alpine.raw() is the official API for this (Alpine 3.x).
  */
@@ -61,14 +52,6 @@ let _copiedTimer       = null    // clears the "Copied ✓" transient message
 let _resizeObserver    = null    // ResizeObserver for viewport gate
 let _lastStructuralSig = null    // last structural signature used to detect layer changes
 
-/**
- * Bootstrap the chart builder Alpine store.
- * Safe to call multiple times (idempotent after first call).
- *
- * @param {object} payload
- * @param {string} plotlyMissingMessage
- * @param {string} deleteConfirmMessage
- */
 /**
  * Deep-merge `defaults` into `target` without overwriting existing values.
  * Only plain objects are recursed; arrays and primitives are left as-is.
@@ -303,7 +286,7 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
             _tooSmall:             false,
 
 
-            // ── Conditional visibility helpers (PRD §8) ───────────────────
+            // ── Conditional visibility helpers ──
 
             /**
              * Alias: the active trace object.
@@ -486,7 +469,7 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
                 })
             },
 
-            // ── Validation (PRD §11) ──────────────────────────────────────
+            // ── Validation ──
 
             /**
              * Run all validations against current traces and dataSources.
@@ -566,7 +549,7 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
                 return trace
             },
 
-            // ── Trace operations (PRD §6) ─────────────────────────────────
+            // ── Trace operations ──
 
             /**
              * Append a new empty trace with the given type (defaults to first
@@ -759,12 +742,12 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
                 delete layout._annotations
             },
 
-            // ── Trace type switching (PRD §6) ─────────────────────────────
+            // ── Trace type switching ──
 
             /**
-             * Change a trace's type. If the profile is not yet cached,
-             * lazy-loads via $wire.getSchemaProfile(). On failure: revert +
-             * dispatch toast (PRD §11.2).
+     * Change a trace's type. If the profile is not yet cached,
+     * lazy-loads via $wire.getSchemaProfile(). On failure: revert +
+     * dispatch toast.
              *
              * @param {number} index
              * @param {string} newType
@@ -856,7 +839,7 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
 
 
 
-            // ── Export (PRD §10) ──────────────────────────────────────────
+            // ── Export ──
 
             _buildExportPayload() {
                 const data = toRaw(this.traces).map(t => this.compileTrace(t))
@@ -927,7 +910,7 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
                 document.body.removeChild(a)
             },
 
-            // ── Sync state ────────────────────────────────────────────────
+            // ── Sync state ──
 
             markDirty() {
                 this.dirty = true
@@ -1039,7 +1022,7 @@ function bootChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
         store._render()
     }
 
-    // ── Viewport gate (PRD §13.3) ─────────────────────────────────────────
+    // ── Viewport gate ──
     // Observe the root element's width. When it drops below 1024px, set the
     // _tooSmall flag (x-show hides the sidebar/canvas in Blade), purge Plotly
     // to release memory, and mark not-booted so it re-initialises on resize up.

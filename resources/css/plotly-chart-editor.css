@@ -1,15 +1,4 @@
-/*
- * plotly-chart-editor.css
- *
- * CSS variable theme (§13.1) + structural layout for the chart builder.
- * Consumers override variables in their own stylesheet to re-theme without
- * modifying package files.
- *
- * No Tailwind directives here — this is the published CSS asset.
- * The @theme block approach (Tailwind v4) is used when building via Vite.
- */
-
-/* ── CSS variables (PRD §13.1) ───────────────────────────────────────────── */
+/* ── CSS variables ── */
 :root {
     --plotly-editor-bg:           #ffffff;
     --plotly-editor-surface:      #f8fafc;
@@ -33,7 +22,7 @@
     color: var(--plotly-editor-text-muted);
 }
 
-/* ── Root container (PRD §13.2) ──────────────────────────────────────────── */
+/* ── Root container ── */
 .chart-builder {
     display: grid;
     grid-template-columns: var(--plotly-editor-sidebar-w) 1fr;
@@ -209,7 +198,7 @@
     border-color: var(--plotly-editor-accent);
 }
 
-/* ── Folds (Phase 6) ─────────────────────────────────────────────────────── */
+/* ── Folds ── */
 .chart-builder__fold {
     border: 1px solid var(--plotly-editor-border);
     border-radius: var(--plotly-editor-radius);
@@ -240,7 +229,7 @@
     border-bottom: 1px solid var(--plotly-editor-border);
 }
 
-/* ── Footer (Phase 7) ────────────────────────────────────────────────────── */
+/* ── Footer ── */
 .chart-builder__footer {
     grid-column: 1 / -1;
     display: flex;
@@ -347,7 +336,7 @@
     border-bottom: 1px solid var(--plotly-editor-border);
 }
 
-/* ── Primitives (Phase 6) ────────────────────────────────────────────────── */
+/* ── Primitives ── */
 .plotly-primitive {
     display: flex;
     flex-direction: column;
@@ -368,7 +357,7 @@
     padding: 0.5rem 0;
 }
 
-/* ── Buttons (Phase 5) ───────────────────────────────────────────────────── */
+/* ── Buttons ── */
 .chart-builder__btn {
     display: inline-flex;
     align-items: center;

@@ -31,7 +31,7 @@
         })();
     "
 >
-    {{-- ── Viewport-too-small placeholder (PRD §13.3) ───────────────── --}}
+    {{-- ── Viewport-too-small placeholder ── --}}
     <div
         class="chart-builder__too-small-msg"
         x-show="{{ $store }}._tooSmall"
