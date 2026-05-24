@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     $raw = json_decode(
-        file_get_contents(__DIR__.'/../../fixtures/african-countries.json'),
+        file_get_contents(__DIR__.'/../fixtures/african-countries.json'),
         true
     );
 
