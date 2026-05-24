@@ -23,23 +23,31 @@ A reactive chart builder for Laravel. This Livewire component gives your users a
 composer require uneca/plotly-chart-editor
 ```
 
-Publish the config and language files:
+Add these Blade directives to your layout's `<head>` **after** Plotly.js is loaded:
 
-```bash
-php artisan vendor:publish --tag="plotly-chart-editor-config"
-php artisan vendor:publish --tag="plotly-chart-editor-translations"
-php artisan vendor:publish --tag="plotly-chart-editor-assets"
-```
+```blade
+{{-- Plotly.js (required, choose one) --}}
 
-Load Plotly.js **before** `@livewireScripts` (Livewire 4 bundles Alpine; do not load Alpine separately):
-
-```html
+{{-- CDN --}}
 <script src="https://cdn.plot.ly/plotly-3.5.0.min.js"></script>
-<link rel="stylesheet" href="/vendor/plotly-chart-editor/plotly-chart-editor.css">
-<script src="/vendor/plotly-chart-editor/plotly-chart-editor.js"></script>
+
+{{-- OR via npm --}}
+{{-- npm install plotly.js-dist-min@^3.0.0 --}}
+{{-- resources/js/app.js:
+     import Plotly from 'plotly.js-dist-min';
+     window.Plotly = Plotly;
+--}}
+{{-- @vite('resources/js/app.js') --}}
+
+{{-- Package assets --}}
+@plotlyChartEditorStyles
+@plotlyChartEditorScripts
+
+{{-- Livewire 4 bundles Alpine; do not load Alpine separately --}}
+@livewireStyles
 ```
 
----
+Place `@livewireScripts` before `</body>`.
 
 ## Quick start
 
@@ -64,6 +72,35 @@ Full control:
     :show-export="true"
 />
 ```
+
+---
+
+## Layout
+
+The editor fills its container. For a full-page editor without scrollbars, wrap `<livewire:plotly-editor>` in a flex container with `height: 100vh`:
+
+**Inline style:**
+
+```blade
+<div style="height: 100vh; display: flex; flex-direction: column;">
+    {{-- Optional title bar --}}
+    <h1 style="flex-shrink: 0;">Edit chart</h1>
+
+    <livewire:plotly-editor ... />
+</div>
+```
+
+**Tailwind:**
+
+```blade
+<div class="h-screen flex flex-col">
+    <h1 class="shrink-0">Edit chart</h1>
+
+    <livewire:plotly-editor ... />
+</div>
+```
+
+The `@plotlyChartEditorStyles` directive includes the inner flex rules — only the wrapper needs explicit sizing.
 
 ---
 
@@ -177,8 +214,9 @@ class EditChart extends \Livewire\Component
 
 ```blade
 {{-- resources/views/livewire/edit-chart.blade.php --}}
-<div>
-    <h1>{{ $chart->title }}</h1>
+<div style="height: 100vh; display: flex; flex-direction: column;">
+    <h1 style="flex-shrink: 0;">{{ $chart->title }}</h1>
+
     <livewire:plotly-editor
         :data-sources="$rawDataset"
         :data="$chart->traces"
@@ -243,7 +281,7 @@ Livewire.on('chart-synced', ({ data, layout }) => {
 
 ---
 
-### Option D — Native Laravel event listener (new)
+### Option D — Native Laravel event listener
 
 The `ChartSynced` event class is dispatched alongside `chart-synced`. Register a listener.
 
@@ -273,7 +311,7 @@ class SaveChart
 
 ---
 
-### Option E — JS CustomEvent (new)
+### Option E — JS CustomEvent
 
 The package dispatches `plotly-chart-editor:synced` on `window`. Listen from any JS framework.
 
@@ -355,6 +393,22 @@ $request->validate([
     'chart' => ['required', new ValidChartConfig],
 ]);
 ```
+
+---
+
+## Publishing assets
+
+None of the following publishes are required for the editor to work. Use them only if you need to override defaults.
+
+```bash
+php artisan vendor:publish --tag="plotly-chart-editor-config"       # trace type profiles
+php artisan vendor:publish --tag="plotly-chart-editor-translations" # language strings
+php artisan vendor:publish --tag="plotly-chart-editor-assets"       # static JS/CSS to public/
+```
+
+- **Config:** Edit `config/plotly-chart-editor.php` to add or modify trace type profiles (see [Adding a new trace type profile](#adding-a-new-trace-type-profile)).
+- **Translations:** Override any string in `resources/lang/vendor/plotly-chart-editor`.
+- **Assets:** By default JS/CSS are served via package routes. Publishing to `public/vendor/` bypasses the PHP route for a minor production perf gain.
 
 ---
 
