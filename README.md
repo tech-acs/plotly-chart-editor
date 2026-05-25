@@ -266,6 +266,12 @@ class EditChart extends \Livewire\Component
 No wrapping needed. `PlotlyEditor` dispatches `chart-synced` as a browser event,
 so any other Livewire component on the page can listen and react.
 
+```blade
+{{-- Parent view --}}
+<livewire:plotly-editor :data-sources="$data" />
+<livewire:save-button />
+```
+
 **Frontend (JS):**
 
 ```blade
