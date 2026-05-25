@@ -18,7 +18,7 @@ A reactive chart builder for Laravel. This Livewire component gives your users a
 - [Persisting charts](#persisting-charts)
   - [Example migration](#example-migration)
   - [Option A — Host Livewire component](#option-a--host-livewire-component-wrapping)
-  - [Option B — JS bridge](#option-b--js-bridge-to-a-sibling-livewire-component)
+  - [Option B — Listen directly from a sibling component](#option-b--listen-directly-from-a-sibling-component)
   - [Option C — Plain JS + HTTP](#option-c--plain-js--http-request)
   - [Option D — Native Laravel event](#option-d--native-laravel-event-listener)
   - [Option E — JS CustomEvent](#option-e--js-customevent)
