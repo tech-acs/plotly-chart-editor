@@ -1,6 +1,11 @@
 @php
     $store    = "Alpine.store('chartBuilder')";
     $atrace   = "({$store}.traces[{$store}.activeTraceIndex] ?? {})"; // active trace object (safe empty fallback)
+
+    $traceLabel = __('plotly-chart-editor::plotly-chart-editor.trace_label', ['n' => '%s']);
+    if ($traceLabel === 'plotly-chart-editor::plotly-chart-editor.trace_label') {
+        $traceLabel = 'Trace %s';
+    }
 @endphp
 
 <div
@@ -93,7 +98,7 @@
                     >
                         <span
                             class="chart-builder__trace-name"
-                            x-text="trace.name || `{{ __('plotly-chart-editor::plotly-chart-editor.trace_label', ['n' => '${index + 1}']) }}`"
+                            x-text="trace.name || @js($traceLabel).replace('%s', index + 1)"
                         ></span>
                         <div class="chart-builder__trace-actions">
                             <button
