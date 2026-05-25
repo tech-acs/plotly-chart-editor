@@ -4,7 +4,7 @@ A reactive chart builder for Laravel. This Livewire component gives your users a
 
 - **Composer:** `uneca/plotly-chart-editor`
 - **License:** MIT
-- **Stack:** PHP 8.4 · Laravel 13 · Livewire ^3.0 \|\| ^4.0 · Alpine 3 · Plotly.js 3.x (peer dep)
+- **Stack:** PHP 8.4 · Laravel 12 \|\| 13 · Livewire ^3.0 \|\| ^4.0 · Alpine 3 · Plotly.js 3.x (peer dep)
 
 ---
 
@@ -35,7 +35,7 @@ A reactive chart builder for Laravel. This Livewire component gives your users a
 ## Requirements
 
 - PHP 8.4+
-- Laravel 13.x
+- Laravel 12.x or 13.x
 - Livewire 3.x or 4.x
 - Plotly.js exposed as `window.Plotly` in your app bundle (peer dependency — not shipped by this package)
 
