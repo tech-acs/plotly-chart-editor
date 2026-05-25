@@ -261,23 +261,30 @@ class EditChart extends \Livewire\Component
 
 ---
 
-### Option B — JS bridge to a sibling Livewire component
+### Option B — Listen directly from a sibling component
 
-No wrapping needed. Listen with `Livewire.on()` and forward to any component on the page.
+No wrapping needed. `PlotlyEditor` dispatches `chart-synced` as a browser event,
+so any other Livewire component on the page can listen and react.
 
 ```blade
+{{-- Parent view --}}
 <livewire:plotly-editor :data-sources="$data" />
-<livewire:save-button />  {{-- or any component --}}
-
-<script>
-Livewire.on('chart-synced', (event) => {
-    Livewire.dispatchTo('save-button', 'chart-synced', event);
-    // Livewire v3: Livewire.emitTo('save-button', 'chart-synced', event);
-});
+<livewire:save-button />
 ```
 
-**Pros:** No wrapping — components stay independent.
-**Cons:** Requires a small JS snippet.
+```blade
+{{-- resources/views/livewire/save-button.blade.php --}}
+@script
+<script>
+Livewire.on('chart-synced', ({ data, layout }) => {
+    // Persist $data and $layout however you like
+});
+</script>
+@endscript
+```
+
+**Pros:** No wrapping — components stay independent. No extra script on the parent page.
+**Cons:** The listening component must register a `Livewire.on` handler.
 
 ---
 
