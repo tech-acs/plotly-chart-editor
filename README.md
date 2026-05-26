@@ -307,7 +307,7 @@ class SaveButton extends Component
 }
 ```
 
-**Pros:** No wrapping — components stay independent. Backend approach needs no JS.
+**Pros:** No wrapping — components stay independent. Backend approach needs no JS.  
 **Cons:** The sibling component must register a listener (JS or `#[On]`).
 
 ---
