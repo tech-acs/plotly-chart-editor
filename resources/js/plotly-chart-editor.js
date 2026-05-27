@@ -224,6 +224,40 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
         LAYOUT_DEFAULTS
     )
 
+    // Derive primary trace colors from the layout's colorway when not
+    // explicitly set on the trace, so the sidebar swatch matches what
+    // Plotly renders. Colorway is the user-configured palette (set via
+    // the dashboard's color profile). Other color fields (borders,
+    // hover labels, fonts) keep their schema defaults.
+    const PRIMARY_COLOR_KEYS = ['marker.color', 'line.color', 'fillcolor']
+    const colorway = payload.layout?.colorway ?? LAYOUT_DEFAULTS.colorway
+    if (payload.traces && Array.isArray(payload.traces)) {
+        payload.traces.forEach((trace, index) => {
+            const paletteColor = colorway[index % colorway.length]
+            for (const key of PRIMARY_COLOR_KEYS) {
+                // Check if already explicitly set (via dot-path traversal)
+                const keys = key.split('.')
+                let cur = trace
+                let exists = true
+                for (const k of keys) {
+                    if (cur === undefined || cur[k] === undefined) { exists = false; break }
+                    cur = cur[k]
+                }
+                if (exists) continue
+                // Set from colorway
+                let target = trace
+                for (let i = 0; i < keys.length - 1; i++) {
+                    if (target[keys[i]] == null || typeof target[keys[i]] !== 'object') {
+                        target[keys[i]] = {}
+                    }
+                    target = target[keys[i]]
+                }
+                target[keys[keys.length - 1]] = paletteColor
+            }
+        })
+    }
+    
+    
     // Convert Plotly-native annotations/shapes/images to internal _annotations
     if (layout.annotations && Array.isArray(layout.annotations)) {
         layout._annotations = layout._annotations.concat(
