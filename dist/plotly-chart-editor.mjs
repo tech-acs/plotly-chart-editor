@@ -223,8 +223,28 @@ var y = {
 };
 function x(c, g, x, S, C, w) {
 	u = x ?? u, d = S ?? d, f = C ?? f, p = w ?? p;
-	let T = c.layout ?? {}, E = v(Array.isArray(T) ? {} : T, y);
-	E.annotations && Array.isArray(E.annotations) && (E._annotations = E._annotations.concat(E.annotations.map((e) => ({
+	let T = c.layout ?? {}, E = v(Array.isArray(T) ? {} : T, y), D = [
+		"marker.color",
+		"line.color",
+		"fillcolor"
+	], O = c.layout?.colorway ?? y.colorway;
+	c.traces && Array.isArray(c.traces) && c.traces.forEach((e, t) => {
+		let n = O[t % O.length];
+		for (let t of D) {
+			let r = t.split("."), i = e, a = !0;
+			for (let e of r) {
+				if (i === void 0 || i[e] === void 0) {
+					a = !1;
+					break;
+				}
+				i = i[e];
+			}
+			if (a) continue;
+			let o = e;
+			for (let e = 0; e < r.length - 1; e++) (o[r[e]] == null || typeof o[r[e]] != "object") && (o[r[e]] = {}), o = o[r[e]];
+			o[r[r.length - 1]] = n;
+		}
+	}), E.annotations && Array.isArray(E.annotations) && (E._annotations = E._annotations.concat(E.annotations.map((e) => ({
 		...e,
 		_plotlyType: "text"
 	}))), delete E.annotations), E.shapes && Array.isArray(E.shapes) && (E._annotations = E._annotations.concat(E.shapes.map((e) => ({
