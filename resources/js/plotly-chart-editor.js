@@ -300,7 +300,8 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
             // ── Sync / UI config ──────────────────────────────────────────
             syncMode:   payload.syncMode   ?? 'manual',
             traceTypes: payload.traceTypes ?? ['bar', 'scatter', 'pie', 'histogram', 'line', 'area'],
-            showExport: payload.showExport ?? true,
+            showExport:     payload.showExport     ?? true,
+            showDataViewer: payload.showDataViewer ?? true,
 
             // ── Derived ───────────────────────────────────────────────────
             activeTraceIndex: 0,

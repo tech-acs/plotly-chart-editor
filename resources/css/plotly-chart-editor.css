@@ -550,3 +550,68 @@
     padding-top: 0.5rem;
     border-top: 1px solid var(--plotly-editor-border);
 }
+
+/* ── Data viewer modal ──────────────────────────────────────────────────── */
+.chart-builder__modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.chart-builder__modal {
+    background: var(--plotly-editor-bg);
+    border-radius: var(--plotly-editor-radius);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    width: min(90vw, 900px);
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-builder__modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--plotly-editor-border);
+}
+
+.chart-builder__modal-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.chart-builder__modal-body {
+    overflow: auto;
+    padding: 0;
+}
+
+.chart-builder__data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+}
+
+.chart-builder__data-table th,
+.chart-builder__data-table td {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--plotly-editor-border);
+    white-space: nowrap;
+}
+
+.chart-builder__data-table th {
+    background: var(--plotly-editor-surface);
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.chart-builder__data-table tbody tr:hover {
+    background: color-mix(in srgb, var(--plotly-editor-accent) 5%, transparent);
+}

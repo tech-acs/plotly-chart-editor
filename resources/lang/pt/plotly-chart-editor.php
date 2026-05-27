@@ -110,6 +110,9 @@ return [
         'svg' => 'Imagem SVG',
         'copy' => 'Copiar para a área de transferência',
         'copied' => 'Copiado ✓',
+        'view_data' => 'Dados',
+        'view_data_title' => 'Dados do gráfico',
+        'view_data_empty' => 'Nenhum dado disponível.',
     ],
 
     'sync' => [

@@ -124,6 +124,9 @@ return [
         'svg' => 'SVG image',
         'copy' => 'Copy to clipboard',
         'copied' => 'Copied ✓',
+        'view_data' => 'Data',
+        'view_data_title' => 'Chart Data',
+        'view_data_empty' => 'No data available.',
     ],
 
     'sync' => [

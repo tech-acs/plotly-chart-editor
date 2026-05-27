@@ -14,6 +14,7 @@ A reactive chart builder for Laravel. This Livewire component gives your users a
 - [Layout](#layout)
 - [Props](#props)
 - [Sync modes](#sync-modes)
+- [Data viewer](#data-viewer)
 - [Events](#events)
 - [Persisting charts](#persisting-charts)
   - [Example migration](#example-migration)
@@ -29,6 +30,7 @@ A reactive chart builder for Laravel. This Livewire component gives your users a
 - [Publishing assets](#publishing-assets)
 - [Theming](#theming)
 - [Adding a new trace type profile](#adding-a-new-trace-type-profile)
+- [Recent improvements](#recent-improvements)
 - [Development](#development)
 - [License](#license)
 
@@ -100,6 +102,7 @@ Full control:
     :preload-schema="true"
     :sync-mode="'hybrid'"
     :show-export="true"
+    :show-data-viewer="true"
 />
 ```
 
@@ -146,6 +149,7 @@ The `@plotlyChartEditorStyles` directive includes the inner flex rules — only 
 | `preloadSchema` | `bool` | `true` | Load all enabled schema profiles on mount. |
 | `syncMode` | `string` | `'manual'` | `manual` \| `auto` \| `hybrid` (see Sync modes below). |
 | `showExport` | `bool` | `true` | Show the Export dropdown in the footer. |
+| `showDataViewer` | `bool` | `true` | Show the Data viewer button in the footer. |
 
 ### `dataSources` shape
 
@@ -167,6 +171,14 @@ All columns should be the same length. Length mismatches produce a non-blocking 
 | `manual` | Syncs only when the user clicks Save. | Visible |
 | `auto` | Debounced (~500ms) sync after each mutation. Shows "Synced ✓" on success. | Hidden |
 | `hybrid` | Auto-sync AND a Save button for forced immediate sync. | Visible |
+
+---
+
+## Data viewer
+
+The footer includes a **Data** button (visible when `showDataViewer` is `true`, which is the default) that opens a modal table of all `dataSources` columns. Each column key is a table header, and the rows display the corresponding array values. This is read-only — for editing column values, modify the `dataSources` prop.
+
+The modal can be closed by clicking the × button, clicking the overlay backdrop, or pressing <kbd>Escape</kbd>.
 
 ---
 

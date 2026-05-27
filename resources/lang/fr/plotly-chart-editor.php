@@ -110,6 +110,9 @@ return [
         'svg' => 'Image SVG',
         'copy' => 'Copier dans le presse-papier',
         'copied' => 'Copié ✓',
+        'view_data' => 'Données',
+        'view_data_title' => 'Données du graphique',
+        'view_data_empty' => 'Aucune donnée disponible.',
     ],
 
     'sync' => [

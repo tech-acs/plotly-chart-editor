@@ -269,6 +269,7 @@ function x(c, g, x, S, C, w) {
 			"area"
 		],
 		showExport: c.showExport ?? !0,
+		showDataViewer: c.showDataViewer ?? !0,
 		activeTraceIndex: 0,
 		activeAxis: "x",
 		warnings: [],

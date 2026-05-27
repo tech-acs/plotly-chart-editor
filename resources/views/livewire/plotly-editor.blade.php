@@ -20,6 +20,7 @@
         'traceTypes'     => $traceTypes,
         'syncMode'       => $syncMode,
         'showExport'     => $showExport,
+        'showDataViewer' => $showDataViewer,
         'schemaProfiles' => empty($schemaProfiles) ? (object) [] : $schemaProfiles,
     ]) }}"
     x-data
@@ -1363,6 +1364,14 @@
             </div>
         </div>
 
+        {{-- View Data button — opens data viewer modal --}}
+        <button
+            type="button"
+            class="chart-builder__btn"
+            x-show="{{ $store }}.showDataViewer"
+            @click="$dispatch('open-data-viewer')"
+        >{{ __('plotly-chart-editor::plotly-chart-editor.export.view_data') }}</button>
+
         {{-- Save button: visible in manual + hybrid, hidden in auto --}}
         <button
             type="button"
@@ -1374,6 +1383,64 @@
                 ? @js(__('plotly-chart-editor::plotly-chart-editor.sync.saving'))
                 : @js(__('plotly-chart-editor::plotly-chart-editor.sync.save_button'))"
         ></button>
+
+    {{-- ═══ DATA VIEWER MODAL ═══ --}}
+    <div
+        x-data="{ open: false }"
+        x-on:open-data-viewer.window="open = true"
+        x-show="open"
+        x-cloak
+        class="chart-builder__modal-overlay"
+        @click.self="open = false"
+        @keydown.escape.window="open = false"
+    >
+        <div class="chart-builder__modal">
+            <div class="chart-builder__modal-header">
+                <span class="chart-builder__modal-title">
+                    {{ __('plotly-chart-editor::plotly-chart-editor.export.view_data_title') }}
+                </span>
+                <button
+                    type="button"
+                    class="chart-builder__btn chart-builder__btn--icon"
+                    @click="open = false"
+                >×</button>
+            </div>
+            <div class="chart-builder__modal-body">
+                {{-- Empty state --}}
+                <p
+                    class="chart-builder__no-profile"
+                    x-show="Object.keys({{ $store }}.dataSources).length === 0"
+                >{{ __('plotly-chart-editor::plotly-chart-editor.export.view_data_empty') }}</p>
+
+                {{-- Data table --}}
+                <table
+                    class="chart-builder__data-table"
+                    x-show="Object.keys({{ $store }}.dataSources).length > 0"
+                >
+                    <thead>
+                        <tr>
+                            <template x-for="col in Object.keys({{ $store }}.dataSources)" :key="col">
+                                <th x-text="col"></th>
+                            </template>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template
+                            x-for="(_, rowIdx) in (Object.values({{ $store }}.dataSources)[0] ?? [])"
+                            :key="rowIdx"
+                        >
+                            <tr>
+                                <template x-for="col in Object.keys({{ $store }}.dataSources)" :key="col">
+                                    <td x-text="{{ $store }}.dataSources[col]?.[rowIdx] ?? ''"></td>
+                                </template>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     </div>
 
 </div>

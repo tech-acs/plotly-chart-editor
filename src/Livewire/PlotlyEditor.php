@@ -36,6 +36,9 @@ class PlotlyEditor extends Component
     /** @var bool Show export buttons in footer. */
     public bool $showExport = true;
 
+    /** @var bool Show Data viewer button in footer. */
+    public bool $showDataViewer = true;
+
     /** @var array<string, array<mixed>> Pre-loaded schema profiles (populated during mount). */
     public array $schemaProfiles = [];
 
@@ -57,6 +60,7 @@ class PlotlyEditor extends Component
         string $syncMode = 'manual',
         bool $preloadSchema = true,
         bool $showExport = true,
+        bool $showDataViewer = true,
     ): void {
         if (empty($dataSources)) {
             throw new InvalidArgumentException(
@@ -72,6 +76,7 @@ class PlotlyEditor extends Component
         $this->syncMode = $syncMode;
         $this->preloadSchema = $preloadSchema;
         $this->showExport = $showExport;
+        $this->showDataViewer = $showDataViewer;
 
         if ($preloadSchema) {
             $this->schemaProfiles = $this->makeLoader()->loadAll($traceTypes);
