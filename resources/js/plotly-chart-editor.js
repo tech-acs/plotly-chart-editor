@@ -610,6 +610,17 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
                         }
                     }
                 }
+                // Cycle primary trace colour from the layout colourway so every
+                // new trace gets a distinct colour instead of all sharing the
+                // profile's hard-coded default (e.g. #1f77b4).
+                const cw = this.layout.colorway ?? ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+                const colorFields = ['marker.color', 'line.color', 'fillcolor']
+                for (const key of colorFields) {
+                    if (this.getPath(trace, key) !== undefined) {
+                        this.setPath(trace, key, cw[this.traces.length % cw.length])
+                        break
+                    }
+                }
                 this.traces.push(trace)
                 this.activeTraceIndex = this.traces.length - 1
             },

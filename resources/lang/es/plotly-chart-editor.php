@@ -246,6 +246,7 @@ return [
         'line_width' => 'Ancho de línea',
         'textinfo' => 'Información de texto',
         'texttemplate' => 'Plantilla de texto',
+        'textangle' => 'Ángulo',
         'pull' => 'Extraer',
         'nbinsx' => 'N.º de intervalos',
         'histnorm' => 'Normalización',

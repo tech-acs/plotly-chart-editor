@@ -260,6 +260,7 @@ return [
         'line_width' => 'Line width',
         'textinfo' => 'Text info',
         'texttemplate' => 'Text template',
+        'textangle' => 'Angle',
         'pull' => 'Pull',
         'nbinsx' => 'Bin count',
         'histnorm' => 'Normalisation',

@@ -246,6 +246,7 @@ return [
         'line_width' => 'Largura da linha',
         'textinfo' => 'Info do texto',
         'texttemplate' => 'Modelo de texto',
+        'textangle' => 'Ângulo',
         'pull' => 'Puxar',
         'nbinsx' => 'N.º de intervalos',
         'histnorm' => 'Normalização',

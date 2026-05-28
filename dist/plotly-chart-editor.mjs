@@ -376,6 +376,26 @@ function x(c, g, x, S, C, w) {
 				meta: { columnNames: {} }
 			}, i = this.schemaProfiles[n];
 			if (i) for (let e of Object.values(i.groups)) for (let t of e.fields) t.dflt !== void 0 && this.setPath(r, t.key, t.dflt);
+			let a = this.layout.colorway ?? [
+				"#1f77b4",
+				"#ff7f0e",
+				"#2ca02c",
+				"#d62728",
+				"#9467bd",
+				"#8c564b",
+				"#e377c2",
+				"#7f7f7f",
+				"#bcbd22",
+				"#17becf"
+			];
+			for (let e of [
+				"marker.color",
+				"line.color",
+				"fillcolor"
+			]) if (this.getPath(r, e) !== void 0) {
+				this.setPath(r, e, a[this.traces.length % a.length]);
+				break;
+			}
 			this.traces.push(r), this.activeTraceIndex = this.traces.length - 1;
 		},
 		duplicateTrace(n) {

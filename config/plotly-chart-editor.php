@@ -116,6 +116,57 @@ return [
                         ],
                     ],
                 ],
+                'Text' => [
+                    'label' => 'plotly-chart-editor::plotly-chart-editor.groups.text',
+                    'fields' => [
+                        [
+                            'key' => 'text',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.text',
+                            'type' => 'column',
+                        ],
+                        [
+                            'key' => 'textposition',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.textposition',
+                            'type' => 'enumerated',
+                            'values' => ['inside', 'outside', 'auto', 'none'],
+                            'dflt' => 'auto',
+                        ],
+                        [
+                            'key' => 'texttemplate',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.texttemplate',
+                            'type' => 'text',
+                        ],
+                        [
+                            'key' => 'textangle',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.textangle',
+                            'type' => 'range',
+                            'min' => -180,
+                            'max' => 180,
+                            'dflt' => 'auto',
+                        ],
+                        [
+                            'key' => 'textfont.family',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.font_family',
+                            'type' => 'enumerated',
+                            'values' => ['Arial', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'system-ui'],
+                            'dflt' => 'Arial',
+                        ],
+                        [
+                            'key' => 'textfont.size',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.font_size',
+                            'type' => 'number',
+                            'min' => 8,
+                            'max' => 48,
+                            'dflt' => 12,
+                        ],
+                        [
+                            'key' => 'textfont.color',
+                            'label' => 'plotly-chart-editor::plotly-chart-editor.fields.font_color',
+                            'type' => 'color',
+                            'dflt' => '#444444',
+                        ],
+                    ],
+                ],
                 'Hover' => [
                     'label' => 'plotly-chart-editor::plotly-chart-editor.groups.hover',
                     'fields' => [
