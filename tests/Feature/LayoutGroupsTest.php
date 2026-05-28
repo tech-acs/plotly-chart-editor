@@ -95,7 +95,7 @@ it('layout_groups labels are translated in the profile', function (): void {
     expect($profile['layout_groups']['BarLayout']['label'])
         ->toBe('Bar Layout')
         ->and($profile['layout_groups']['BarLayout']['fields'][0]['label'])
-        ->toBe('Bar mode');
+        ->toBe('Mode');
 });
 
 it('layout_groups are rendered in the component HTML', function (): void {

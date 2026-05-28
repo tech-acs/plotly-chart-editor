@@ -32,7 +32,7 @@ it('translates layout_groups labels', function () use ($baseConfig): void {
 
     expect($profile)->toHaveKey('layout_groups')
         ->and($profile['layout_groups']['BarLayout']['label'])->toBe('Bar Layout')
-        ->and($profile['layout_groups']['BarLayout']['fields'][0]['label'])->toBe('Bar mode');
+        ->and($profile['layout_groups']['BarLayout']['fields'][0]['label'])->toBe('Mode');
 });
 
 it('includes layout_groups only for profiles that define them', function () use ($baseConfig): void {

@@ -242,8 +242,8 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
+    gap: 0.6rem;
+    padding: 0.85rem 0.9rem;
     border-top: 1px solid var(--plotly-editor-border);
     background: var(--plotly-editor-surface);
 }
@@ -279,7 +279,7 @@
 /* ── Save button ─────────────────────────────────────────────────────────── */
 .chart-builder__btn--save {
     font-weight: 600;
-    padding: 0.3rem 0.9rem;
+    padding: 0.4rem 1.1rem;
     background: var(--plotly-editor-accent);
     color: var(--plotly-editor-accent-fg);
     border-color: var(--plotly-editor-accent);
@@ -373,9 +373,9 @@
     border-radius: var(--plotly-editor-radius);
     background: var(--plotly-editor-bg);
     color: var(--plotly-editor-text);
-    font-size: 0.8125rem;
+    font-size: 1rem;
     font-family: inherit;
-    padding: 0.25rem 0.5rem;
+    padding: 0.35rem 0.7rem;
     cursor: pointer;
     line-height: 1;
     transition: background 0.1s, border-color 0.1s;
