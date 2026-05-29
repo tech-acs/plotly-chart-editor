@@ -52,6 +52,7 @@ return [
     'confirmations' => [
         'delete_trace' => 'Delete this trace? This cannot be undone.',
         'delete_annotation' => 'Delete this annotation? This cannot be undone.',
+        'clear_all' => 'Remove all traces and reset the layout?',
     ],
 
     'ui' => [
@@ -110,6 +111,7 @@ return [
         'hover_label' => 'Hover label',
         'defaults' => 'Defaults',
         'global_font' => 'Global font',
+        'clear_all' => 'Clear All',
 
     ],
 

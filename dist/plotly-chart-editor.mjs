@@ -9,12 +9,12 @@ var n = null, r = { area: "scatter" }, i = { area: {
 	mode: "none",
 	fill: "tozeroy",
 	fillcolor: "#1f77b4"
-} }, a = null, o = null, s = null, c = !1, l = !1, u = "Delete this trace? This cannot be undone.", d = "Delete this annotation? This cannot be undone.", f = "Column ':field' has :colLen values but trace expects :expectedLen. Showing first :shown.", p = "Failed to load profile for :type. Please try again.", m = null, h = null, g = null, _ = null;
-function v(e, t) {
-	for (let [n, r] of Object.entries(t)) e[n] === void 0 || e[n] === null || typeof e[n] != typeof r ? e[n] = structuredClone(r) : typeof r == "object" && !Array.isArray(r) && typeof e[n] == "object" && !Array.isArray(e[n]) && v(e[n], r);
+} }, a = null, o = null, s = null, c = !1, l = !1, u = "Delete this trace? This cannot be undone.", d = "Delete this annotation? This cannot be undone.", f = "Column ':field' has :colLen values but trace expects :expectedLen. Showing first :shown.", p = "Failed to load profile for :type. Please try again.", m = "Remove all traces and reset the layout?", h = null, g = null, _ = null, v = null, y = null;
+function b(e, t) {
+	for (let [n, r] of Object.entries(t)) e[n] === void 0 || e[n] === null || typeof e[n] != typeof r ? e[n] = structuredClone(r) : typeof r == "object" && !Array.isArray(r) && typeof e[n] == "object" && !Array.isArray(e[n]) && b(e[n], r);
 	return e;
 }
-var y = {
+var x = {
 	title: {
 		text: "",
 		font: {
@@ -156,7 +156,7 @@ var y = {
 		},
 		align: "auto"
 	}
-}, b = {
+}, S = {
 	text: {
 		_plotlyType: "text",
 		text: "new text",
@@ -221,16 +221,18 @@ var y = {
 		opacity: 1
 	}
 };
-function x(c, g, x, S, C, w) {
-	u = x ?? u, d = S ?? d, f = C ?? f, p = w ?? p;
-	let T = c.layout ?? {}, E = v(Array.isArray(T) ? {} : T, y), D = [
+function C(c, v, C, w, T, E, D) {
+	u = C ?? u, d = w ?? d, f = T ?? f, p = E ?? p, m = D ?? m;
+	let O = c.layout ?? {}, k = b(Array.isArray(O) ? {} : O, x);
+	h = t(k);
+	let A = [
 		"marker.color",
 		"line.color",
 		"fillcolor"
-	], O = c.layout?.colorway ?? y.colorway;
+	], j = c.layout?.colorway ?? x.colorway;
 	c.traces && Array.isArray(c.traces) && c.traces.forEach((e, t) => {
-		let n = O[t % O.length];
-		for (let t of D) {
+		let n = j[t % j.length];
+		for (let t of A) {
 			let r = t.split("."), i = e, a = !0;
 			for (let e of r) {
 				if (i === void 0 || i[e] === void 0) {
@@ -244,20 +246,20 @@ function x(c, g, x, S, C, w) {
 			for (let e = 0; e < r.length - 1; e++) (o[r[e]] == null || typeof o[r[e]] != "object") && (o[r[e]] = {}), o = o[r[e]];
 			o[r[r.length - 1]] = n;
 		}
-	}), E.annotations && Array.isArray(E.annotations) && (E._annotations = E._annotations.concat(E.annotations.map((e) => ({
+	}), k.annotations && Array.isArray(k.annotations) && (k._annotations = k._annotations.concat(k.annotations.map((e) => ({
 		...e,
 		_plotlyType: "text"
-	}))), delete E.annotations), E.shapes && Array.isArray(E.shapes) && (E._annotations = E._annotations.concat(E.shapes.map((e) => ({
+	}))), delete k.annotations), k.shapes && Array.isArray(k.shapes) && (k._annotations = k._annotations.concat(k.shapes.map((e) => ({
 		...e,
 		_plotlyType: "shape"
-	}))), delete E.shapes), E.images && Array.isArray(E.images) && (E._annotations = E._annotations.concat(E.images.map((e) => ({
+	}))), delete k.shapes), k.images && Array.isArray(k.images) && (k._annotations = k._annotations.concat(k.images.map((e) => ({
 		...e,
 		_plotlyType: "image"
-	}))), delete E.images), Alpine.store("chartBuilder") || Alpine.store("chartBuilder", {
+	}))), delete k.images), Alpine.store("chartBuilder") || Alpine.store("chartBuilder", {
 		dataSources: c.dataSources ?? {},
 		schemaProfiles: c.schemaProfiles ?? {},
 		traces: c.traces ?? [],
-		layout: E,
+		layout: k,
 		config: c.config ?? { responsive: !0 },
 		syncMode: c.syncMode ?? "manual",
 		traceTypes: c.traceTypes ?? [
@@ -278,7 +280,7 @@ function x(c, g, x, S, C, w) {
 		lastSyncAt: null,
 		savedAt: null,
 		copiedAt: null,
-		_plotlyMissingMessage: g,
+		_plotlyMissingMessage: v,
 		_plotlyMissing: !1,
 		_tooSmall: !1,
 		get trace() {
@@ -335,8 +337,8 @@ function x(c, g, x, S, C, w) {
 				type: e.type,
 				mode: e.mode,
 				columnNames: e.meta?.columnNames
-			}))), o = i !== _;
-			_ = i, r.uirevision = i, (o ? (window.Plotly.purge(a), window.Plotly.newPlot) : window.Plotly.react)(a, n, r, t(this.config)).catch((e) => {
+			}))), o = i !== y;
+			y = i, r.uirevision = i, (o ? (window.Plotly.purge(a), window.Plotly.newPlot) : window.Plotly.react)(a, n, r, t(this.config)).catch((e) => {
 				console.error("[plotly-chart-editor] Plotly render failed:", e);
 			});
 		},
@@ -406,6 +408,9 @@ function x(c, g, x, S, C, w) {
 			let t = e ?? this.activeTraceIndex;
 			window.confirm(u) && (this.traces.splice(t, 1), this.traces.length === 0 ? this.activeTraceIndex = 0 : this.activeTraceIndex >= this.traces.length && (this.activeTraceIndex = this.traces.length - 1));
 		},
+		clearAll() {
+			window.confirm(m) && (this.traces.splice(0, this.traces.length), this.activeTraceIndex = 0, this.layout = t(h), this.markDirty());
+		},
 		moveTrace(n, r) {
 			let i = this.traces.length;
 			if (r < 0 || r >= i) return;
@@ -421,7 +426,7 @@ function x(c, g, x, S, C, w) {
 			this.moveTrace(t, t + 1);
 		},
 		addAnnotation(e) {
-			let n = b[e];
+			let n = S[e];
 			n && (this.layout._annotations || (this.layout._annotations = []), this.layout._annotations.push(t(n)), this._scheduleRender());
 		},
 		removeAnnotation(e) {
@@ -518,7 +523,7 @@ function x(c, g, x, S, C, w) {
 		},
 		async copyConfig() {
 			try {
-				await navigator.clipboard.writeText(this._buildExportPayload()), this.copiedAt = Date.now(), clearTimeout(h), h = setTimeout(() => {
+				await navigator.clipboard.writeText(this._buildExportPayload()), this.copiedAt = Date.now(), clearTimeout(_), _ = setTimeout(() => {
 					this.copiedAt = null;
 				}, 2e3);
 			} catch (e) {
@@ -530,7 +535,7 @@ function x(c, g, x, S, C, w) {
 			i.href = r ? n : `data:${t};charset=utf-8,${encodeURIComponent(n)}`, i.download = e, i.style.display = "none", document.body.appendChild(i), i.click(), document.body.removeChild(i);
 		},
 		markDirty() {
-			this.dirty = !0, this._maybeAutoSync();
+			this.dirty || window.dispatchEvent(new CustomEvent("plotly-editor-dirty")), this.dirty = !0, this._maybeAutoSync();
 		},
 		_maybeAutoSync() {
 			(this.syncMode === "auto" || this.syncMode === "hybrid") && (clearTimeout(s), s = setTimeout(() => this.syncToBackend(), 500));
@@ -555,7 +560,7 @@ function x(c, g, x, S, C, w) {
 				layout: i
 			};
 			n.syncFromAlpine(JSON.stringify(a)).then(() => {
-				this.dirty = !1, this.savedAt = Date.now(), clearTimeout(m), m = setTimeout(() => {
+				this.dirty = !1, window.dispatchEvent(new CustomEvent("plotly-editor-clean")), this.savedAt = Date.now(), clearTimeout(g), g = setTimeout(() => {
 					this.savedAt = null;
 				}, 2e3), window.dispatchEvent(new CustomEvent("plotly-chart-editor:synced", { detail: {
 					traces: a.traces,
@@ -572,24 +577,24 @@ function x(c, g, x, S, C, w) {
 		}
 	});
 }
-function S(e, t, r, i, o, s, u, d) {
-	x(e, t, r, i, u, d);
-	let f = Alpine.store("chartBuilder");
+function w(e, t, r, i, o, s, u, d, f) {
+	C(e, t, r, i, u, d, f);
+	let p = Alpine.store("chartBuilder");
 	if (a = o, n = s, window.Plotly === void 0) {
-		f._plotlyMissing = !0, o && (o.textContent = t);
+		p._plotlyMissing = !0, o && (o.textContent = t);
 		return;
 	}
-	c && f._render(), g && g.disconnect();
-	let p = o?.closest(".chart-builder");
-	p && typeof ResizeObserver < "u" && (g = new ResizeObserver((e) => {
+	c && p._render(), v && v.disconnect();
+	let m = o?.closest(".chart-builder");
+	m && typeof ResizeObserver < "u" && (v = new ResizeObserver((e) => {
 		let t = (e[0]?.contentRect?.width ?? window.innerWidth) < 1024;
-		f._tooSmall = t, t && a && window.Plotly !== void 0 && (window.Plotly.purge(a), c = !1);
-	}), g.observe(p)), o && typeof ResizeObserver < "u" && new ResizeObserver(() => {
-		if (f._plotlyMissing || window.Plotly === void 0 || f._tooSmall) return;
+		p._tooSmall = t, t && a && window.Plotly !== void 0 && (window.Plotly.purge(a), c = !1);
+	}), v.observe(m)), o && typeof ResizeObserver < "u" && new ResizeObserver(() => {
+		if (p._plotlyMissing || window.Plotly === void 0 || p._tooSmall) return;
 		let e = o.getBoundingClientRect();
-		e.width === 0 || e.height === 0 || (c ? window.Plotly.Plots.resize(o) : (l = !0, f._startEffects(), c = !0, f._render()));
+		e.width === 0 || e.height === 0 || (c ? window.Plotly.Plots.resize(o) : (l = !0, p._startEffects(), c = !0, p._render()));
 	}).observe(o);
 }
-typeof window < "u" && (window.initChartBuilder = x, window.bootChartBuilder = S);
+typeof window < "u" && (window.initChartBuilder = C, window.bootChartBuilder = w);
 //#endregion
-export { S as bootChartBuilder, x as initChartBuilder };
+export { w as bootChartBuilder, C as initChartBuilder };

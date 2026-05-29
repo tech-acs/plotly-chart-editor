@@ -47,6 +47,8 @@ let _deleteConfirmMsg  = 'Delete this trace? This cannot be undone.'
 let _deleteAnnotationConfirmMsg = 'Delete this annotation? This cannot be undone.'
 let _lengthMismatchMsg      = "Column ':field' has :colLen values but trace expects :expectedLen. Showing first :shown."
 let _profileLoadFailedMsg   = 'Failed to load profile for :type. Please try again.'
+let _clearAllConfirmMsg     = 'Remove all traces and reset the layout?'
+let _initialLayout          = null
 let _savedTimer        = null    // clears the "Saved ✓" transient message
 let _copiedTimer       = null    // clears the "Copied ✓" transient message
 let _resizeObserver    = null    // ResizeObserver for viewport gate
@@ -209,11 +211,12 @@ const _ANNOTATION_SCAFFOLDS = {
     },
 }
 
-function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, deleteAnnotationConfirmMessage, lengthMismatchMsg, profileLoadFailedMsg) {
+function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, deleteAnnotationConfirmMessage, lengthMismatchMsg, profileLoadFailedMsg, clearAllConfirmMessage) {
     _deleteConfirmMsg = deleteConfirmMessage ?? _deleteConfirmMsg
     _deleteAnnotationConfirmMsg = deleteAnnotationConfirmMessage ?? _deleteAnnotationConfirmMsg
     _lengthMismatchMsg = lengthMismatchMsg ?? _lengthMismatchMsg
     _profileLoadFailedMsg = profileLoadFailedMsg ?? _profileLoadFailedMsg
+    _clearAllConfirmMsg = clearAllConfirmMessage ?? _clearAllConfirmMsg
 
     // Ensure layout sub-objects always exist before the store is registered.
     // PHP serialises [] as a JSON array; named properties added by mergeDefaults
@@ -223,6 +226,7 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
         Array.isArray(rawLayout) ? {} : rawLayout,
         LAYOUT_DEFAULTS
     )
+    _initialLayout = deepClone(layout)
 
     // Derive primary trace colors from the layout's colorway when not
     // explicitly set on the trace, so the sidebar swatch matches what
@@ -660,6 +664,19 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
             },
 
             /**
+             * Clear all traces and reset layout to the consumer's initial
+             * payload. Emits plotly-editor-dirty via markDirty().
+             */
+            clearAll() {
+                if (!window.confirm(_clearAllConfirmMsg)) return
+
+                this.traces.splice(0, this.traces.length)
+                this.activeTraceIndex = 0
+                this.layout = deepClone(_initialLayout)
+                this.markDirty()
+            },
+
+            /**
              * Swap trace at `from` with trace at `to`.
              *
              * @param {number} from
@@ -959,6 +976,9 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
             // ── Sync state ──
 
             markDirty() {
+                if (!this.dirty) {
+                    window.dispatchEvent(new CustomEvent('plotly-editor-dirty'))
+                }
                 this.dirty = true
                 this._maybeAutoSync()
             },
@@ -1004,6 +1024,7 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
                 _wire.syncFromAlpine(JSON.stringify(wirePayload))
                     .then(() => {
                         this.dirty = false
+                        window.dispatchEvent(new CustomEvent('plotly-editor-clean'))
                         this.savedAt = Date.now()
                         clearTimeout(_savedTimer)
                         _savedTimer = setTimeout(() => { this.savedAt = null }, 2000)
@@ -1047,10 +1068,10 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
  * @param {HTMLElement} canvasEl
  * @param {object}      wire
  */
-function bootChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, deleteAnnotationConfirmMessage, canvasEl, wire, lengthMismatchMsg, profileLoadFailedMsg) {
+function bootChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, deleteAnnotationConfirmMessage, canvasEl, wire, lengthMismatchMsg, profileLoadFailedMsg, clearAllConfirmMessage) {
     // Register the store (side effect) — do NOT use its return value,
     // Vite minification makes it unreliable (see initChartBuilder comment).
-    initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, deleteAnnotationConfirmMessage, lengthMismatchMsg, profileLoadFailedMsg)
+    initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, deleteAnnotationConfirmMessage, lengthMismatchMsg, profileLoadFailedMsg, clearAllConfirmMessage)
 
     // Retrieve the store directly — always returns the registered object.
     const store = Alpine.store('chartBuilder')

@@ -38,6 +38,7 @@ return [
     'confirmations' => [
         'delete_trace' => 'Supprimer cette trace ? Cette action est irréversible.',
         'delete_annotation' => 'Supprimer cette annotation ? Cette action est irréversible.',
+        'clear_all' => 'Supprimer toutes les traces et réinitialiser la disposition ?',
     ],
 
     'ui' => [
@@ -96,6 +97,7 @@ return [
         'hover_label' => 'Étiquette de survol',
         'defaults' => 'Valeurs par défaut',
         'global_font' => 'Police globale',
+        'clear_all' => 'Tout effacer',
 
     ],
 

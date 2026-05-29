@@ -32,8 +32,9 @@
             var deleteAnnMsg = @js(__('plotly-chart-editor::plotly-chart-editor.confirmations.delete_annotation'));
             var lengthMismatchMsg = @js(__('plotly-chart-editor::plotly-chart-editor.warnings.length_mismatch'));
             var profileLoadFailedMsg = @js(__('plotly-chart-editor::plotly-chart-editor.errors.profile_load_failed'));
+            var clearAllMsg = @js(__('plotly-chart-editor::plotly-chart-editor.confirmations.clear_all'));
             var canvas     = $el.querySelector('[data-plotly-canvas]');
-            window.bootChartBuilder(payload, missingMsg, deleteMsg, deleteAnnMsg, canvas, $wire, lengthMismatchMsg, profileLoadFailedMsg);
+            window.bootChartBuilder(payload, missingMsg, deleteMsg, deleteAnnMsg, canvas, $wire, lengthMismatchMsg, profileLoadFailedMsg, clearAllMsg);
         })();
     "
 >
@@ -1313,6 +1314,13 @@
             x-show="{{ $store }}.savedAt !== null"
             x-text="@js(__('plotly-chart-editor::plotly-chart-editor.sync.saved'))"
         ></span>
+
+        {{-- Clear All button --}}
+        <button
+            type="button"
+            class="chart-builder__btn chart-builder__btn--danger"
+            @click="{{ $store }}.clearAll()"
+        >{{ __('plotly-chart-editor::plotly-chart-editor.ui.clear_all') }}</button>
 
         {{-- Export dropdown (shown when showExport is true) --}}
         <div

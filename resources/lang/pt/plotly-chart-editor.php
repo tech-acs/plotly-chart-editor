@@ -38,6 +38,7 @@ return [
     'confirmations' => [
         'delete_trace' => 'Excluir este traço? Esta ação não pode ser desfeita.',
         'delete_annotation' => 'Excluir esta anotação? Esta ação não pode ser desfeita.',
+        'clear_all' => 'Remover todos os traços e redefinir a disposição?',
     ],
 
     'ui' => [
@@ -96,6 +97,7 @@ return [
         'hover_label' => 'Rótulo de pairar',
         'defaults' => 'Padrões',
         'global_font' => 'Fonte global',
+        'clear_all' => 'Limpar tudo',
 
     ],
 

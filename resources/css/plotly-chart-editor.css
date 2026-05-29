@@ -412,6 +412,11 @@
     border-color: var(--plotly-editor-border);
 }
 
+.chart-builder__btn--danger {
+    color: var(--plotly-editor-danger);
+    border-color: color-mix(in srgb, var(--plotly-editor-danger) 30%, transparent);
+}
+
 .chart-builder__btn--danger:hover:not(:disabled) {
     background: color-mix(in srgb, var(--plotly-editor-danger) 10%, transparent);
     border-color: var(--plotly-editor-danger);

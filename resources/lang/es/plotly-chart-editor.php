@@ -38,6 +38,7 @@ return [
     'confirmations' => [
         'delete_trace' => '¿Eliminar este trazo? Esta acción no se puede deshacer.',
         'delete_annotation' => '¿Eliminar esta anotación? Esta acción no se puede deshacer.',
+        'clear_all' => '¿Eliminar todos los trazos y restablecer la disposición?',
     ],
 
     'ui' => [
@@ -96,6 +97,7 @@ return [
         'hover_label' => 'Etiqueta flotante',
         'defaults' => 'Valores predeterminados',
         'global_font' => 'Fuente global',
+        'clear_all' => 'Limpiar todo',
 
     ],
 
