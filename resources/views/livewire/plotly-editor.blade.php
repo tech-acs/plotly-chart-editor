@@ -1320,7 +1320,7 @@
             type="button"
             class="chart-builder__btn chart-builder__btn--danger"
             @click="{{ $store }}.clearAll()"
-        >{{ __('plotly-chart-editor::plotly-chart-editor.ui.clear_all') }}</button>
+        ><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75V4H2.75a.75.75 0 000 1.5h.97l.721 11.653A1.75 1.75 0 006.183 18.5h7.634a1.75 1.75 0 001.741-1.347L16.28 5.5h.97a.75.75 0 000-1.5H14V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25V4h5zM5.265 5.5l.66 10.652a.25.25 0 00.249.348h7.634a.25.25 0 00.249-.348l.66-10.652H5.265z" clip-rule="evenodd"/></svg>{{ __('plotly-chart-editor::plotly-chart-editor.ui.clear_all') }}</button>
 
         {{-- Export dropdown (shown when showExport is true) --}}
         <div
@@ -1334,7 +1334,7 @@
                 class="chart-builder__btn"
                 @click="open = !open"
                 :aria-expanded="open"
-            >{{ __('plotly-chart-editor::plotly-chart-editor.export.button') }} ▾</button>
+            ><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10.75 2.75a.75.75 0 00-1.5 0v8.614L6.295 8.235a.75.75 0 10-1.09 1.03l4.25 4.5a.75.75 0 001.09 0l4.25-4.5a.75.75 0 00-1.09-1.03l-2.955 3.129V2.75z"/><path d="M3.5 12.75a.75.75 0 00-1.5 0v2.5A2.75 2.75 0 004.75 18h10.5A2.75 2.75 0 0018 15.25v-2.5a.75.75 0 00-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z"/></svg>{{ __('plotly-chart-editor::plotly-chart-editor.export.button') }} ▾</button>
 
             <div class="chart-builder__export-menu" x-show="open" x-cloak>
 
@@ -1378,7 +1378,7 @@
             class="chart-builder__btn"
             x-show="{{ $store }}.showDataViewer"
             @click="$dispatch('open-data-viewer')"
-        >{{ __('plotly-chart-editor::plotly-chart-editor.export.view_data') }}</button>
+        ><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M4.5 2A2.5 2.5 0 002 4.5v11A2.5 2.5 0 004.5 18h11a2.5 2.5 0 002.5-2.5v-11A2.5 2.5 0 0015.5 2h-11zM4 4.5a.5.5 0 01.5-.5h11a.5.5 0 01.5.5V6H4V4.5zm0 2.5h4v4H4V7zm0 6h4v4H4v-4zm6-6h4v4h-4V7zm0 6h4v4h-4v-4z" clip-rule="evenodd"/></svg>{{ __('plotly-chart-editor::plotly-chart-editor.export.view_data') }}</button>
 
         {{-- Save button: visible in manual + hybrid, hidden in auto --}}
         <button
@@ -1387,10 +1387,14 @@
             x-show="{{ $store }}.syncMode !== 'auto'"
             x-bind:disabled="{{ $store }}.syncing || !{{ $store }}.dirty"
             @click="{{ $store }}.syncToBackend()"
-            x-text="{{ $store }}.syncing
-                ? @js(__('plotly-chart-editor::plotly-chart-editor.sync.saving'))
-                : @js(__('plotly-chart-editor::plotly-chart-editor.sync.save_button'))"
-        ></button>
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/></svg>
+            <span
+                x-text="{{ $store }}.syncing
+                    ? @js(__('plotly-chart-editor::plotly-chart-editor.sync.saving'))
+                    : @js(__('plotly-chart-editor::plotly-chart-editor.sync.save_button'))"
+            ></span>
+        </button>
 
     {{-- ═══ DATA VIEWER MODAL ═══ --}}
     <div
