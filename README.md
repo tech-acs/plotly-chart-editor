@@ -7,6 +7,10 @@ A reactive chart builder for Laravel. This Livewire component gives your users a
 - **Stack:** PHP 8.4 · Laravel 12 \|\| 13 · Livewire ^3.0 \|\| ^4.0 · Alpine 3 · Plotly.js 3.x (peer dep)
 
 ---
+![Full preview](./Main.png)
+
+![Sidepanels](./Sidepanels.png)
+---
 
 - [Requirements](#requirements)
 - [Installation](#installation)

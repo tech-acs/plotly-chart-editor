@@ -60,7 +60,7 @@
     @endif
 </head>
 <body>
-    <h1>Plotly Chart Editor — Workbench Demo</h1>
+    <h1>Plotly Chart Editor — Demo</h1>
 
     <livewire:plotly-editor
         :data-sources="$dataSources"
