@@ -292,6 +292,7 @@ return [
         'axis_side_bottom' => 'Bottom',
         'axis_side_left' => 'Left',
         'axis_side_right' => 'Right',
+        'axis_title_standoff' => 'Standoff',
         'hoverinfo' => 'Info',
         'hovertemplate' => 'Template',
         'hover_bgcolor' => 'Label BG',

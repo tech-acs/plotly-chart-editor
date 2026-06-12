@@ -19,6 +19,18 @@
     <x-plotly-chart-editor::primitives.font
         :path="$axisPath . '.title.font'"
     />
+    <div class="chart-builder__field">
+        <label class="chart-builder__field-label">
+            {{ __('plotly-chart-editor::plotly-chart-editor.fields.axis_title_standoff') }}
+        </label>
+        <input
+            type="number"
+            class="chart-builder__control chart-builder__control--number"
+            min="0"
+            :value="{!! $axisPath !!}.title.standoff ?? ''"
+            @change="{!! $axisPath !!}.title.standoff = parseFloat($event.target.value)"
+        >
+    </div>
 </div>
 
 {{-- Range --}}

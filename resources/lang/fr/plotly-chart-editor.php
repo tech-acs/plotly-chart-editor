@@ -278,6 +278,7 @@ return [
         'axis_side_bottom' => 'Bas',
         'axis_side_left' => 'Gauche',
         'axis_side_right' => 'Droite',
+        'axis_title_standoff' => 'Standoff',
         'hoverinfo' => 'Info',
         'hovertemplate' => 'Modèle',
         'hover_bgcolor' => 'Fond de l\'étiquette',

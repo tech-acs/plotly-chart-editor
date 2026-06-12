@@ -278,6 +278,7 @@ return [
         'axis_side_bottom' => 'Fundo',
         'axis_side_left' => 'Esquerda',
         'axis_side_right' => 'Direita',
+        'axis_title_standoff' => 'Standoff',
         'hoverinfo' => 'Info',
         'hovertemplate' => 'Modelo',
         'hover_bgcolor' => 'Fundo do rótulo',

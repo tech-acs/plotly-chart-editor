@@ -278,6 +278,7 @@ return [
         'axis_side_bottom' => 'Inferior',
         'axis_side_left' => 'Izquierda',
         'axis_side_right' => 'Derecha',
+        'axis_title_standoff' => 'Standoff',
         'hoverinfo' => 'Información',
         'hovertemplate' => 'Plantilla',
         'hover_bgcolor' => 'Fondo de etiqueta',
