@@ -356,7 +356,7 @@ function C(c, v, C, w, T, E, D) {
 			let t = [];
 			e(this.traces).forEach((n, r) => {
 				let i = n.meta?.columnNames ?? {}, a = {};
-				for (let [t, n] of Object.entries(i)) if (Array.isArray(n)) {
+				for (let [t, n] of Object.entries(i)) if (Array.isArray(n) && n.length === 1 && (n = n[0]), Array.isArray(n)) {
 					let r = n.filter((e) => e && this.dataSources[e]).map((t) => e(this.dataSources[t]));
 					r.length > 0 && (a[t] = r.map((e) => e.length)[0]);
 				} else n && this.dataSources[n] && (a[t] = e(this.dataSources[n]).length);
@@ -378,7 +378,7 @@ function C(c, v, C, w, T, E, D) {
 			let i = t(n), a = i.meta?.columnNames ?? {};
 			for (let [t, n] of Object.entries(a)) {
 				if (!n) continue;
-				if (Array.isArray(n)) {
+				if (Array.isArray(n) && n.length === 1 && (n = n[0]), Array.isArray(n)) {
 					let r = n.filter((e) => e && this.dataSources[e]).map((t) => e(this.dataSources[t])), a = t.split("."), o = i;
 					for (let e = 0; e < a.length - 1; e++) (o[a[e]] == null || typeof o[a[e]] != "object") && (o[a[e]] = {}), o = o[a[e]];
 					o[a[a.length - 1]] = r;

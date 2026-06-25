@@ -553,7 +553,11 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
 
                     // Collect resolved column lengths for this trace
                     const lengths = {}
-                    for (const [field, colName] of Object.entries(columnNames)) {
+                    for (let [field, colName] of Object.entries(columnNames)) {
+                        // Unwrap single-element arrays to plain strings
+                        if (Array.isArray(colName) && colName.length === 1) {
+                            colName = colName[0]
+                        }
                         if (Array.isArray(colName)) {
                             const resolved = colName
                                 .filter(n => n && this.dataSources[n])
@@ -608,8 +612,13 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
             compileTrace(storeTrace) {
                 const trace = deepClone(storeTrace)
                 const columnNames = trace.meta?.columnNames ?? {}
-                for (const [axis, columnName] of Object.entries(columnNames)) {
+                for (let [axis, columnName] of Object.entries(columnNames)) {
                     if (!columnName) continue
+
+                    // Unwrap single-element arrays to plain strings
+                    if (Array.isArray(columnName) && columnName.length === 1) {
+                        columnName = columnName[0]
+                    }
 
                     if (Array.isArray(columnName)) {
                         const resolved = columnName

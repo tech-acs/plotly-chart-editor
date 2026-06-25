@@ -198,26 +198,27 @@
                                             {{-- column --}}
                                             <template x-if="field.type === 'column'">
                                                 <div>
-                                                    {{-- Single column mode (string) --}}
-                                                    <template x-if="typeof ({{ $atrace }}.meta?.columnNames?.[field.key] ?? '') === 'string'">
+                                                    {{-- Single column mode (string or non-multiColumn array) --}}
+                                                    <template x-if="typeof ({{ $atrace }}.meta?.columnNames?.[field.key] ?? '') === 'string' || (Array.isArray({{ $atrace }}.meta?.columnNames?.[field.key]) && !field.multiColumn)">
                                                         <div class="chart-builder__column-slot">
                                                             <select
                                                                 class="chart-builder__control chart-builder__control--select"
-                                                                :value="{{ $atrace }}.meta?.columnNames?.[field.key] ?? ''"
+                                                                :value="typeof ({{ $atrace }}.meta?.columnNames?.[field.key] ?? '') === 'string' ? ({{ $atrace }}.meta?.columnNames?.[field.key] ?? '') : ({{ $atrace }}.meta?.columnNames?.[field.key]?.[0] ?? '')"
                                                                 @change="{{ $store }}.setColumnName({{ $store }}.activeTraceIndex, field.key, $event.target.value)"
                                                             >
-                                                                <option value="" :selected="!{{ $atrace }}.meta?.columnNames?.[field.key]">{{ __('plotly-chart-editor::plotly-chart-editor.fields.select_column') }}</option>
+                                                                <option value="" :selected="!(typeof ({{ $atrace }}.meta?.columnNames?.[field.key] ?? '') === 'string' ? ({{ $atrace }}.meta?.columnNames?.[field.key] ?? '') : ({{ $atrace }}.meta?.columnNames?.[field.key]?.[0] ?? ''))">{{ __('plotly-chart-editor::plotly-chart-editor.fields.select_column') }}</option>
                                                                 <template x-for="col in Object.keys({{ $store }}.dataSources)" :key="col">
                                                                     <option
                                                                         :value="col"
                                                                         x-text="col"
-                                                                        :selected="{{ $atrace }}.meta?.columnNames?.[field.key] === col"
+                                                                        :selected="(typeof ({{ $atrace }}.meta?.columnNames?.[field.key] ?? '') === 'string' ? ({{ $atrace }}.meta?.columnNames?.[field.key] ?? '') : ({{ $atrace }}.meta?.columnNames?.[field.key]?.[0] ?? '')) === col"
                                                                     ></option>
                                                                 </template>
                                                             </select>
                                                             <button
                                                                 type="button"
                                                                 class="chart-builder__btn-icon"
+                                                                x-show="field.multiColumn"
                                                                 @click="{{ $store }}.addColumnSlot({{ $store }}.activeTraceIndex, field.key)"
                                                                 title="Add another column"
                                                             >+</button>
@@ -225,7 +226,7 @@
                                                     </template>
 
                                                     {{-- Multi-column mode (array) --}}
-                                                    <template x-if="Array.isArray({{ $atrace }}.meta?.columnNames?.[field.key])">
+                                                    <template x-if="field.multiColumn && Array.isArray({{ $atrace }}.meta?.columnNames?.[field.key])">
                                                         <div class="chart-builder__multi-column">
                                                             <template x-for="(col, slotIdx) in ({{ $atrace }}.meta?.columnNames?.[field.key] ?? [])" :key="slotIdx">
                                                                 <div class="chart-builder__column-slot">
@@ -245,7 +246,8 @@
                                                                     </select>
                                                                     <button
                                                                         type="button"
-                                                                        class="chart-builder__btn-icon"
+                                                                        class="chart-builder__btn-icon chart-builder__btn--danger"
+                                                                        x-show="({{ $atrace }}.meta?.columnNames?.[field.key] ?? []).length > 1"
                                                                         @click="{{ $store }}.removeColumnSlot({{ $store }}.activeTraceIndex, field.key, slotIdx)"
                                                                         title="Remove this column"
                                                                     >×</button>

@@ -47,11 +47,13 @@ return [
                             'key' => 'x',
                             'label' => 'plotly-chart-editor::plotly-chart-editor.fields.x',
                             'type' => 'column',
+                            'multiColumn' => true,
                         ],
                         [
                             'key' => 'y',
                             'label' => 'plotly-chart-editor::plotly-chart-editor.fields.y',
                             'type' => 'column',
+                            'multiColumn' => true,
                         ],
                         [
                             'key' => 'orientation',
@@ -272,11 +274,13 @@ return [
                             'key' => 'x',
                             'label' => 'plotly-chart-editor::plotly-chart-editor.fields.x',
                             'type' => 'column',
+                            'multiColumn' => true,
                         ],
                         [
                             'key' => 'y',
                             'label' => 'plotly-chart-editor::plotly-chart-editor.fields.y',
                             'type' => 'column',
+                            'multiColumn' => true,
                         ],
                         [
                             'key' => 'mode',
@@ -710,11 +714,13 @@ return [
                             'key' => 'x',
                             'label' => 'plotly-chart-editor::plotly-chart-editor.fields.x',
                             'type' => 'column',
+                            'multiColumn' => true,
                         ],
                         [
                             'key' => 'y',
                             'label' => 'plotly-chart-editor::plotly-chart-editor.fields.y',
                             'type' => 'column',
+                            'multiColumn' => true,
                         ],
                     ],
                 ],
@@ -903,11 +909,13 @@ return [
                             'key' => 'y',
                             'label' => 'plotly-chart-editor::plotly-chart-editor.fields.y',
                             'type' => 'column',
+                            'multiColumn' => true,
                         ],
                         [
                             'key' => 'x',
                             'label' => 'plotly-chart-editor::plotly-chart-editor.fields.x',
                             'type' => 'column',
+                            'multiColumn' => true,
                         ],
                         [
                             'key' => 'orientation',
