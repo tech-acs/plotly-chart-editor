@@ -80,8 +80,7 @@
             'margin' => ['t' => 60, 'b' => 80, 'l' => 70, 'r' => 30],
         ]"
         sync-mode="hybrid"
-        :show-export="false"
-        show-export="true"
+        :show-export="true"
     />
 
     @livewireScripts

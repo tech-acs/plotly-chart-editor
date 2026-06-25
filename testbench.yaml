@@ -1,0 +1,9 @@
+providers:
+  - Workbench\App\Providers\WorkbenchServiceProvider
+
+workbench:
+  welcome: false
+  discovers:
+    config: true
+    web: true
+    views: true

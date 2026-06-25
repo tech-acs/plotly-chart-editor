@@ -297,9 +297,19 @@ function C(c, v, C, w, T, E, D) {
 			for (let e = 0; e < r.length - 1; e++) (i[r[e]] == null || typeof i[r[e]] != "object") && (i[r[e]] = {}), i = i[r[e]];
 			i[r[r.length - 1]] = n;
 		},
-		setColumnName(e, t, n) {
-			let r = this.traces[e];
-			r.meta ||= { columnNames: {} }, r.meta.columnNames || (r.meta.columnNames = {}), r.meta.columnNames[t] = n;
+		setColumnName(e, t, n, r = null) {
+			let i = this.traces[e];
+			i.meta ||= { columnNames: {} }, i.meta.columnNames || (i.meta.columnNames = {}), r === null ? i.meta.columnNames[t] = n : (Array.isArray(i.meta.columnNames[t]) || (i.meta.columnNames[t] = []), i.meta.columnNames[t][r] = n);
+		},
+		addColumnSlot(e, t) {
+			let n = this.traces[e];
+			n.meta ||= { columnNames: {} }, n.meta.columnNames || (n.meta.columnNames = {});
+			let r = n.meta.columnNames[t];
+			Array.isArray(r) || (n.meta.columnNames[t] = [r ?? ""]), n.meta.columnNames[t].push("");
+		},
+		removeColumnSlot(e, t, n) {
+			let r = this.traces[e], i = r?.meta?.columnNames?.[t];
+			Array.isArray(i) && (i.splice(n, 1), i.length === 1 && (r.meta.columnNames[t] = i[0]));
 		},
 		hasMarkerSupport(e) {
 			return [
@@ -346,7 +356,10 @@ function C(c, v, C, w, T, E, D) {
 			let t = [];
 			e(this.traces).forEach((n, r) => {
 				let i = n.meta?.columnNames ?? {}, a = {};
-				for (let [t, n] of Object.entries(i)) n && this.dataSources[n] && (a[t] = e(this.dataSources[n]).length);
+				for (let [t, n] of Object.entries(i)) if (Array.isArray(n)) {
+					let r = n.filter((e) => e && this.dataSources[e]).map((t) => e(this.dataSources[t]));
+					r.length > 0 && (a[t] = r.map((e) => e.length)[0]);
+				} else n && this.dataSources[n] && (a[t] = e(this.dataSources[n]).length);
 				let o = Object.values(a);
 				if (o.length < 2) return;
 				let s = Math.min(...o);
@@ -364,7 +377,14 @@ function C(c, v, C, w, T, E, D) {
 		compileTrace(n) {
 			let i = t(n), a = i.meta?.columnNames ?? {};
 			for (let [t, n] of Object.entries(a)) {
-				if (!n || this.dataSources[n] === void 0 || t === "marker.size" && i.marker?.size_from_column === !1) continue;
+				if (!n) continue;
+				if (Array.isArray(n)) {
+					let r = n.filter((e) => e && this.dataSources[e]).map((t) => e(this.dataSources[t])), a = t.split("."), o = i;
+					for (let e = 0; e < a.length - 1; e++) (o[a[e]] == null || typeof o[a[e]] != "object") && (o[a[e]] = {}), o = o[a[e]];
+					o[a[a.length - 1]] = r;
+					continue;
+				}
+				if (this.dataSources[n] === void 0 || t === "marker.size" && i.marker?.size_from_column === !1) continue;
 				let r = t.split("."), a = i;
 				for (let e = 0; e < r.length - 1; e++) (a[r[e]] == null || typeof a[r[e]] != "object") && (a[r[e]] = {}), a = a[r[e]];
 				a[r[r.length - 1]] = e(this.dataSources[n]);

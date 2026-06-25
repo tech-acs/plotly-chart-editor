@@ -198,20 +198,69 @@
                                             {{-- column --}}
                                             <template x-if="field.type === 'column'">
                                                 <div>
-                                                    <select
-                                                        class="chart-builder__control chart-builder__control--select"
-                                                        :value="{{ $atrace }}.meta?.columnNames?.[field.key]"
-                                                        @change="{{ $store }}.setColumnName({{ $store }}.activeTraceIndex, field.key, $event.target.value)"
-                                                    >
-                                                        <option value="" :selected="!{{ $atrace }}.meta?.columnNames?.[field.key]">{{ __('plotly-chart-editor::plotly-chart-editor.fields.select_column') }}</option>
-                                                        <template x-for="col in Object.keys({{ $store }}.dataSources)" :key="col">
-                                                            <option
-                                                                :value="col"
-                                                                x-text="col"
-                                                                :selected="{{ $atrace }}.meta?.columnNames?.[field.key] === col"
-                                                            ></option>
-                                                        </template>
-                                                    </select>
+                                                    {{-- Single column mode (string) --}}
+                                                    <template x-if="typeof ({{ $atrace }}.meta?.columnNames?.[field.key] ?? '') === 'string'">
+                                                        <div class="chart-builder__column-slot">
+                                                            <select
+                                                                class="chart-builder__control chart-builder__control--select"
+                                                                :value="{{ $atrace }}.meta?.columnNames?.[field.key] ?? ''"
+                                                                @change="{{ $store }}.setColumnName({{ $store }}.activeTraceIndex, field.key, $event.target.value)"
+                                                            >
+                                                                <option value="" :selected="!{{ $atrace }}.meta?.columnNames?.[field.key]">{{ __('plotly-chart-editor::plotly-chart-editor.fields.select_column') }}</option>
+                                                                <template x-for="col in Object.keys({{ $store }}.dataSources)" :key="col">
+                                                                    <option
+                                                                        :value="col"
+                                                                        x-text="col"
+                                                                        :selected="{{ $atrace }}.meta?.columnNames?.[field.key] === col"
+                                                                    ></option>
+                                                                </template>
+                                                            </select>
+                                                            <button
+                                                                type="button"
+                                                                class="chart-builder__btn-icon"
+                                                                @click="{{ $store }}.addColumnSlot({{ $store }}.activeTraceIndex, field.key)"
+                                                                title="Add another column"
+                                                            >+</button>
+                                                        </div>
+                                                    </template>
+
+                                                    {{-- Multi-column mode (array) --}}
+                                                    <template x-if="Array.isArray({{ $atrace }}.meta?.columnNames?.[field.key])">
+                                                        <div class="chart-builder__multi-column">
+                                                            <template x-for="(col, slotIdx) in ({{ $atrace }}.meta?.columnNames?.[field.key] ?? [])" :key="slotIdx">
+                                                                <div class="chart-builder__column-slot">
+                                                                    <select
+                                                                        class="chart-builder__control chart-builder__control--select"
+                                                                        :value="col"
+                                                                        @change="{{ $store }}.setColumnName({{ $store }}.activeTraceIndex, field.key, $event.target.value, slotIdx)"
+                                                                    >
+                                                                        <option value="" :selected="!col">{{ __('plotly-chart-editor::plotly-chart-editor.fields.select_column') }}</option>
+                                                                        <template x-for="colName in Object.keys({{ $store }}.dataSources)" :key="colName">
+                                                                            <option
+                                                                                :value="colName"
+                                                                                x-text="colName"
+                                                                                :selected="col === colName"
+                                                                            ></option>
+                                                                        </template>
+                                                                    </select>
+                                                                    <button
+                                                                        type="button"
+                                                                        class="chart-builder__btn-icon"
+                                                                        @click="{{ $store }}.removeColumnSlot({{ $store }}.activeTraceIndex, field.key, slotIdx)"
+                                                                        title="Remove this column"
+                                                                    >×</button>
+                                                                    <button
+                                                                        type="button"
+                                                                        class="chart-builder__btn-icon"
+                                                                        x-show="slotIdx === ({{ $atrace }}.meta?.columnNames?.[field.key].length - 1)"
+                                                                        @click="{{ $store }}.addColumnSlot({{ $store }}.activeTraceIndex, field.key)"
+                                                                        title="Add another column"
+                                                                    >+</button>
+                                                                </div>
+                                                            </template>
+                                                        </div>
+                                                    </template>
+
                                                     {{-- Inline column-length mismatch warning --}}
                                                     <div
                                                         class="chart-builder__warning chart-builder__warning--inline"

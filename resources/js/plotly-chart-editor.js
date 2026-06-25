@@ -385,11 +385,41 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
              * @param {string} fieldKey    e.g. 'text', 'x', 'y'
              * @param {string} columnName  the selected data-source key
              */
-            setColumnName(traceIndex, fieldKey, columnName) {
+            setColumnName(traceIndex, fieldKey, columnName, slotIndex = null) {
                 const trace = this.traces[traceIndex]
                 if (!trace.meta)             trace.meta = { columnNames: {} }
                 if (!trace.meta.columnNames) trace.meta.columnNames = {}
-                trace.meta.columnNames[fieldKey] = columnName
+
+                if (slotIndex !== null) {
+                    if (!Array.isArray(trace.meta.columnNames[fieldKey])) {
+                        trace.meta.columnNames[fieldKey] = []
+                    }
+                    trace.meta.columnNames[fieldKey][slotIndex] = columnName
+                } else {
+                    trace.meta.columnNames[fieldKey] = columnName
+                }
+            },
+
+            addColumnSlot(traceIndex, fieldKey) {
+                const trace = this.traces[traceIndex]
+                if (!trace.meta)             trace.meta = { columnNames: {} }
+                if (!trace.meta.columnNames) trace.meta.columnNames = {}
+
+                const current = trace.meta.columnNames[fieldKey]
+                if (!Array.isArray(current)) {
+                    trace.meta.columnNames[fieldKey] = [current ?? '']
+                }
+                trace.meta.columnNames[fieldKey].push('')
+            },
+
+            removeColumnSlot(traceIndex, fieldKey, slotIndex) {
+                const trace = this.traces[traceIndex]
+                const arr = trace?.meta?.columnNames?.[fieldKey]
+                if (!Array.isArray(arr)) return
+                arr.splice(slotIndex, 1)
+                if (arr.length === 1) {
+                    trace.meta.columnNames[fieldKey] = arr[0]
+                }
             },
 
             /**
@@ -524,7 +554,15 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
                     // Collect resolved column lengths for this trace
                     const lengths = {}
                     for (const [field, colName] of Object.entries(columnNames)) {
-                        if (colName && this.dataSources[colName]) {
+                        if (Array.isArray(colName)) {
+                            const resolved = colName
+                                .filter(n => n && this.dataSources[n])
+                                .map(n => toRaw(this.dataSources[n]))
+                            if (resolved.length > 0) {
+                                const lens = resolved.map(a => a.length)
+                                lengths[field] = lens[0]
+                            }
+                        } else if (colName && this.dataSources[colName]) {
                             lengths[field] = toRaw(this.dataSources[colName]).length
                         }
                     }
@@ -571,7 +609,26 @@ function initChartBuilder(payload, plotlyMissingMessage, deleteConfirmMessage, d
                 const trace = deepClone(storeTrace)
                 const columnNames = trace.meta?.columnNames ?? {}
                 for (const [axis, columnName] of Object.entries(columnNames)) {
-                    if (!columnName || this.dataSources[columnName] === undefined) continue
+                    if (!columnName) continue
+
+                    if (Array.isArray(columnName)) {
+                        const resolved = columnName
+                            .filter(n => n && this.dataSources[n])
+                            .map(n => toRaw(this.dataSources[n]))
+
+                        const keys = axis.split('.')
+                        let cur = trace
+                        for (let i = 0; i < keys.length - 1; i++) {
+                            if (cur[keys[i]] == null || typeof cur[keys[i]] !== 'object') {
+                                cur[keys[i]] = {}
+                            }
+                            cur = cur[keys[i]]
+                        }
+                        cur[keys[keys.length - 1]] = resolved
+                        continue
+                    }
+
+                    if (this.dataSources[columnName] === undefined) continue
                     // Skip column resolution when the corresponding *_from_column flag is false
                     if (axis === 'marker.size' && trace.marker?.size_from_column === false) continue
                     const keys = axis.split('.')

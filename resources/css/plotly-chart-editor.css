@@ -627,3 +627,38 @@
 .chart-builder__data-table tbody tr:hover {
     background: color-mix(in srgb, var(--plotly-editor-accent) 5%, transparent);
 }
+
+/* ── Multi-column axis slot ─────────────────────────────────────────────── */
+.chart-builder__column-slot {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+}
+.chart-builder__column-slot select {
+    flex: 1;
+}
+
+.chart-builder__multi-column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.chart-builder__btn-icon {
+    width: 1.75rem;
+    height: 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--plotly-editor-border, #d1d5db);
+    border-radius: 0.25rem;
+    background: var(--plotly-editor-bg, #fff);
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    flex-shrink: 0;
+    user-select: none;
+}
+.chart-builder__btn-icon:hover {
+    background: var(--plotly-editor-bg-hover, #f3f4f6);
+}
